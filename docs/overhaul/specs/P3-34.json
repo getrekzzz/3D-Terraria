@@ -1,0 +1,42 @@
+{
+ "id": "P3-34",
+ "title": "Sleeping in a bed skips time",
+ "player_outcome": "Interacting with a bed sets your spawn and lets you lie down; while you sleep (and nothing threatens you) night passes five times faster. Moving wakes you.",
+ "design": [
+  "Verified: TileInteraction.Sleep only sets the spawn point (ObjectInteraction.cs:73-75).",
+  "PlayerEntity.Sleeping and SleepBed (object id).",
+  "ObjectInteraction Sleep: first use sets spawn (as now) and starts sleeping (new InteractOutcome.Slept); a second use wakes.",
+  "GameWorld.Tick: if every alive player sleeps, no boss is alive, no kill-goal event is active and no hostile NPC is within 15 m, advance the clock 4 extra ticks per tick (SleepTimeScale = 5).",
+  "Game: PlayerController locks the body onto the bed top while sleeping and wakes on movement, jump or use input, or when hurt.",
+  "PlayerAvatar plays the 'sleep' locomotion state (from P3-03). A soft snore loop (P3-27) and occasional 'Z' EffectKit puffs."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Session/PlayerEntity.cs \u2014 Sleeping, SleepBed",
+  "src/Strata.Core/Gameplay/Interaction/ObjectInteraction.cs \u2014 Slept outcome, toggle",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 accelerated clock while sleeping",
+  "src/Strata.Core/Gameplay/Combat/Vitals.cs (or the PlayerHurt handler) \u2014 hurt wakes",
+  "game/Player/PlayerController.cs \u2014 bed lock / wake on input",
+  "game/Player/PlayerAvatar.Motion.cs \u2014 sleep state",
+  "game/Player/InteractionController.cs \u2014 Slept sound/feedback"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/Gameplay/SleepTests.cs \u2014 sleep tests"
+ ],
+ "data_changes": [],
+ "tests": [
+  "SleepTests: after 600 ticks asleep, the clock advanced \u2265 2900 ticks; with a boss alive or a zombie within 10 m it advanced exactly 600",
+  "Smoke town.cmds: 'time 22' / 'place bed 3 0 0' / 'interact 3 0 0' / 'wait 10' / 'assert time.hour > 22.6'"
+ ],
+ "verification": [
+  "dotnet test; smoke PASS",
+  "Screenshot of the player lying in bed"
+ ],
+ "depends_on": [
+  "P3-03"
+ ],
+ "risks": [
+  "Bed object id and footprint for the lying pose; find the bed's top via object bounds.",
+  "MusicDirector/EnvironmentController must tolerate faster clock steps (they already do with 'time speed')."
+ ],
+ "effort": "S"
+}

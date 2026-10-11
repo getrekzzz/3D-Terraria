@@ -1,0 +1,45 @@
+{
+ "id": "P4-16",
+ "title": "Dungeon entrance keep on the far snow-side edge, grounded and facing inland, with the entrance shaft",
+ "player_outcome": "Near the snow-side coast stands a tall brick keep with corner turrets and crenellations, the Old Man waiting at its arched door facing inland. Inside, a pillared foyer opens onto a platformed shaft down into the dungeon.",
+ "design": [
+  "New DungeonBuilder.Keep.cs.",
+  "Keep: interior 20\u00d716\u00d720. Walls 3 cells (a 2 brick shell plus an inner panel). Crenellated parapet. Four corner turrets as Cylinder ops (r 3, 24 tall) with stepped caps. A front facade 2 cells thicker.",
+  "Door: an arched doorway 6 wide \u00d7 9 tall (stepped arch carve at +9..+10) facing Inward, and two slit windows.",
+  "Foundation: fill brick from min(surface under the footprint) \u2212 6 up to the keep floor, so the keep never floats.",
+  "Approach: NoZone carve 10 wide \u00d7 12 tall \u00d7 12 deep in front of the door, and NoZone brick steps up to the door if the door floor is above the terrain.",
+  "Foyer: 4 pillars and a central 10\u00d710 floor opening into the entrance shaft down to the planner's trunk start, with platforms every 4 cells.",
+  "Landmark dungeon_gate: the ground cell 3 cells outside the door. The Old Man stays outside the zone thanks to NoZone.",
+  "DungeonTests.CryptWallsResistPicksUntilTheWardenFalls picks a wall cell from Layout.KeepInterior instead of gate offsets.",
+  "Re-pin golden hashes (no further GenVersion bump within P4)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/WorldGen/Structures/DungeonBuilder.cs \u2014 call keep emission first",
+  "src/Strata.Core/WorldGen/Passes/DungeonPass.cs \u2014 dungeon_gate from the keep door",
+  "tests/Strata.Core.Tests/Gameplay/DungeonTests.cs \u2014 wall cell from the layout",
+  "tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs \u2014 re-pin"
+ ],
+ "files_add": [
+  "src/Strata.Core/WorldGen/Structures/DungeonBuilder.Keep.cs \u2014 keep, turrets, foundation, approach, foyer, shaft"
+ ],
+ "data_changes": [],
+ "tests": [
+  "DungeonGenerationTests.TheKeepStandsOnTheGround: no air under the foundation footprint.",
+  "DungeonGenerationTests.TheDoorFacesTheWorldCentre.",
+  "DungeonTests.ZonesFollow\u2026 still: ZonesAt(dungeon_gate) has no dungeon.",
+  "DungeonTests.TheKeeperWaitsAtTheGate\u2026 passes.",
+  "Smoke dungeon.cmds keeps 'tp landmark dungeon_gate', 'wait_until town.old_man == 1 60', 'assert zone.dungeon == 0'."
+ ],
+ "verification": [
+  "dotnet test; headless dungeon.cmds",
+  "lavapipe screenshot of the facade at noon (screenshot tour stop, see P4-23)"
+ ],
+ "depends_on": [
+  "P4-15"
+ ],
+ "risks": [
+  "On mountainous snow terrain the foundation can be very deep. Cap it at 24 cells and otherwise flatten with a stepped plinth.",
+  "A turret may intersect a tree placed by the ecology pass. Tree cells are overwritten by Fill, which is acceptable."
+ ],
+ "effort": "S"
+}

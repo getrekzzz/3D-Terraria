@@ -1,11 +1,22 @@
-"""The ambience: one seamless stereo loop per biome soundscape (assets/audio/ambient/<id>.ogg), played under the music on
-the Ambient bus. Biomes name theirs in data/biomes.json ("ambience"); a "<id>_night" loop replaces it after dark. Each
-loop is a bed (wind, air, surf, rumble) with calls scattered over it at random times and places, then a room."""
-import numpy as np
+"""Seamless stereo ambience loops (assets/audio/ambience/<id>.ogg): the biome, cave and underworld beds the ambience
+director picks by place and time of day (data/config/ambience.json), and the weather beds (light and heavy rain, wind,
+blizzard, sandstorm; game/Ambience/WeatherAudio.cs). Each loop is a bed (wind, air, surf, rumble, rain) with calls
+scattered over it at random times and places, folded into a seamless loop, set in a room and levelled.
 
-import ambience_voices as v
+The biome beds are #13's soundscapes under the overhaul's loop ids, seeded by their #13 names, so each is the very loop
+#13 made (forest_day is #13's "birds"), lifted by the volume the director plays it at so it is heard where #13 put it.
+The weather beds are the overhaul's recipes, now one take per ear at the pipeline's rate (band-limited where the
+overhaul's renders ended) and levelled to the overhaul's loudness; the deep cavern and the mushroom hum are the
+overhaul's beds rebuilt from #13's cave air and voices. #13 also gave the underground jungle its insects and the ice
+caves its snow wind: those are takes of their own of the same soundscapes (so they never phase against the surface
+beds while one fades into the other), a little quieter, as they layer over the cave air. Built by
+``build_audio.py --ambience``."""
+from typing import Callable, NamedTuple, Optional
+
+import numpy as np
 from scipy import signal
 
+import ambience_voices as v
 from synth import SR, bandpass, circular, hall, highpass, loudness, lowpass, osc, pan, samples, seconds, wander
 
 LOOP = 30.0  # seconds
@@ -29,6 +40,8 @@ def _calls(buf, rng, makers, every, distance=(0.2, 0.9), spread=0.9, gain=1.0):
 def _bed(fn, rng, width=0.8):
     return v.seamless(v.stereo(fn, rng, samples(LOOP) + XF, width), XF)
 
+
+# ---- #13's soundscapes -------------------------------------------------------------------------------------------------
 
 def birds(rng):
     buf = _bed(lambda r, n: v.wind(r, n, 300, 700, 3, 0.08, 0.5, 0.15), rng) * 0.25
@@ -71,7 +84,8 @@ def insects_night(rng):
     return hall(buf, rt60=1.8, wet=0.25, loop=True), -26
 
 
-def wind(rng):
+def snow_wind(rng):
+    """#13's "wind": the snow's gusting rush and wandering whistle."""
     buf = _bed(lambda r, n: v.wind(r, n, 320, 950, 9, 0.14, 0.5, 2.0), rng, 0.9) * 0.3
     return hall(buf, rt60=1.2, wet=0.15, loop=True), -23
 
@@ -122,8 +136,8 @@ def lava(rng):
     return hall(buf, rt60=2.4, wet=0.3, loop=True), -22
 
 
-def cave(rng, rt60=3.2, drips=(0.6, 2.2), low=1.0):
-    buf = _bed(lambda r, k: lowpass(v.coloured(r, k, 2.0), 140) * (0.6 + 0.4 * wander(r, k, 0.1)), rng) * 0.25 * low
+def cave(rng, rt60=3.2, drips=(0.6, 2.2), low=1.0, rumble=140):
+    buf = _bed(lambda r, k: lowpass(v.coloured(r, k, 2.0), rumble) * (0.6 + 0.4 * wander(r, k, 0.1)), rng) * 0.25 * low
     buf += _bed(lambda r, k: v.resonant_sweep(v.coloured(r, k, 1.0), 180 * 1.6 ** wander(r, k, 0.05), 6), rng) * 0.05
     _calls(buf, rng, [v.drip], drips, (0.0, 0.85), gain=0.22)
     return hall(buf, rt60=rt60, damp=0.45, wet=0.45, loop=True), -28
@@ -170,12 +184,185 @@ def sparkle(rng):
     return hall(buf, rt60=2.6, wet=0.35, loop=True), -27
 
 
-BEDS = {f.__name__: f for f in (birds, birds_night, insects, insects_night, wind, desert_wind, high_wind, waves, lava, cave,
-                                crypt, eerie, bees, sparkle)}
+# ---- the overhaul's own beds -----------------------------------------------------------------------------------------
+
+def cavern(rng):
+    """The deep caverns: #13's cave air with a lower, heavier rumble, sparser drips and a bigger, darker room."""
+    buf, _ = cave(rng, 4.6, (1.2, 3.6), 1.8, rumble=95)
+    return buf, -27
 
 
-def build(name, seed):
-    """Renders one loop: stereo float32 (n, 2) at SR, levelled to its bed's target loudness."""
-    x, rms_db = BEDS[name](np.random.default_rng(seed))
+def _plink(rng):
+    """A bright drop settling in pitch: the glowing mushroom caves' sparkle."""
+    n = samples(0.35)
+    t = seconds(n)
+    tone = np.sin(2 * np.pi * np.cumsum(rng.uniform(1300, 2800) * (1 + 0.6 * np.exp(-t / 0.01))) / SR)
+    return tone * np.minimum(t / 0.001, 1) * np.exp(-t / 0.05)
+
+
+def mushroom(rng):
+    """The glowing mushroom caves: a soft A major hum swelling slowly and differently in each ear (whole cycles over
+    the loop, so it needs no seam), sparkling drips, and a cave's room."""
+    n = samples(LOOP)
+    t = seconds(n)
+    hum = np.zeros((n, 2))
+    for ch in range(2):
+        for i, f in enumerate((220.0, 277.2, 329.6, 440.0)):
+            sway = rng.integers(2, 7) / LOOP
+            hum[:, ch] += np.sin(2 * np.pi * f * t) * (0.6 + 0.4 * np.sin(2 * np.pi * sway * t + i + 2 * ch))
+    buf = hum * 0.12
+    _calls(buf, rng, [_plink], (0.5, 2.0), (0.0, 0.8), gain=0.3)
+    return hall(buf, rt60=2.8, damp=0.5, wet=0.35, loop=True), -26
+
+
+# ---- weather: one independent take per ear, so the rain falls and the wind gusts all around ---------------------------
+
+def _noise(n, rng):
+    return rng.uniform(-1, 1, n)
+
+
+def _smooth(n, rng, rate, lo=0.0, hi=1.0):
+    """A slow random curve (control signal) between lo and hi, about `rate` changes per second."""
+    k = max(4, int(n / SR * rate) + 2)
+    pts = rng.uniform(lo, hi, k)
+    return np.interp(np.linspace(0, k - 1, n), np.arange(k), pts)
+
+
+def _swept(x, cutoff, kind="low"):
+    """Filters x with a cutoff that moves every ~80 ms (cutoff: array the length of x, Hz), its state carried along."""
+    out = np.zeros_like(x)
+    blocks = max(200, int(len(x) / SR * 12))
+    edges = np.linspace(0, len(x), blocks + 1).astype(int)
+    zi = None
+    for i in range(blocks):
+        a0, a1 = edges[i], edges[i + 1]
+        c = float(np.clip(np.mean(cutoff[a0:a1]), 40, SR * 0.45))
+        b, a = signal.butter(2, c / (SR / 2), kind)
+        if zi is None:
+            zi = signal.lfilter_zi(b, a) * 0.0
+        out[a0:a1], zi = signal.lfilter(b, a, x[a0:a1], zi=zi)
+    return out
+
+
+def _drops(n, rng, rate, lo, hi, tau=0.004):
+    """Raindrop ticks: sparse impulses rung through a band, each a tiny decaying click."""
+    imp = (rng.uniform(0, 1, n) < rate / SR) * rng.uniform(0.2, 1.0, n) * rng.choice([-1, 1], n)
+    kernel = np.exp(-np.arange(int(SR * tau * 6)) / (SR * tau))
+    return bandpass(signal.oaconvolve(imp, kernel)[:n], lo, hi, SR)
+
+
+def _rain_light(n, rng):
+    hiss = bandpass(_noise(n, rng), 900, 7000, SR) * 0.35
+    patter = _drops(n, rng, 900, 1500, 7500) * 2.2
+    near = _drops(n, rng, 60, 600, 3500, 0.01) * 1.6
+    return (hiss + patter + near) * _smooth(n, rng, 0.3, 0.8, 1.0)
+
+
+def _rain_heavy(n, rng):
+    roar = lowpass(_noise(n, rng), 6500, SR) * 0.6
+    body = bandpass(_noise(n, rng), 120, 600, SR) * 0.7
+    patter = _drops(n, rng, 4000, 1200, 8000) * 1.5
+    return (roar + body + patter) * _smooth(n, rng, 0.4, 0.75, 1.0)
+
+
+def _gusts(n, rng):
+    gust = _smooth(n, rng, 0.35, 0.15, 1.0) ** 1.6
+    cutoff = 220 + 900 * gust
+    bed = _swept(_noise(n, rng), cutoff) * (0.35 + gust)
+    howl = bandpass(_noise(n, rng), 300, 900, SR) * (gust ** 3) * 0.6
+    return bed + howl
+
+
+def _blizzard(n, rng):
+    base = _gusts(n, rng) * 1.2
+    hiss = highpass(_noise(n, rng), 3000, SR) * _smooth(n, rng, 0.8, 0.25, 0.6)
+    return base + hiss * 0.5
+
+
+def _sandstorm(n, rng):
+    base = _gusts(n, rng)
+    grit = _drops(n, rng, 6000, 2500, 9000, 0.0015) * _smooth(n, rng, 0.7, 0.4, 1.0) * 1.4
+    rasp = bandpass(_noise(n, rng), 1200, 5000, SR) * 0.3
+    return base + grit + rasp
+
+
+def _weather(fn, rng, width=0.9, room=None):
+    """A weather bed: one take per ear, band-limited where the overhaul's 22 kHz renders of it ended (11 kHz)."""
+    buf = _bed(lambda r, n: lowpass(fn(n, r), 11000, SR, 4), rng, width)
+    return hall(buf, rt60=room[0], wet=room[1], loop=True) if room else buf
+
+
+def rain_light(rng):
+    return _weather(_rain_light, rng), -23.5
+
+
+def rain_heavy(rng):
+    return _weather(_rain_heavy, rng), -18.5
+
+
+def wind(rng):
+    return _weather(_gusts, rng, room=(1.2, 0.12)), -21.5
+
+
+def blizzard(rng):
+    return _weather(_blizzard, rng, room=(1.2, 0.12)), -21
+
+
+def sandstorm(rng):
+    return _weather(_sandstorm, rng, room=(0.8, 0.1)), -20
+
+
+# ---- the loops ---------------------------------------------------------------------------------------------------------
+
+class Loop(NamedTuple):
+    recipe: Callable  # rng -> (stereo bed, its RMS level in dB as heard at full presence)
+    seed: str  # build_audio.py seeds the render with this name: #13's own, so its loops come out unchanged
+    played_at: float = 1.0  # the volume data/config/ambience.json gave the bed when it was levelled; the file is lifted by it
+    heard: Optional[float] = None  # where the bed is heard (dB RMS at full presence) when not where its recipe puts it
+
+
+# Loop id (data/config/ambience.json and WeatherAudio name these) -> recipe. #13 mixed its beds to be heard at full
+# volume under the music (-17 dB RMS); the director plays each at the volume beside it here, so the file is that much
+# louder and the bed lands where #13 put it (as far as its peaks allow, see render). A later change of a volume in the
+# config turns that bed up or down from there, as a volume should; these numbers are the calibration, not a copy to sync.
+LOOPS = {
+    "forest_day": Loop(birds, "birds", 0.55),
+    "forest_night": Loop(birds_night, "birds_night", 0.5),
+    "jungle_day": Loop(insects, "insects", 0.6),
+    "jungle_night": Loop(insects_night, "insects_night", 0.6),
+    "ocean": Loop(waves, "waves", 0.7),
+    "desert": Loop(desert_wind, "desert_wind", 0.45),
+    "tundra": Loop(snow_wind, "wind", 0.45),
+    "evil": Loop(eerie, "eerie", 0.5),
+    "hallow": Loop(sparkle, "sparkle", 0.45),
+    "sky": Loop(high_wind, "high_wind", 0.4),
+    "cave": Loop(cave, "cave", 0.55),
+    "cavern": Loop(cavern, "cavern", 0.6),
+    "mushroom": Loop(mushroom, "mushroom", 0.55),
+    "hive": Loop(bees, "bees", 0.6),
+    "dungeon": Loop(crypt, "crypt", 0.55),
+    # Over the cave or cavern air (-28 / -27 dB), each 2 dB under #13's level for its soundscape (insects -25, snow wind
+    # -23), so the two together land about where #13's bed alone was (#13 played it instead of the cave's).
+    "jungle_underground": Loop(insects, "jungle_underground", 0.6, heard=-27),
+    "ice_cave": Loop(snow_wind, "ice_cave", 0.6, heard=-25),
+    "underworld": Loop(lava, "lava", 0.75),
+    "rain_light": Loop(rain_light, "rain_light"),
+    "rain_heavy": Loop(rain_heavy, "rain_heavy"),
+    "wind": Loop(wind, "wind_gusts"),
+    "blizzard": Loop(blizzard, "blizzard"),
+    "sandstorm": Loop(sandstorm, "sandstorm"),
+}
+
+PEAK = 10 ** (-1 / 20)  # a loop lifted by its volume never peaks above -1 dBFS (just under loudness()'s 0.9 ceiling)
+
+
+def render(loop_id, seed):
+    """One loop: stereo float32 (n, 2) at SR. Levelled to where it is heard (loudness: RMS with a soft ceiling, exactly as
+    #13 levelled its loops), then lifted by the volume the game plays it at, as far as -1 dBFS peaks allow."""
+    loop = LOOPS[loop_id]
+    x, heard_db = loop.recipe(np.random.default_rng(seed))
+    heard_db = heard_db if loop.heard is None else loop.heard
     x = circular(lambda c: highpass(c, 30), x)  # nothing below hearing, without a seam at the loop point
-    return loudness(x, rms_db, 0.9).astype(np.float32)
+    x = loudness(x, heard_db, 0.9)
+    lift = min(-20 * np.log10(loop.played_at), 20 * np.log10(PEAK / (np.max(np.abs(x)) or 1.0)))
+    return (x * 10 ** (max(lift, 0.0) / 20)).astype(np.float32)

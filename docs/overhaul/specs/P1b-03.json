@@ -1,0 +1,59 @@
+{
+ "id": "P1b-03",
+ "title": "Tame the overhang field: rare, deliberate cliff zones, true-surface caves, worm cave mouths",
+ "player_outcome": "Walking the surface is predictable. No random fins, floating blobs, pits or trenches in normal terrain. Overhangs and cliffs appear only in rare mountain, jungle or snow cliff zones. Cave entrances are proper holes into hillsides, not long gullies along the ground.",
+ "design": [
+  "Add src/Strata.Core/WorldGen/Fields/TerrainTuning.cs (algorithm constants, not content): OverhangWavelength 48, OverhangOctaves 2, OverhangYStretch 0.8, BaseAmp 0.6, RuggedAmp 1.4, CliffAmp 11, CliffMaskWavelength 520, CliffMaskLow/High 0.60/0.78, WormMouthFraction 0.3, MouthPitch -0.45..-0.30 for 3 segments, BuriedWormDepth 14..40.",
+  "WorldPlan: add Grid2D Cliffs (HeightStep). BiomeRelief.Apply fills it: cliff = SmoothStep(0.60, 0.78, cliffMask01(x,z)) \u00d7 blended affinity (region weights \u00d7 ReliefSpec.Cliffs, lerped to 0.8 by the mountain mask) \u00d7 spawnCalm \u00d7 land, then Blur(2).",
+  "TerrainField: _overhang = NoiseField.Create(seeds, \"overhang\", 48f, Fbm, 2). Add Cliff(x,z) => _plan.Cliffs.SampleSmooth. Change the static to OverhangAmplitude(float rug, float cliff) => 0.6 + 1.4*rug + 11*cliff. New Density(x,y,z,h,amp) adds _overhang.Sample(x, y*0.8f, z)*amp inside |d| < amp+1. Outside cliff zones amp is at most 2 cells, so \u2202d/\u2202y stays negative (a pure heightfield with sub-cell jitter). Inside cliff zones amp up to 11.6 gives steep walls with occasional undercuts only at maximum gradient.",
+  "ChunkGenContext: add per-padded-column arrays Cliff[] and OverhangAmp[], computed in the constructor. GlobalDensityPass uses ctx.OverhangAmp[col] for its band and Density call. WorldPlan.RaiseTerrainColumnTops uses TerrainField.OverhangAmplitude(rug, cliff) (pass the TerrainField from WorldGenerator).",
+  "Caves respect the true surface: in CaveGenerationPass.CarveNoiseCaves use sd = (h - ctx.OverhangAmp[col]) - wy - spawnGuard. Pass 1 guarantees solid below that level, so noise tunnels and cracks keep at least 5 cells of roof even where the 3D field dips below the 2D height (today sd uses the raw 2D height).",
+  "Worms in CaveGenerationPass.Plan: keep 190 (cabins need tunnels). About 30% are mouths: they start at SurfaceHeight - 1 and their first 3 segments pitch -0.45..-0.30, cutting a hole into the hillside; then the existing shallow meander. Today every worm starts at surface+2 with pitch -0.06..-0.12, leaving a ~50-cell open trench. The rest start buried at SurfaceHeight - rng.Range(14, 40). The mouth roll comes from the same rng stream; the order change is fine under the version bump.",
+  "PlanHasher: hash the Cliffs grid (rounded) for drift detection.",
+  "Re-pin golden hashes. Stay on GenVersion 10 if P1b-02 has not been pushed and played; otherwise bump to 11.",
+  "docs/architecture/worldgen.md: 'Surface shape' paragraph (heightfield plus small 3D jitter, rare cliff zones, cave mouths, conservative cave roof)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/WorldGen/Fields/TerrainField.cs \u2014 new amplitude model, cliff sampling, 2-octave overhang with y*0.8",
+  "src/Strata.Core/WorldGen/Passes/BiomeRelief.cs \u2014 fill and blur plan.Cliffs",
+  "src/Strata.Core/WorldGen/Plan/WorldPlan.cs \u2014 Cliffs grid; RaiseTerrainColumnTops uses the new amplitude",
+  "src/Strata.Core/WorldGen/WorldGenerator.cs \u2014 pass TerrainField to RaiseTerrainColumnTops",
+  "src/Strata.Core/WorldGen/Chunk/ChunkGenContext.cs \u2014 Cliff[] and OverhangAmp[] per column",
+  "src/Strata.Core/WorldGen/Passes/GlobalDensityPass.cs \u2014 use per-column amplitude",
+  "src/Strata.Core/WorldGen/Passes/CaveGenerationPass.cs \u2014 true-surface depth; worm mouths vs buried worms",
+  "src/Strata.Core/WorldGen/Plan/PlanHasher.cs \u2014 include Cliffs",
+  "src/Strata.Core/WorldGen/GenVersion.cs \u2014 comment / version",
+  "tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs \u2014 re-pinned hashes",
+  "docs/architecture/worldgen.md \u2014 surface shape section"
+ ],
+ "files_add": [
+  "src/Strata.Core/WorldGen/Fields/TerrainTuning.cs \u2014 generator constants",
+  "tests/Strata.Core.Tests/WorldGen/TerrainShapeTests.cs \u2014 monotone density, rare cliffs, heightfield spawn area, cave roofs, worm mouths"
+ ],
+ "data_changes": [
+  "None beyond P1b-02 (cliff affinity comes from BiomeDef.Relief.Cliffs)"
+ ],
+ "tests": [
+  "TerrainShapeTests.DensityIsMonotoneOutsideCliffZones: 20k random land columns on Small 1234 with Cliff < 0.05; Density(y+1) < Density(y) across the whole band",
+  "TerrainShapeTests.CliffZonesAreRare: land grid samples with Cliffs > 0.25 make up 2-15%; none within 140 cells of spawn",
+  "TerrainShapeTests.SpawnAreaIsAHeightfield: SurfaceProfile, Tiny 1234, 160\u00d7160 around spawn: lips == 0, breaches < 1%, p99 step \u2264 2",
+  "TerrainShapeTests.NoiseCavesKeepARoof: columns not inside any plan.Features bounds have no air within 4 cells under Top",
+  "TerrainShapeTests.WormMouthsAreFew: 20-40% of worm chains start within 2 cells of the surface; the rest start at least 12 cells below",
+  "CabinTests (\u226510 cabins, \u2154 in tunnels), CaveFinderTests, purity and padding tests pass; golden hashes re-pinned"
+ ],
+ "verification": [
+  "dotnet test; worldgen-report --seed=1234 --size=small --compare against build/wg-before and the P1b-02 run: forest lip % \u2248 0, floating cells down \u2265 90%, breach % down; red flags only inside cliff zones in terrain_flags.png; chunkMsAvg not worse (the density band is thinner)",
+  "All smoke scripts SMOKE PASS (basic.cmds walks on natural terrain near spawn)",
+  "Lavapipe tour screenshots of forest, tundra and jungle compared with baseline; in-game fly-over with `biome jungle` / `biome tundra` to find a cliff zone"
+ ],
+ "depends_on": [
+  "P1b-02"
+ ],
+ "risks": [
+  "Over-smoothing can make the world boring: rely on the relief std-dev metric and keep cliff zones",
+  "Cabin placement depends on worm positions; retune the buried depth range if CabinTests fail",
+  "Chasms, shafts and sinkholes still start above ground (deliberate features); check they still read as holes",
+  "Touches the same files as P1b-02 (TerrainField, BiomeRelief, WorldPlan, WorldGenTests, GenVersion) and P1b-12 (CaveGenerationPass): strictly sequence"
+ ],
+ "effort": "M"
+}

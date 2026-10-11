@@ -190,7 +190,7 @@ def snatcher(mb: MeshBuilder, p, rng):
     """Carnivorous plant head: leafy upper lip, hinged jaw, rows of teeth (the stalk is drawn by the game)."""
     leaf, inner = p.get("leaf", "#4a8a2a"), p.get("inner", "#c03050")
     mb.bone = "head"
-    mb.sphere((0, 0.05, 0.46), 0.26, "prop:leaves", leaf, subdivisions=2, scale=(1.0, 1.25, 0.55))
+    mb.sphere((0, 0.05, 0.46), 0.26, "prop:jungle_leaves", leaf, subdivisions=2, scale=(1.0, 1.25, 0.55))
     mb.sphere((0, 0.08, 0.4), 0.2, "prop:flesh", inner, subdivisions=1, scale=(0.9, 1.1, 0.35))
     for k in range(7):
         x = -0.15 + k * 0.05
@@ -198,10 +198,10 @@ def snatcher(mb: MeshBuilder, p, rng):
     for k in range(5):
         a = k * 2 * math.pi / 5
         # Petals fanned around the back of the head (rotating about the facing axis).
-        mb.extrude_polygon([(0, 0), (0.14, 0.05), (0.26, 0), (0.14, -0.05)], 0.01, "prop:leaves", leaf,
+        mb.extrude_polygon([(0, 0), (0.14, 0.05), (0.26, 0), (0.14, -0.05)], 0.01, "prop:jungle_leaves", leaf,
                            matrix=Matrix.Translation((0, -0.2, 0.42)) @ Matrix.Rotation(a, 4, "Y"))
     mb.bone = "jaw"
-    mb.sphere((0, 0.05, 0.33), 0.22, "prop:leaves", leaf, subdivisions=1, scale=(0.95, 1.2, 0.4))
+    mb.sphere((0, 0.05, 0.33), 0.22, "prop:jungle_leaves", leaf, subdivisions=1, scale=(0.95, 1.2, 0.4))
     for k in range(6):
         x = -0.13 + k * 0.052
         mb.cylinder((x, 0.24 - abs(x) * 0.6, 0.36), (x, 0.24 - abs(x) * 0.6, 0.42), 0.016, 0.0, "prop:plain", "#f4f0e0", segments=3)

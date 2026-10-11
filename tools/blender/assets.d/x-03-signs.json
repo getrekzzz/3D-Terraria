@@ -1,0 +1,6 @@
+{
+ "comment": "X-03 signs (bgen/furniture_family.py signpost).",
+ "objects": {
+  "sign": {"generator": "signpost", "params": {"tint": "#a8743e", "postTint": "#7a5230"}}
+ }
+}

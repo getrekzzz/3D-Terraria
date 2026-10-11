@@ -4,11 +4,12 @@
     python3.13 tools/blender/preview.py -- --creature=king_slime --out=DIR
     python3.13 tools/blender/preview.py -- '--creature=king_slime_v2:{"width": 3.5}' --out=DIR   (generator:params)
 
-Builds the creature from tools/blender/assets.json (nothing is written to assets/) and renders it with Blender's
-Workbench engine in vertex colours: for every clip a row of evenly spaced frames seen from the front-right, or for a
-static model a row of views (front, three-quarter, side, back, top). --view=X,Y,Z sets the clip camera direction
-(the creature faces +Y; 1,0,0 is its right side). --hold=1 puts a 0.9 m rod in a human's right fist, attached as the
-game attaches held items (out of the fist along the hand bone's Z axis); --hold=shoot tilts it as the game tilts guns. Writes DIR/<creature>.png.
+Builds the creature from tools/blender/assets.json and assets.d/*.json (nothing is written to assets/) and renders it
+with Blender's Workbench engine in vertex colours: for every clip a row of evenly spaced frames seen from the
+front-right, or for a static model a row of views (front, three-quarter, side, back, top). --view=X,Y,Z sets the
+clip camera direction (the creature faces +Y; 1,0,0 is its right side). --hold=1 puts a 0.9 m rod in a human's right
+fist, attached as the game attaches held items (out of the fist along the hand bone's Z axis); --hold=shoot tilts it
+as the game tilts guns (actions.TILT). Writes DIR/<creature>.png.
 """
 import json
 import math
@@ -33,15 +34,17 @@ def args():
 
 def build(name):
     import bpy  # noqa: F401
+    import bgen
+    from asset_spec import load_spec
     from bgen import beasts, bosses, creatures, critters, export, fauna, festive, horrors, human, lunar, mechs
     from bgen.mesh import MeshBuilder, reset_scene, rng_for
-    spec = json.loads((HERE / "assets.json").read_text(encoding="utf-8"))["creatures"]
+    spec = load_spec()["creatures"]
     job = spec[name] if ":" not in name else {"generator": name.split(":")[0], "params": json.loads(name.split(":", 1)[1] or "{}")}
     reset_scene()
     if job["generator"] == "humanoid":
         return human.build(name, job.get("params", {}))
     mb = MeshBuilder(name.split(":")[0])
-    gen = None
+    gen = bgen.load_all().get(job["generator"])
     for module in (creatures, fauna, beasts, mechs, horrors, lunar, festive, critters, bosses, *_extra_modules()):
         gen = gen or getattr(module, "GENERATORS", {}).get(job["generator"])
     rig = gen(mb, job.get("params", {}), rng_for(name.split(":")[0], 0))

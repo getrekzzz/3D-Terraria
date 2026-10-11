@@ -1,5 +1,6 @@
 {
   // Critters: harmless animals that wander the world. A Bug Net catches them as items; using the item lets them go.
+  // Worms, fireflies, butterflies and frogs double as fishing bait (Terraria bait power).
   "enemies": [
     {"id": "bunny", "name": "Bunny", "description": "A fluffy forest hopper.", "tags": ["critter"], "brain": {"type": "walker", "aggroRange": 0, "jumpHeight": 2, "wander": true}, "life": 5, "damage": 0, "defense": 0, "knockbackResist": 0.2, "size": [0.8, 0.8], "moveSpeed": 2.2, "catchItem": "bunny", "value": 0, "covers": ["terraria:bunny"]},
     {"id": "squirrel", "name": "Squirrel", "description": "Busy gathering acorns.", "tags": ["critter"], "brain": {"type": "walker", "aggroRange": 0, "jumpHeight": 2, "wander": true}, "life": 5, "damage": 0, "defense": 0, "knockbackResist": 0.2, "size": [0.7, 0.7], "moveSpeed": 2.6, "catchItem": "squirrel", "value": 0, "covers": ["terraria:squirrel"]},
@@ -14,10 +15,10 @@
     {"id": "bunny", "name": "Bunny", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "bunny"}]},
     {"id": "squirrel", "name": "Squirrel", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "squirrel"}]},
     {"id": "bird", "name": "Bird", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "bird"}]},
-    {"id": "butterfly", "name": "Butterfly", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "butterfly"}]},
-    {"id": "firefly", "name": "Firefly", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "firefly"}]},
-    {"id": "worm", "name": "Worm", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "worm"}]},
-    {"id": "frog", "name": "Frog", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "frog"}]},
+    {"id": "butterfly", "name": "Butterfly", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "butterfly"}, {"type": "bait", "power": 15}], "tags": ["bait"]},
+    {"id": "firefly", "name": "Firefly", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "firefly"}, {"type": "bait", "power": 10}], "tags": ["bait"]},
+    {"id": "worm", "name": "Worm", "description": "Right click to let it go. 25% bait power.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "worm"}, {"type": "bait", "power": 25}], "tags": ["bait"]},
+    {"id": "frog", "name": "Frog", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "frog"}, {"type": "bait", "power": 15}], "tags": ["bait"]},
     {"id": "duck", "name": "Duck", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "duck"}]}
   ],
   "spawnRules": [

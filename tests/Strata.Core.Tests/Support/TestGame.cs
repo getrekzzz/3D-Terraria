@@ -1,5 +1,6 @@
 using System.Numerics;
 using Strata.Core.Common;
+using Strata.Core.Content;
 using Strata.Core.Diagnostics;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Gameplay.Player;
@@ -36,12 +37,15 @@ public sealed class TestGame : IDisposable
     public PlayerEntity Player => World.LocalPlayer!;
     public Strata.Core.Content.ContentDatabase Content => World.Session.Content;
 
-    public static TestGame Create(string? saveDir = null, long seed = 42, Difficulty difficulty = Difficulty.Classic)
+    public static TestGame Create(string? saveDir = null, long seed = 42, Difficulty difficulty = Difficulty.Classic, ContentDatabase? content = null,
+        WorldSizePreset size = WorldSizePreset.Tiny, SecretSeed secret = SecretSeed.None)
     {
         var log = new MemoryLog();
-        var settings = new WorldSettings { Name = "test", Seed = seed, Size = WorldSizePreset.Tiny, Difficulty = difficulty };
-        var session = WorldSession.Create(TestPaths.Content, settings, saveDir, Tables, log);
+        var settings = new WorldSettings { Name = "test", Seed = seed, Size = size, Difficulty = difficulty, Secret = secret };
+        var session = WorldSession.Create(content ?? TestPaths.Content, settings, saveDir, content == null ? Tables : new RenderTables(content, _ => 0), log);
+        session.Seasons.Clock = () => new DateTime(2026, 6, 1); // no seasonal event unless a test forces one
         var world = new GameWorld(session, new StreamingSettings { MeshRadius = 1, MeshDown = 1, MeshUp = 1, SkyColumnRadius = 1 }, 1, saveDir == null ? null : Path.Combine(saveDir, "players"));
+        world.ItemUse.Timing = TestPaths.Timing; // the shipped use styles, as the game loads them
         var center = session.SpawnCell;
         var chunk = ChunkMath.CellToChunk(center);
         for (int y = -1; y <= 1; y++)
@@ -72,6 +76,7 @@ public sealed class TestGame : IDisposable
 
         var player = PlayerState.CreateNew("tester", session.Content);
         world.AddPlayer(player, CellFeet(floor + Int3.Up));
+        world.Town.DefenseEnabled = false; // the starter guide would shoot every test's creatures; TownFightBackTests turn it on
         return new TestGame(world, floor);
     }
 

@@ -12,6 +12,6 @@ public sealed class ContentValidationOptions
     /// <summary>When set, block texture layer names must be in this set (from the texture atlas manifest).</summary>
     public IReadOnlySet<string>? TextureLayers { get; init; }
 
-    /// <summary>Warn about items that have no recipe, loot source, block drop or world source.</summary>
+    /// <summary>Warn about items with no source in the <see cref="Index.ItemSourceIndex"/>.</summary>
     public bool CheckObtainability { get; init; } = true;
 }

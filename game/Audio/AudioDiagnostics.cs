@@ -13,7 +13,7 @@ public static class AudioDiagnostics
 {
     public const string SfxDirectory = "res://assets/audio/sfx";
     public const string MusicDirectory = "res://assets/audio/music";
-    public const string AmbientDirectory = "res://assets/audio/ambient";
+    public const string AmbienceDirectory = "res://assets/audio/ambience";
     private static AudioStreamPlayer? _tester;
 
     /// <summary>One line: driver, device, mix rate and latency.</summary>
@@ -44,12 +44,12 @@ public static class AudioDiagnostics
             if (Load(path) == null) log.Error("audio", $"Could not load {path}. Open the project in the Godot editor once (or run `godot --path . --import`) so the audio files are imported.");
     }
 
-    /// <summary>Tries every sound, music and ambience file; returns how many loaded and the names of those that did not.</summary>
+    /// <summary>Tries every sound, music, sting and ambience file; returns how many loaded and the names of those that did not.</summary>
     public static (int Loaded, int Total, List<string> Failed) ProbeFiles()
     {
         var failed = new List<string>();
         int loaded = 0, total = 0;
-        foreach (var (dir, ext) in new[] { (SfxDirectory, ".wav"), (MusicDirectory, ".ogg"), (AmbientDirectory, ".ogg") })
+        foreach (var (dir, ext) in new[] { (SfxDirectory, ".wav"), (MusicDirectory, ".ogg"), (MusicDirector.StingDirectory, ".ogg"), (AmbienceDirectory, ".ogg") })
         {
             foreach (var name in Files(dir, ext))
             {

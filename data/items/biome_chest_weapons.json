@@ -1,0 +1,40 @@
+{
+  // The six Dungeon biome-chest weapons (Terraria 1.4 stats; shot speeds in m/s): the Piranha Gun's latching piranhas,
+  // the Scourge of the Corruptor's javelin that bursts into tiny eaters, the life-stealing Vampire Knives, the Rainbow
+  // Gun's slow piercing beam, the Staff of the Frost Hydra's sentry and the Desert Tiger Staff's minion.
+  "projectiles": [
+    { "id": "piranha", "name": "Piranha", "visual": "creature", "model": "fish", "color": "#d0503a", "scale": 0.35, "lifetime": 300, "radius": 0.5, "latch": true, "latchInterval": 10 },
+    { "id": "scourge_javelin", "name": "Scourge of the Corruptor", "visual": "item", "model": "scourge_of_the_corruptor", "gravity": 3, "lifetime": 150, "radius": 0.45, "light": [6, 3, 10],
+      "onHit": [{ "type": "spawnProjectiles", "projectile": "tiny_eater", "count": 3, "speed": 9, "homing": true, "damageScale": 0.6 }] },
+    { "id": "tiny_eater", "name": "Tiny Eater", "visual": "creature", "model": "eater_of_souls", "color": "#9a7ab0", "scale": 0.22, "lifetime": 180, "radius": 0.45, "homing": 5 },
+    { "id": "vampire_knife", "name": "Vampire Knife", "visual": "item", "model": "vampire_knives", "gravity": 1.5, "lifetime": 70, "radius": 0.35,
+      "onHit": [{ "type": "lifeSteal", "fraction": 0.075 }] },
+    { "id": "rainbow_gun_beam", "name": "Rainbow", "visual": "bolt", "color": "#ff8ad8", "lifetime": 240, "radius": 0.7, "pierce": -1, "light": [12, 9, 14], "trail": "#8ae0ff" },
+    { "id": "frost_hydra", "name": "Frost Hydra", "visual": "creature", "model": "wyvern_head", "color": "#8ad8ff", "scale": 0.45, "lifetime": 60, "radius": 0.8, "pierce": -1, "light": [4, 8, 12],
+      "minion": { "speed": 0, "range": 30, "shoot": "frost_hydra_bolt", "shootInterval": 30, "shootSpeed": 26 } },
+    { "id": "frost_hydra_bolt", "name": "Frost Hydra Bolt", "visual": "orb", "color": "#aaf0ff", "lifetime": 90, "radius": 0.4, "light": [4, 9, 14], "trail": "#d8f8ff",
+      "onHit": [{ "type": "applyBuff", "buff": "frostburn", "ticks": 180, "chance": 0.5 }] },
+    { "id": "desert_tiger", "name": "Desert Tiger", "visual": "creature", "model": "wolf", "color": "#e8a848", "scale": 0.55, "lifetime": 60, "radius": 0.8, "pierce": -1,
+      "minion": { "speed": 13, "range": 26 } }
+  ],
+  "items": [
+    { "id": "piranha_gun", "name": "Piranha Gun", "description": "Fires piranhas that bite down and keep gnawing.", "category": "weapon", "rarity": 8, "value": 200000, "useStyle": "gun",
+      "useTime": 8, "useAnimation": 8, "autoReuse": true, "damage": 36, "damageType": "ranged", "knockback": 0.5, "projectile": "piranha", "shootSpeed": 24,
+      "behaviors": [{ "type": "shootProjectile", "maxActive": 3 }], "covers": ["terraria:piranha_gun"] },
+    { "id": "scourge_of_the_corruptor", "name": "Scourge of the Corruptor", "description": "A javelin that bursts into tiny eaters.", "category": "weapon", "rarity": 8, "value": 200000,
+      "useStyle": "throw", "useTime": 20, "useAnimation": 20, "autoReuse": true, "damage": 59, "damageType": "melee", "knockback": 5, "projectile": "scourge_javelin", "shootSpeed": 30,
+      "covers": ["terraria:scourge_of_the_corruptor"] },
+    { "id": "vampire_knives", "name": "Vampire Knives", "description": "Throws a fan of knives that drink the blood of what they cut.", "category": "weapon", "rarity": 8, "value": 200000,
+      "useStyle": "throw", "useTime": 15, "useAnimation": 15, "autoReuse": true, "damage": 29, "damageType": "melee", "knockback": 2.75, "projectile": "vampire_knife", "shootSpeed": 30,
+      "behaviors": [{ "type": "shootProjectile", "count": 4, "spread": 9 }], "covers": ["terraria:vampire_knives"] },
+    { "id": "rainbow_gun", "name": "Rainbow Gun", "description": "Shoots a slow rainbow that burns through everything in its way.", "category": "weapon", "rarity": 8, "value": 200000,
+      "useStyle": "gun", "useTime": 40, "useAnimation": 40, "autoReuse": true, "damage": 45, "damageType": "magic", "knockback": 3, "manaCost": 20, "projectile": "rainbow_gun_beam",
+      "shootSpeed": 12, "covers": ["terraria:rainbow_gun"] },
+    { "id": "staff_of_the_frost_hydra", "name": "Staff of the Frost Hydra", "description": "Summons a frost hydra that spits ice at your enemies.", "category": "weapon", "rarity": 8,
+      "value": 200000, "useStyle": "swing", "useTime": 30, "useAnimation": 30, "damage": 100, "damageType": "summon", "knockback": 4.5, "manaCost": 10, "projectile": "frost_hydra",
+      "shootSpeed": 3, "covers": ["terraria:staff_of_the_frost_hydra"] },
+    { "id": "desert_tiger_staff", "name": "Desert Tiger Staff", "description": "Summons a desert tiger to fight for you.", "category": "weapon", "rarity": 8, "value": 200000,
+      "useStyle": "swing", "useTime": 36, "useAnimation": 36, "damage": 24, "damageType": "summon", "knockback": 4.5, "manaCost": 10, "projectile": "desert_tiger", "shootSpeed": 3,
+      "covers": ["terraria:desert_tiger_staff"] }
+  ]
+}

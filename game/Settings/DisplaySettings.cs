@@ -1,4 +1,5 @@
 using Godot;
+using Strata.Core.Presentation;
 
 namespace Strata.Game.Settings;
 
@@ -21,6 +22,29 @@ public static class DisplaySettings
         Engine.MaxFps = Mathf.Max(0, s.MaxFps);
     }
 
-    /// <summary>Scales every 2D interface (menus, HUD) by the UI scale setting.</summary>
-    public static void ApplyUiScale(Window root, UserSettings s) => root.ContentScaleFactor = Mathf.Clamp(s.UiScale, 0.5f, 3f);
+    /// <summary>The UI scale in effect: the setting, lowered when the window is too small to hold the layout at it.</summary>
+    public static float EffectiveUiScale { get; private set; } = 1f;
+
+    /// <summary>True when the window size lowered the UI scale below the setting.</summary>
+    public static bool UiScaleClamped { get; private set; }
+
+    /// <summary>
+    /// Scales every 2D interface (menus, HUD) by the UI scale setting, clamped so the logical viewport stays at least
+    /// 1024×600 (<see cref="UiScale"/>): raising the scale can never push panels off a small window. Called again
+    /// whenever the window is resized.
+    /// </summary>
+    public static void ApplyUiScale(Window root, UserSettings s) => ApplyUiScale(root, s.UiScale);
+
+    public static void ApplyUiScale(Window root, float setting)
+    {
+        EffectiveUiScale = Effective(setting, root.Size);
+        UiScaleClamped = EffectiveUiScale < Mathf.Clamp(setting, UiScale.Min, UiScale.Max) - 0.001f;
+        if (!Mathf.IsEqualApprox(root.ContentScaleFactor, EffectiveUiScale)) root.ContentScaleFactor = EffectiveUiScale;
+    }
+
+    /// <summary>The UI scale a window of <paramref name="window"/> pixels gets for <paramref name="setting"/>.</summary>
+    public static float Effective(float setting, Vector2I window) =>
+        DisplayServer.GetName() != "headless" ? UiScale.Effective(setting, window.X, window.Y)
+            : UI.LayoutWidgets.SimulatedWindow is { } sim ? UiScale.Effective(setting, sim.X, sim.Y) // the window a test lays out for
+            : UiScale.Effective(setting, 0, 0); // no real window to fit
 }

@@ -1,0 +1,52 @@
+{
+ "id": "P1b-06",
+ "title": "Save pipeline core: cache-authoritative region store and a background WorldSaver",
+ "player_outcome": "No visible change yet. This is the base that lets autosave and chunk unloads write in the background. It also fixes a latent bug where chunks saved on unload could reference block ids missing from world.json after a crash.",
+ "design": [
+  "Checked in code: WorldSaveStore.SaveChunks holds _gate while RegionFile.Update re-reads, merges and rewrites the whole region file with a flush-to-disk. Worker LoadChunk calls wait on the same lock. ChunkCodec.Encode (palette, RLE, zlib Optimal) runs on the main thread in both WorldSession.SaveAll and Unload. SaveUnloaded never rewrites world.json, although encoding can intern new ids.",
+  "RegionFile: add `byte[] Serialize(IReadOnlyDictionary<int, byte[]>)` and `Write(string path, IReadOnlyDictionary<int, byte[]>)`. Keep ReadAll. Update delegates to Read + merge + Write.",
+  "WorldSaveStore: _gate protects only in-memory maps. `IReadOnlyList<RegionWrite> ApplyChunks(IEnumerable<KeyValuePair<Int3, byte[]?>>)`: under _gate, take the cached region (or read it once), build a new dictionary with the updates (copy-on-write, so readers see a consistent map), store it in _regionCache, and return (path, snapshot) pairs. `WriteRegions(list)` writes outside _gate, sequentially under _writeGate. SaveChunks = ApplyChunks + WriteRegions. LoadChunk never waits on disk writes, and the cache stays authoritative for regions written this session.",
+  "ChunkCodec: split out `byte[] EncodeObjects(IReadOnlyList<TileObjectInstance>, WorldIdTables)` and `List<TileObjectInstance> DecodeObjects(byte[], ContentDatabase, WorldIdTables)`. Add `Encode(ChunkData, int mutationLevel, byte[] objectSection, db, ids)`; the old overload delegates to it.",
+  "Add src/Strata.Core/Persistence/WorldSaver.cs: one background thread 'strata-saver' (BelowNormal) consuming SaveBatch {List<ChunkSnapshot> Chunks; JsonObject? Meta; List<(string Path, Func<byte[]> Bytes)> Files; Action<int>? Done}. ChunkSnapshot is (Int3 Coord, ChunkData Data, int MutationLevel, byte[] Objects, long Seq).",
+  "Worker order per batch: encode chunks; store.ApplyChunks; remove pending entries whose Seq matches; WriteRegions; set the meta node's idTables from SaveIdTable.Names (already thread-safe) and write world.json after all blobs (it also rewrites meta when an unload-only batch grew the id tables); write extra files; post Done to main through an injected Action<Action> (GameWorld passes Jobs.Completions.Enqueue).",
+  "Pending state: ConcurrentDictionary<Int3, ChunkSnapshot>, registered before queuing; TryGetPending(coord); Flush(TimeSpan) blocks until the queue is empty; InFlight flag. Errors are logged with context through ILog; snapshots that failed to write stay pending and are re-queued with the next batch. Internal test hooks: TestGate and BeforeWrite.",
+  "New file src/Strata.Core/Session/WorldSession.Persist.cs (keeps WorldSession.Saving.cs small). `ChunkSnapshot Capture(Chunk)` on main: chunk.Capture(), ChunkCodec.EncodeObjects(World.TileObjects.InChunk), Modified = false. `SaveBatch BeginSave(...)`: all modified chunks plus the meta node (set tick/flags/counters/wires/mutations on main, then JsonSerializer.SerializeToNode(Meta, SaveJson.Options)). SaveAll() stays synchronous: BeginSave + Enqueue + Flush. SaveMetaOnly also goes through the saver and flushes, so there is a single writer for every file.",
+  "WorldSession.Produce: if Saver.TryGetPending(coord, out snap), build the product from the snapshot (MutationLog.Apply(snap.Data, ...), ChunkCodec.DecodeObjects(snap.Objects, ...), FromSave: true). A chunk streamed back in before its write lands keeps its edits.",
+  "WorldSession owns Saver when Store != null; add WorldSession.Dispose, called from GameWorld.Dispose."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Persistence/RegionFile.cs \u2014 Serialize and Write",
+  "src/Strata.Core/Persistence/WorldSaveStore.cs \u2014 ApplyChunks and WriteRegions, lock split",
+  "src/Strata.Core/Persistence/ChunkCodec.cs \u2014 object-section encode/decode and Encode overload",
+  "src/Strata.Core/Session/WorldSession.cs \u2014 Saver ownership, pending-aware Produce, Dispose",
+  "src/Strata.Core/Session/WorldSession.Saving.cs \u2014 SaveAll and SaveMetaOnly route through the saver",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 dispose the session saver"
+ ],
+ "files_add": [
+  "src/Strata.Core/Persistence/WorldSaver.cs \u2014 background single-writer save queue with pending snapshots",
+  "src/Strata.Core/Session/WorldSession.Persist.cs \u2014 Capture and BeginSave",
+  "tests/Strata.Core.Tests/Persistence/WorldSaverTests.cs \u2014 async save correctness tests"
+ ],
+ "data_changes": [],
+ "tests": [
+  "WorldSaverTests.EditsSurviveReloadWhileWriteIsPending: gate the worker; edit, capture and unload a chunk; Produce returns the edited data with FromSave; release, Flush, a new WorldSession.Load sees the edit",
+  "WorldSaverTests.LoadChunkDoesNotWaitForRegionWrite: BeforeWrite hook sleeps 500 ms; LoadChunk of a sibling chunk in the same region returns in under 50 ms and sees the new blob",
+  "WorldSaverTests.NewBlockIdsReachWorldJson: place never-saved gray_brick; unload-only batch; Flush; reload resolves the real block, not a placeholder",
+  "WorldSaverTests.LatestSnapshotWins: two snapshots of the same chunk, the older Seq never overwrites the newer",
+  "Existing StreamingTests, SaveStoreTests, ChunkCodecTests, CharacterTests, MapTests, TownTests, MutationTests pass (SaveAll is still synchronous)"
+ ],
+ "verification": [
+  "dotnet test (full suite, run twice to catch flakiness)",
+  "Smoke basic.cmds (`save`), town.cmds; menu tour (save & exit)",
+  "Manual: build, place blocks, Save & Quit, reload: edits intact; world.json id tables contain the new ids"
+ ],
+ "depends_on": [
+  "P1b-05"
+ ],
+ "risks": [
+  "Worker threads read ContentDatabase registries; placeholder registration already happens on load workers, but review GetOrAddPlaceholder* locking",
+  "Every file write must go through the saver (map and player files move in P1b-07) to avoid .tmp collisions in AtomicFile",
+  "A snapshot can be held twice (pending plus queue); ChunkData is copy-on-write immutable, so memory stays small"
+ ],
+ "effort": "M"
+}

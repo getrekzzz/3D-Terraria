@@ -23,6 +23,9 @@ public enum ObjectHitResult
 
     /// <summary>The tool is the right kind but too weak (a Pwnhammer is needed for altars).</summary>
     TooWeak,
+
+    /// <summary>A locked chest: it cannot be broken until its key opens it.</summary>
+    Locked,
 }
 
 public sealed partial class WorldEditor
@@ -30,10 +33,10 @@ public sealed partial class WorldEditor
     /// <summary>Raised after an object is broken by gameplay (not by chunk unloading).</summary>
     public event Action<TileObjectInstance>? ObjectBroken;
 
-    public event Action<TileObjectInstance>? ObjectPlaced;
+    /// <summary>A tool struck an object: Damaged, Broken or TooWeak (sounds, chips, leaves, crack progress, falling trees).</summary>
+    public event Action<TileObjectInstance, ObjectHitResult>? ObjectHit;
 
-    /// <summary>Raised when a tool damages an object that is still standing (a chop into a tree).</summary>
-    public event Action<TileObjectInstance>? ObjectDamaged;
+    public event Action<TileObjectInstance>? ObjectPlaced;
 
     /// <summary>Places a tile object whose minimum corner is <paramref name="anchor"/>.</summary>
     public PlacementResult PlaceObject(TileObjectDef def, Int3 anchor, int rotation, int variant = 0)
@@ -53,6 +56,25 @@ public sealed partial class WorldEditor
     /// </summary>
     public ObjectHitResult HitObject(TileObjectInstance obj, ItemDef? tool)
     {
+        var result = HitObjectQuietly(obj, tool);
+        if (result is ObjectHitResult.Damaged or ObjectHitResult.Broken or ObjectHitResult.TooWeak) ObjectHit?.Invoke(obj, result);
+        return result;
+    }
+
+    /// <summary>Objects weapons have smashed (probe <c>objects.smashed</c>; the <c>smashed reset</c> command zeroes it).</summary>
+    public int Smashed { get; set; }
+
+    /// <summary>A weapon smashes an object outright (a pot, a tuft of grass): it breaks with its drops and loot (P3-23).</summary>
+    public void SmashObject(TileObjectInstance obj)
+    {
+        if (World.TileObjects.Get(obj.Id) != obj) return;
+        Smashed++;
+        BreakObject(obj, dropItems: true);
+        ObjectHit?.Invoke(obj, ObjectHitResult.Broken);
+    }
+
+    private ObjectHitResult HitObjectQuietly(TileObjectInstance obj, ItemDef? tool)
+    {
         int power = obj.Def.Decor ? 100 : obj.Def.BreakTool switch
         {
             BreakTool.Axe => tool?.AxePower ?? 0,
@@ -63,13 +85,12 @@ public sealed partial class WorldEditor
         if (power <= 0) return ObjectHitResult.WrongTool;
         if (power < obj.Def.MinPower) return ObjectHitResult.TooWeak;
         if (obj.Def.RequiresFlag is { } flag && !_session.Flags.Contains(flag)) return ObjectHitResult.TooWeak;
+        if (obj.Locked) return ObjectHitResult.Locked;
+        // An unopened world chest rolls its loot first, so breaking it never throws the loot away.
+        EnsureContainerLoot(obj);
         if (obj.Container != null && obj.Container.Any(s => !s.IsEmpty)) return ObjectHitResult.NotEmpty;
         obj.HitPoints -= Math.Max(1, power / 40);
-        if (obj.HitPoints > 0)
-        {
-            ObjectDamaged?.Invoke(obj);
-            return ObjectHitResult.Damaged;
-        }
+        if (obj.HitPoints > 0) return ObjectHitResult.Damaged;
         BreakObject(obj, dropItems: true);
         return ObjectHitResult.Broken;
     }
@@ -77,6 +98,7 @@ public sealed partial class WorldEditor
     /// <summary>Removes an object, dropping its item, rolled loot and any container contents.</summary>
     public void BreakObject(TileObjectInstance obj, bool dropItems)
     {
+        if (dropItems) EnsureContainerLoot(obj); // an unopened world chest spills what it was generated with
         if (!World.TileObjects.Remove(obj)) return;
         DirtyForLight(obj);
         if (dropItems)
@@ -85,10 +107,12 @@ public sealed partial class WorldEditor
             var content = _session.Content;
             if (obj.Def.PlacingItemId is { } itemId && content.Items.TryGet(itemId, out var item) && !obj.Def.Natural)
                 SpawnDrop(new ItemStack(item, 1), center);
-            if (obj.Def.Loot != null)
+            // A non-container's own pending loot (the one Water Bolt among a shelf of books) replaces its kind's table.
+            var table = obj.Container == null && obj.PendingLoot != null ? obj.PendingLoot : obj.Def.Loot;
+            if (table != null)
             {
                 var rng = NextRng(center);
-                foreach (var stack in _loot.Roll(obj.Def.Loot, ref rng, LootContext(center))) SpawnDrop(stack, center);
+                foreach (var stack in _loot.Roll(table, ref rng, LootContext(center))) SpawnDrop(stack, center);
             }
             if (obj.Container != null)
                 foreach (var stack in obj.Container.Where(s => !s.IsEmpty)) SpawnDrop(stack, center);
@@ -122,7 +146,8 @@ public sealed partial class WorldEditor
                 if (World.TileObjects.At(cell + o) is { } obj) candidates.Add(obj);
         foreach (var obj in candidates)
         {
-            if (World.TileObjects.Get(obj.Id) == null || PlacementRules.IsSupported(World, obj)) continue;
+            // A locked chest stays put (it cannot be broken until opened).
+            if (World.TileObjects.Get(obj.Id) == null || obj.Locked || PlacementRules.IsSupported(World, obj)) continue;
             broken.Add(obj);
             BreakObject(obj, dropItems: true);
         }
@@ -145,11 +170,18 @@ public sealed partial class WorldEditor
         var box = obj.Bounds.Expand(Neighborhood.Margin);
         var min = ChunkMath.CellToChunk(box.Min);
         var max = ChunkMath.CellToChunk(box.Max - Int3.One);
+        // The light's own chunk remeshes as an edit (the player sees the light appear at once); the up to 7 others its
+        // reach crosses follow right behind block edits, so no lighting seam lingers at chunk borders.
+        var own = ChunkMath.CellToChunk(obj.Anchor);
         var dirty = new HashSet<Int3>();
         for (int y = min.Y; y <= max.Y; y++)
             for (int z = min.Z; z <= max.Z; z++)
                 for (int x = min.X; x <= max.X; x++)
-                    if (World.HasChunk(new Int3(x, y, z))) dirty.Add(new Int3(x, y, z));
-        if (dirty.Count > 0) ChunksDirty?.Invoke(dirty);
+                {
+                    var c = new Int3(x, y, z);
+                    if (c != own && World.HasChunk(c)) dirty.Add(c);
+                }
+        if (World.HasChunk(own)) ChunksDirty?.Invoke(new HashSet<Int3> { own });
+        if (dirty.Count > 0) LightDirty?.Invoke(dirty);
     }
 }

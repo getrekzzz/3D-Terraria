@@ -1,0 +1,8 @@
+{
+ "comment": "X-11: disguised mini-bosses — the chest a sleeping Mimic poses as, the Lost Girl the Nymph poses as, and the Wyvern's leg piece.",
+ "creatures": {
+  "mimic_chest": {"generator": "mimic_chest", "params": {}},
+  "lost_girl": {"generator": "humanoid", "params": {"body": "female", "skin": "#f2d6c4", "hair": "#e8c870", "hairStyle": "long", "shirt": "#e8e0f0", "pants": "#c8a8c8", "boots": "#6a4a3a", "eyes": "#3a6ab0"}},
+  "wyvern_legs": {"generator": "sky_dragon", "params": {"part": "legs", "radius": 0.6}}
+ }
+}

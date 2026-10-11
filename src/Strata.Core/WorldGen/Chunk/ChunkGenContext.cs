@@ -26,8 +26,11 @@ public sealed class ChunkGenContext
         Blocks = new ushort[Volume];
         SurfaceHeight = new float[Size * Size];
         Ruggedness = new float[Size * Size];
+        Cliff = new float[Size * Size];
+        OverhangAmp = new float[Size * Size];
         SoilDepth = new float[Size * Size];
         Biome = new byte[Volume];
+        if (generator.Plan.Bands.Inverted) Ceiling = new float[Size * Size];
         for (int lz = 0; lz < Size; lz++)
             for (int lx = 0; lx < Size; lx++)
             {
@@ -35,7 +38,10 @@ public sealed class ChunkGenContext
                 int c = lz * Size + lx;
                 SurfaceHeight[c] = generator.Terrain.SurfaceHeight(wx, wz);
                 Ruggedness[c] = generator.Terrain.Ruggedness(wx, wz);
+                Cliff[c] = generator.Terrain.Cliff(wx, wz);
+                OverhangAmp[c] = Fields.TerrainField.OverhangAmplitude(Ruggedness[c], Cliff[c]);
                 SoilDepth[c] = generator.Terrain.SoilDepth(wx, wz);
+                if (Ceiling != null) Ceiling[c] = generator.Terrain.CeilingHeight(wx, wz);
             }
     }
 
@@ -56,7 +62,27 @@ public sealed class ChunkGenContext
     /// <summary>Surface height per padded column (index = lz * Size + lx).</summary>
     public float[] SurfaceHeight { get; }
     public float[] Ruggedness { get; }
+
+    /// <summary>Cliff-zone strength per padded column (0–1).</summary>
+    public float[] Cliff { get; }
+
+    /// <summary>
+    /// 3D overhang amplitude per padded column (cells): the terrain is solid everywhere below SurfaceHeight − OverhangAmp
+    /// (the true surface can dip that far), and open above SurfaceHeight + OverhangAmp.
+    /// </summary>
+    public float[] OverhangAmp { get; }
     public float[] SoilDepth { get; }
+
+    /// <summary>Don't Dig Up only: the rock roof's underside per padded column (null in ordinary worlds).</summary>
+    public float[]? Ceiling { get; }
+
+    /// <summary>Cells into the ground from the column's nearest exposed surface (see <see cref="Fields.TerrainField.SurfaceDepth(float, float, float)"/>).</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float SurfaceDepth(int col, int wy) =>
+        Ceiling == null ? SurfaceHeight[col] - wy : Fields.TerrainField.SurfaceDepth(wy, SurfaceHeight[col], Ceiling[col]);
+
+    /// <summary>Don't Dig Up: whether a cell lies in the rock mass above the open-air pocket (always false otherwise).</summary>
+    public bool AboveRoofPocket(int col, int wy) => Ceiling != null && wy + wy > SurfaceHeight[col] + Ceiling[col];
 
     /// <summary>Biome runtime id per padded cell (filled by the biome pass).</summary>
     public byte[] Biome { get; }
@@ -94,6 +120,12 @@ public sealed class ChunkGenContext
     public byte[] EnsureLiquids() => Liquids ??= new byte[Volume];
     public byte[] EnsureShapes() => Shapes ??= new byte[Volume];
     public byte[] EnsureFlags() => Flags ??= new byte[Volume];
+
+    /// <summary>Whether a padded cell was written by a protected structure (the Dungeon's walls and halls, a temple):
+    /// later passes leave such cells alone.</summary>
+    public bool IsStructure(int index) => Flags != null && (Flags[index] & (byte)Voxels.CellFlags.Structure) != 0;
+
+    public bool IsStructure(int wx, int wy, int wz) => Contains(wx, wy, wz) && IsStructure(WorldIndex(wx, wy, wz));
 
     public void SetLiquid(int wx, int wy, int wz, byte liquid)
     {

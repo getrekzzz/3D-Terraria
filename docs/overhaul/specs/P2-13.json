@@ -1,0 +1,43 @@
+{
+ "id": "P2-13",
+ "title": "Hearts (golden past 400), mana stars and breath bubbles",
+ "player_outcome": "Life shows as 'Life: 120/140' over rows of pixel hearts, 20 HP each and golden once Life Fruit takes you past 400. The partial heart shrinks and fades, and the last one gently pulses. Mana is a column of stars at the far right. Breath appears as 10 bubbles above the crosshair that pop one by one underwater.",
+ "design": [
+  "New game/UI/Hud/LifeHearts.cs:\n- Draws in _Draw with UiSprites heart and heart_gold, TextureFilter Nearest.\n- Model: Core `VitalsDisplay.Hearts(v.Life, v.MaxLife, PlayerState.BaseLife + BonusLife)`. 10 per row at a 26 px pitch.\n- The partial heart is drawn at scale 0.6 + 0.4f and alpha 0.4 + 0.6f.\n- The last full heart pulses at 1 + 0.04\u00b7sin(4t).\n- QueueRedraw only when life or max changes, or on a 15 Hz pulse tick.\n- A 'Life: X/Y' label (outlined, right-aligned) sits in the LifeText rect.",
+  "New game/UI/Hud/ManaStars.cs: a vertical column from VitalsDisplay.Stars, labelled 'Mana', redrawn on change.",
+  "New game/UI/Hud/BreathBubbles.cs: 10 bubbles in the Breath rect, hidden at full breath, redrawn on change. Bubble i shows when breath > i\u00b7Max/10, and the partial one scales by its fraction. They flash Color8(255,80,90) when breath is 0.",
+  "Setting `UserSettings.LifeDisplay` (\"classic\" | \"bars\"). The old progress bars move into game/UI/Hud/VitalsBars.cs and are shown only for \"bars\". Add a SettingsScreen Interface row (MenuKit.Choice).",
+  "Remove _life, _mana, _breath and their Bar() helper from Hud.cs.",
+  "UiProbes gains hud.hearts, hud.golden_hearts, hud.stars and hud.bubbles."
+ ],
+ "files_modify": [
+  "game/UI/Hud.cs \u2014 create the vitals widgets",
+  "game/Settings/UserSettings.cs \u2014 LifeDisplay",
+  "game/Menu/SettingsScreen.cs \u2014 Life display row",
+  "game/Debug/UiProbes.cs \u2014 hud.* vitals probes"
+ ],
+ "files_add": [
+  "game/UI/Hud/LifeHearts.cs",
+  "game/UI/Hud/ManaStars.cs",
+  "game/UI/Hud/BreathBubbles.cs",
+  "game/UI/Hud/VitalsBars.cs \u2014 optional bars style"
+ ],
+ "data_changes": [],
+ "tests": [
+  "Core: the VitalsDisplay tests from P2-04",
+  "ui.cmds:\n- `assert hud.hearts == 5` / `assert hud.stars == 1` / `assert hud.bubbles == 0`.\n- `give life_crystal 3` / `wield life_crystal` / `use` / `wait 0.5` / `use` / `wait 0.5` / `use` / `wait 0.5` / `assert hud.hearts == 8`."
+ ],
+ "verification": [
+  "Headless ui.cmds SMOKE PASS",
+  "Lavapipe: a screenshot after a zombie hit shows a partial heart; underwater (liquid command) shows bubbles"
+ ],
+ "depends_on": [
+  "P2-02",
+  "P2-04",
+  "P2-12"
+ ],
+ "risks": [
+  "Lifeforce (+20% max life) pushes MaxLife over 400 without Life Fruit. Heart count and life-per-heart use MaxLife, and gold uses the permanent max, which matches Terraria."
+ ],
+ "effort": "S"
+}

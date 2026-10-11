@@ -1,0 +1,53 @@
+{
+ "id": "P3-25",
+ "title": "Hurt and impact feel: fall/debuff hurt sounds and numbers, first-person hurt vignette, camera punch on bosses and heavy hits, Terraria knockback, real jump sound",
+ "player_outcome": "Falling and burning hurt audibly and show numbers. In first person the screen flashes red at the edges when you are hit. The camera punches when a boss awakens, when it dies and on heavy hits and landings. Getting hit knocks you back properly, enemies hop back when struck, and the jump sound only plays when you actually jump.",
+ "design": [
+  "Verified: FallDamaged (PlayerController.cs:46/269) has no subscriber. DoT uses Vitals.DamageDirect (GameWorld.cs:282) without reporting. The only CameraShake.Kick is explosions (CombatEffects.cs:35). The jump sound is inferred from v.Y > 3 (PlayerController.Sound.cs:29), so knockback plays it.",
+  "Core: GameWorld.HurtPlayerDirect(p, damage, DamageKind): DamageDirect + NpcSystem.ReportPlayerDamage(kind). Used by the DoT second-tick (Periodic) and exposed for fall damage (PlayerController.TrackFall calls it instead of the local-only FallDamaged).",
+  "SoundEvents: local PlayerHurt of any kind \u2192 'player_hurt' (Periodic at \u22126 dB, max once per 0.8 s).",
+  "New game/UI/HurtOverlay.cs: a CanvasLayer ColorRect with new shaders/hurt_vignette.gdshader (radial red). On local hurt, alpha = 0.35 \u00d7 clamp(4\u00b7dmg/MaxLife) in FP (0.15 in 3P), fading over 0.35 s. UserSettings.HurtFlash toggle (default on).",
+  "CameraShake.Punch(strength, seconds = 0.25, rollDeg = 1.5): a decaying impulse with roll. CameraRig applies roll to Camera.Rotation.Z. Calls: BossSpawned 0.45, BossDefeated 0.7, local hurt 0.1\u20130.35 by dmg/MaxLife, landing with airVelocityY < \u221214 m/s at 0.15.",
+  "Knockback toward Terraria: NpcSystem.ContactDamage knock = away\u00b7(4 + kb\u00b70.6) + (0, 5.5, 0); ProjectileSystem.HurtPlayer similar.",
+  "NpcSystem.Knock: vertical = max(2.5, kb\u00b71.1) for grounded non-bosses (a visible hop); crits \u00d71.4 knockback.",
+  "PlayerController: a new Jumped event raised where a ground/coyote jump starts; PlayerController.Sound plays 'jump' only on Jumped.",
+  "NpcRenderer: on HurtFlash rising, a 1.12 \u2192 1.0 scale punch over 0.1 s; the tint lerps by HurtFlash/8 instead of on/off."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Session/GameWorld.cs \u2014 HurtPlayerDirect; DoT reporting",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.cs \u2014 ReportPlayerDamage kind; contact knock values",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Knockback.cs \u2014 vertical hop; crit knockback",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs \u2014 HurtPlayer knock values",
+  "game/Player/PlayerController.cs \u2014 fall damage via Core; Jumped event",
+  "game/Player/PlayerController.Sound.cs \u2014 jump on Jumped; landing punch",
+  "game/Player/CameraShake.cs \u2014 Punch with roll",
+  "game/Player/CameraRig.cs \u2014 apply roll",
+  "game/Audio/SoundEvents.cs \u2014 hurt sounds per kind; boss punch hooks",
+  "game/Entities/NpcRenderer.cs \u2014 scale punch, tint lerp",
+  "game/Settings/UserSettings.cs \u2014 HurtFlash",
+  "game/Bootstrap/WorldLauncher.cs \u2014 create HurtOverlay"
+ ],
+ "files_add": [
+  "game/UI/HurtOverlay.cs \u2014 vignette overlay",
+  "shaders/hurt_vignette.gdshader \u2014 radial vignette",
+  "tests/Strata.Core.Tests/Gameplay/HurtFeelTests.cs \u2014 damage/knockback tests"
+ ],
+ "data_changes": [],
+ "tests": [
+  "HurtFeelTests: on_fire on the player raises one ToPlayer Periodic DamageEvent per second; HurtPlayerDirect raises PlayerHurt",
+  "HurtFeelTests: a grounded zombie hit with kb 5 gets vertical velocity \u2265 2.5",
+  "Smoke movement.cmds: 'fill -2 30 -2 2 30 2 stone' / 'tp 0 31 0' (relative variant if tp is absolute) / 'wait 4' / 'assert player.life < 100' / 'assert errors == 0'"
+ ],
+ "verification": [
+  "dotnet test; movement/combat smoke PASS",
+  "Lavapipe FP screenshot at the hurt frame shows the vignette"
+ ],
+ "depends_on": [
+  "P3-19"
+ ],
+ "risks": [
+  "CameraRig.cs and PlayerController.cs are touched by P1 (facing/camera); coordinate.",
+  "The vignette is a HUD-layer node: align it with P2's CanvasLayer ordering."
+ ],
+ "effort": "M"
+}

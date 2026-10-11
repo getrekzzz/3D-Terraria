@@ -1,5 +1,7 @@
-# Animation tour (timescale slows animation, not the simulation: waits after "use" are animation time): the player's body from the side while idling, running, swinging, mining, stabbing, shooting,
-# drawing a bow, casting, drinking and holding a torch; zombies shambling and dying; bosses turning to look.
+# Animation tour (timescale slows animation, not the simulation: waits after "use" are animation time): the player's body from the side while idling, running, swinging, mining, lunging with a spear,
+# shooting, drawing a bow, casting, drinking, then every other use style's clip (a rapier jab, a throw, eating, holding
+# up a crate, a staff, a tome, a whip crack, a yoyo and a flail on the right arm) and holding a torch; first-person bow,
+# gun and pickaxe; zombies shambling and dying; bosses turning to look.
 #   godot --path . --rendering-driver vulkan -- --world=anim --size=tiny --new --player=anim --fresh-player \
 #         --view=2 --shots=/tmp/shots --smoke=res://game/Testing/Tours/animation.cmds
 wait_until player.frozen == 0 300
@@ -45,7 +47,7 @@ wait 0.3
 timescale 0.01
 use
 wait 0.16
-screenshot d_thrust 0
+screenshot d_spear 0
 wait_until screenshot.pending == 0 900
 timescale 1
 wait 1
@@ -93,6 +95,97 @@ screenshot h_drink 0
 wait_until screenshot.pending == 0 900
 timescale 1
 wait 1
+
+# The other use styles at mid-clip: the rapier's jab held out, the throw just let go, the second bite, the crate held
+# high, the staff lifting, the tome pushed out, the whip at its crack.
+give copper_shortsword
+wield copper_shortsword
+wait 0.3
+timescale 0.01
+use
+wait 0.06
+screenshot h1_rapier 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give shuriken 20
+wield shuriken
+wait 0.3
+timescale 0.01
+use
+wait 0.05
+screenshot h2_throw 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give cooked_fish 3
+wield cooked_fish
+wait 0.3
+timescale 0.01
+use
+wait 0.17
+screenshot h3_eat 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give wooden_crate 2
+wield wooden_crate
+wait 0.3
+timescale 0.01
+use
+wait 0.2
+screenshot h4_hold_up 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give amethyst_staff
+wield amethyst_staff
+wait 0.3
+timescale 0.01
+use
+wait 0.05
+screenshot h5_staff 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give water_bolt
+wield water_bolt
+wait 0.3
+timescale 0.01
+use
+wait 0.05
+screenshot h6_tome 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give leather_whip
+wield leather_whip
+wait 0.3
+timescale 0.01
+use
+wait 0.3
+screenshot h7_whip 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+# Looping right-arm clips while the button is held: a yoyo worked by the wrist, a flail spun over the head.
+give wood_yoyo
+wield wood_yoyo
+press use_primary
+wait 0.3
+screenshot h8_yoyo 0
+wait_until screenshot.pending == 0 900
+release use_primary
+wait 1
+give sunfury
+wield sunfury
+press use_primary
+wait 0.4
+screenshot h9_flail 0
+wait_until screenshot.pending == 0 900
+release use_primary
+wait 1
+assert anim.missing_clips == 0
 give torch 10
 wield torch
 time 21
@@ -125,6 +218,38 @@ screenshot m_jump 0
 wait_until screenshot.pending == 0 900
 press jump off
 wait 1.5
+
+# First person: a bow held upright with an arrow on the string, the arrow gone just after the release, and a pistol
+# pointing along the view at the crosshair.
+camera first
+wield wooden_bow
+give wooden_arrow 20
+wait 0.5
+screenshot q_fp_bow_rest
+wait_until screenshot.pending == 0 900
+press use_primary
+wait 0.05
+screenshot q_fp_bow_release 0
+wait_until screenshot.pending == 0 900
+release use_primary
+wait 0.6
+wield flintlock_pistol
+wait 0.5
+screenshot r_fp_gun
+wait_until screenshot.pending == 0 900
+camera third
+wait 0.5
+
+# First person: a held pickaxe mid-chop (the view model eases up, strikes and settles on the use's timing).
+camera first
+wield copper_pickaxe
+press use_primary
+wait 0.2
+screenshot s_fp_mine 0
+wait_until screenshot.pending == 0 900
+release use_primary
+camera third
+wait 0.5
 
 camera orbit 0
 spawn zombie 3 6

@@ -1,0 +1,45 @@
+{
+ "id": "P3-15",
+ "title": "Whips (presentation) and the autoswing rule (Feral Claws family)",
+ "player_outcome": "The whip is a visible tapered lash that coils back and cracks with a snap and sparks at the tip. Whips need a Feral Claws-type accessory to auto-swing, as in Terraria 1.4.4.",
+ "design": [
+  "New game/Entities/WhipRenderer.cs: for each active lash, a 6-sided tapered tube (width 0.03 \u2192 0.008) along WhipGeometry.Points, evaluated at smooth render time. Colour from the item (whip params colour). Hide the held whip model while lashing and draw a handle cylinder at the hand socket.",
+  "Crack moment (t 0.55\u20130.6): EffectKit Sparks at the tip plus Sfx 'whip_crack'. Swing-up whoosh 'whip_swing' at the start.",
+  "StatIds.Autoswing ('autoswing'), registered in the Known set.",
+  "ItemUseSystem repeat rule: whips repeat only when Autoswing > 0. Melee keeps 1.4.4 always-autoswing.",
+  "Data: feral_claws and its upgrades present in data (power_glove, mechanical_glove, fire_gauntlet, berserkers_glove if they exist) gain {stat: autoswing, add: 1}; descriptions follow Terraria ('Enables auto swing for melee weapons and whips').",
+  "ContentValidator.Items: warn on autoReuse set on melee swing items (dead data)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Stats/StatIds.cs \u2014 Autoswing",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 whip repeat uses Autoswing",
+  "src/Strata.Core/Content/Validation/ContentValidator.Items.cs \u2014 dead autoReuse warning",
+  "game/Player/PlayerAvatar.Held.cs \u2014 hide whip during lash",
+  "game/Bootstrap/WorldLauncher.cs \u2014 create WhipRenderer",
+  "game/Audio/SoundEvents.cs \u2014 whip sounds"
+ ],
+ "files_add": [
+  "game/Entities/WhipRenderer.cs \u2014 lash tube rendering and crack effects"
+ ],
+ "data_changes": [
+  "data/items/equipment.json feral_claws (+ existing upgrades): add equipEffect {type: stat, stat: autoswing, add: 1}; update descriptions"
+ ],
+ "tests": [
+  "WhipTests (extend): with feral_claws equipped, holding repeats the whip",
+  "Tour: timescale-0.01 screenshots at t 0.3/0.6 of leather_whip in 3P and FP"
+ ],
+ "verification": [
+  "Screenshots show the lash curve matching the hit test (overlay debug: 'whip debug' engine command draws WhipGeometry points)",
+  "perf: gd.whips < 0.1 ms"
+ ],
+ "depends_on": [
+  "P3-14",
+  "P3-03",
+  "P3-06",
+  "P3-08"
+ ],
+ "risks": [
+  "Render/Core lash mismatch if a different t is used; share WhipGeometry and UseAnimationMax."
+ ],
+ "effort": "S"
+}

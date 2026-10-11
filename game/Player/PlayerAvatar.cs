@@ -10,7 +10,7 @@ namespace Strata.Game.Player;
 
 /// <summary>
 /// The visible player body in third person: the animated human (see PlayerAvatar.Motion), the held item in the right
-/// hand (carried and trailed as PlayerAvatar.Blade describes) and voxel lighting.
+/// hand (carried and trailed as PlayerAvatar.Blade describes), worn armour (PlayerAvatar.Armor) and voxel lighting.
 /// </summary>
 public sealed partial class PlayerAvatar : Node3D
 {
@@ -29,14 +29,16 @@ public sealed partial class PlayerAvatar : Node3D
         _props = props;
         Name = "Avatar";
         InitializeGear();
+        InitializeArmor();
         var look = controller.Entity.State.Look;
         var model = $"assets/models/creatures/{look.ModelId}.glb";
-        _visual = CreatureVisual.Create(ResourceLoader.Exists("res://" + model) ? model : "assets/models/creatures/player.glb", props, aim: true);
+        _visual = CreatureVisual.Create(ResourceLoader.Exists("res://" + model) ? model : "assets/models/creatures/player.glb", props, aim: true, now: true);
         if (_visual == null) return;
         AddChild(_visual);
         if (ResourceLoader.Exists("res://" + model)) _visual.SetAppearance(look);
         // Full detail up close: simplified LODs let the hair shell sink into the scalp.
         _visual.SetLodBias(8f);
+        InitializeLook(ResourceLoader.Exists("res://" + model));
         InitializeBlade();
     }
 
@@ -48,11 +50,17 @@ public sealed partial class PlayerAvatar : Node3D
         int immune = entity.State.Vitals.ImmunityTicks;
         Visible = !_controller.Rig.FirstPerson && (immune <= 0 || (immune / 4) % 2 == 0); // blink while invulnerable
         UpdateHeld(entity.Minecart != null ? default : entity.State.Inventory.Held);
+        ExtendThrust(entity);
         UpdateCart(entity.Minecart);
+        UpdateMount(entity.Mount);
         UpdateGear(delta);
         _light = PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity);
         Animate(entity, (float)delta);
+        UpdateRagdoll(entity);
         _visual.SetLight(_light);
+        UpdateArmor((float)delta);
+        UpdateStatus();
+        UpdateLook(delta);
     }
 
     /// <summary>Clip choice for bodies without an animation set (their own embedded clips).</summary>
@@ -60,10 +68,10 @@ public sealed partial class PlayerAvatar : Node3D
     {
         speed = 1f;
         if (!entity.Alive) return "death";
-        if (entity.UseAnimation > 0 && _heldItem != null)
+        if (entity.UseAnimation > 0 && (entity.UseItem ?? _heldItem) is { } acting)
         {
-            var info = _game.Uses[_heldItem];
-            return info.Has(ItemAction.Melee) || info.IsTool ? "swing" : "use";
+            var info = _game.Uses[acting]; // a quick-key drink animates its potion, not the held item
+            return info.Has(ItemAction.Melee) || info.IsTool || info.Style == UseStyle.Swing ? "swing" : "use";
         }
         var v = _controller.Velocity;
         if (!_controller.IsOnFloor() && !_controller.Frozen) return v.Y > 0 ? "jump" : "fall";
@@ -86,8 +94,7 @@ public sealed partial class PlayerAvatar : Node3D
         var item = held.Item;
         if (item == _heldItem) return;
         _heldItem = item;
-        // (Free the bone attachment AttachToBone made for it too, or every switch leaves one behind on the skeleton.)
-        (_held?.GetParent() as BoneAttachment3D ?? _held)?.QueueFree();
+        ReleaseHeld();
         _held = null;
         LightAnchor = null;
         if (item == null || _visual == null)
@@ -97,18 +104,18 @@ public sealed partial class PlayerAvatar : Node3D
         }
         var path = AssetPaths.ItemModel(item, _game.Session.Content);
         Node3D? node;
+        float scale = 1f;
         if (path != null && _props.Model(path, multimesh: false) is { } mesh)
         {
-            node = new MeshInstance3D { Mesh = mesh, Scale = Vector3.One * HeldScale(item) };
+            node = new MeshInstance3D { Mesh = mesh };
+            scale = HeldScale(item) * MeleeScale(_game, _game.Uses[item], _props, path, HeldSize(held));
         }
         else
         {
-            node = new Sprite3D { Texture = ItemIcons.Get(item), PixelSize = 0.25f / 128f, Shaded = true };
+            node = HeldFallback(item); // a block's textured cube (PlayerAvatar.Held), else the icon
         }
-        // Items are modelled with the grip at the origin and the business end along +Y: the handle sits in the fist
-        // and the item leaves it past the thumb (the hand bone's +Z), tilted toward the fingers for guns.
-        node.RotationDegrees = new Vector3(90f - HeldTilt(item), 0, 0);
-        node.Position = HeldGrip();
+        node.Transform = HeldPose(_game.Uses[item], path, scale); // the style's hand frame (PlayerAvatar.Held)
+        RememberHeld(node, item, path, scale, HeldSize(held));
         _held = node;
         LightAnchor = node;
         if (Flames.Of(item, _game.Session.Content) is { } flame)
@@ -117,40 +124,30 @@ public sealed partial class PlayerAvatar : Node3D
             node.AddChild(fire);
             LightAnchor = fire;
         }
-        if (!_visual.AttachToBone("hand.R", node))
+        if (!AttachHeld(node))
         {
             node.QueueFree();
             LightAnchor = null;
-            node = null;
+            _held = node = null;
         }
         TrackBlade(node, item);
     }
 
-    /// <summary>
-    /// Where a held item's handle runs through the right fist, in the hand bone's space: toward the palm and along the
-    /// hand, as a fraction of the hand's length (tools/blender/bgen/human/motion.py GRIP, where the fingers wrap).
-    /// </summary>
-    private static readonly Vector3 Grip = new(-0.33f, 0.89f, 0f);
-
-    private Vector3 HeldGrip()
-    {
-        var sk = _visual?.Skeleton;
-        int hand = sk?.FindBone("hand.R") ?? -1, finger = sk?.FindBone("middle.01.R") ?? -1;
-        if (sk == null || hand < 0) return new Vector3(0, 0.08f, 0);
-        // The hand bone is about 1.05 x the wrist-to-knuckle distance (the generator's 0.1 m against 0.095 m).
-        float length = finger >= 0 ? sk.GetBoneRest(finger).Origin.Length() * 1.05f : 0.1f;
-        return Grip * length;
-    }
-
-    /// <summary>
-    /// Degrees an item tips from square to the forearm toward the fingers: guns lie along the forearm like a real
-    /// pistol grip, so the barrel follows the arm to the target (the shoot action is authored for it, see
-    /// tools/blender/bgen/human/actions.py TILT).
-    /// </summary>
-    private float HeldTilt(ItemDef item) => ActionFor(item, _game.Uses[item]) == "shoot" ? 70f : 0f;
-
     /// <summary>Where a carried light shines from in third person: the held torch's flame, or the held item.</summary>
     public Node3D? LightAnchor { get; private set; }
+
+    /// <summary>
+    /// The held item in the hand: how far (degrees) its limbs or shaft (+Y) lean from straight up, and how far its
+    /// business end (a bow's back, −X; anything else's +Y) points from the aim. −1 with nothing in hand.
+    /// </summary>
+    public (float Tilt, float Aim) HeldDegrees()
+    {
+        if (_held == null || _heldItem == null || !IsInstanceValid(_held) || !_held.IsInsideTree()) return (-1f, -1f);
+        var b = _held.GlobalBasis.Orthonormalized();
+        var a = _controller.Entity.Aim;
+        var axis = _game.Uses[_heldItem].Style == UseStyle.Bow ? -b.X : b.Y;
+        return (Mathf.RadToDeg(b.Y.AngleTo(Vector3.Up)), Mathf.RadToDeg(axis.AngleTo(new Vector3(a.X, a.Y, a.Z))));
+    }
 
     private MeshInstance3D? _cart;
 

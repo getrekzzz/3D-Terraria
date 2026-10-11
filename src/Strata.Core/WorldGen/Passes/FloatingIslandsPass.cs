@@ -33,9 +33,11 @@ public sealed class FloatingIslandsPass : GenPass
             {
                 if (!ctx.TryRandomLandPoint(ref rng, 0.9f, 60f, out float x, out float z)) break;
                 if (placed.Any(p => (p.X - x) * (p.X - x) + (p.Z - z) * (p.Z - z) < 140f * 140f)) continue;
-                placed.Add((x, z));
-                float top = rng.Range(bands.SkyStart + 12f, bands.SpaceStart - 16f);
+                // Don't Dig Up: the islands float in the open air over the bottom surface, clear of the rock roof.
+                float top = bands.Inverted ? rng.Range(bands.SkyStart + 12f, bands.UndergroundTop - 14f) : rng.Range(bands.SkyStart + 12f, bands.SpaceStart - 16f);
                 float radius = rng.Range(18f, 32f), depth = rng.Range(14f, 24f);
+                if (bands.Inverted && (top - depth < ctx.Terrain.SurfaceHeight(x, z) + 10f || top + 12f > ctx.Terrain.CeilingHeight(x, z))) continue;
+                placed.Add((x, z));
                 var island = new IslandFeature(x, z, top, radius, depth) { Kind = "island", Zone = "sky", CloudLake = rng.Chance(0.3f), Seed = rng.NextUInt() };
                 ctx.Plan.AddFeature(island);
                 StructurePlacementPass.AddStructure(ctx.Plan, "sky_house", SkyHouse(ctx, new Int3((int)x, (int)top + 1, (int)z), ref rng));

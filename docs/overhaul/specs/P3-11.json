@@ -1,0 +1,50 @@
+{
+ "id": "P3-11",
+ "title": "Projectile visuals: data trails, bolt halos, spin from data, terrain impacts, pooled lights and materials",
+ "player_outcome": "Gem bolts, sparks, Starfury stars, the Enchanted Sword beam and flaming arrows leave coloured trails. Magic bolts glow with a halo. Shuriken spin flat, boomerangs whirl flat, bombs tumble. Arrows thunk into walls with dust. Fishing bites splash and plop.",
+ "design": [
+  "Verified: ProjectileDef.Trail has zero readers. Bolts are SphereMesh radius Def.Radius*0.25 with a new material and OmniLight each (ProjectileRenderer.cs:264-285). Spin only when Returns > 0 || Fuse, end over end (line 222). fish_bite.wav is unused.",
+  "ProjectileDef: Spin (rad/s, default 0), SpinAxis ('tumble' | 'flat' | 'roll'), TrailWidth (m, 0.12), TrailTime (s, 0.25).",
+  "Split ProjectileRenderer.cs into ProjectileRenderer.cs (lifecycle), ProjectileRenderer.Visuals.cs (Create: meshes, bolt halos, cached materials Dictionary<Color, Material>) and ProjectileRenderer.Trails.cs.",
+  "Trails: one shared ImmediateMesh. Each projectile has a 12-point ring buffer sampled at 60 Hz, drawn as camera-facing tapered strips (additive, alpha fade), with dying trails kept for TrailTime after Removed. Buffers are pooled.",
+  "Bolts: core radius \u2265 0.06 m plus an additive halo billboard (radius\u00d74).",
+  "Remove the per-projectile OmniLight. ProjectileRenderer.Lights(eye, radius) becomes a DynamicLights provider that tracks the projectile, so the count is limited by the preset pool.",
+  "Core ProjectileSystem: event HitTerrain(Projectile, Vector3 point, ushort block), raised in MoveThroughTerrain on collision (once per bounce).",
+  "SoundEvents plays 'arrow_hit' for Visual 'arrow', else dig_{material} at \u22126 dB. EffectKit fires 4 chips in the block colour.",
+  "Fishing: ProjectileRenderer detects the Biting rising edge \u2192 Sfx.PlayAt('fish_bite') plus an EffectKit Splash."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/ProjectileDef.cs \u2014 Spin, SpinAxis, TrailWidth, TrailTime",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs \u2014 HitTerrain event",
+  "game/Entities/ProjectileRenderer.cs \u2014 lifecycle only; spin from data; lights provider",
+  "game/Bootstrap/WorldLauncher.cs \u2014 register lights provider",
+  "game/Audio/SoundEvents.cs \u2014 impact sounds",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 spinAxis values, trail colour"
+ ],
+ "files_add": [
+  "game/Entities/ProjectileRenderer.Visuals.cs \u2014 meshes, halos, cached materials",
+  "game/Entities/ProjectileRenderer.Trails.cs \u2014 pooled ribbon trails"
+ ],
+ "data_changes": [
+  "Projectiles: shuriken spin 30 flat; spiky_ball 12 tumble; throwing_knife 0; bomb 6 tumble; dynamite 5 tumble; grenade 8 tumble; beenade 8 tumble",
+  "Projectiles: wooden_boomerang/enchanted_boomerang/flamarang/paladins_hammer_throw/possessed_hatchet 22 flat",
+  "Projectiles: flaming_arrow gets a trail if missing; 'trail' colours kept"
+ ],
+ "tests": [
+  "ArsenalTests: an arrow fired into a wall raises HitTerrain exactly once",
+  "Smoke combat.cmds bow section unchanged: errors == 0"
+ ],
+ "verification": [
+  "Lavapipe screenshot of amethyst_staff bolts and a thrown shuriken",
+  "perf: 60 bolts on screen \u2192 gd.projectiles < 1 ms, draw calls not scaling with bolt count"
+ ],
+ "depends_on": [
+  "P3-08",
+  "P3-10"
+ ],
+ "risks": [
+  "Overlaps P1 lag item D5 (per-projectile materials/OmniLights) in the same file; whichever lands second rebases.",
+  "Trail ribbons on very fast bullets can stretch; cap segment length."
+ ],
+ "effort": "M"
+}

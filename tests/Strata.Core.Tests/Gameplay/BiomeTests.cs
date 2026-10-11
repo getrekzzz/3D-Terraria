@@ -1,5 +1,6 @@
 using System.Numerics;
 using Strata.Core.Common;
+using Strata.Core.Content.Loading;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Tests.Support;
 using Strata.Core.Voxels;
@@ -90,6 +91,16 @@ public class BiomeTests
         int liquid = chunk.Data.Liquids?[ChunkMath.Index(local)] ?? 0;
         Assert.Equal((int)LiquidType.Shimmer, liquid >> 5);
         Assert.Contains("aether", session.ContextAt(lake).Biomes);
+    }
+
+    [Fact]
+    public void BrightBiomesHaveExposureBias()
+    {
+        Assert.True(TestPaths.Content.Biomes.Get("desert").ExposureBias < 1f);
+        Assert.True(TestPaths.Content.Biomes.Get("tundra").ExposureBias < 1f);
+        Assert.Equal(1f, TestPaths.Content.Biomes.Get("forest").ExposureBias);
+        var db = ContentLoader.LoadFromTexts(new[] { ("biomes.json", """{ "biomes": [ { "id": "glare", "exposureBias": 3.0 } ] }""") });
+        Assert.Contains(db.Report.Errors, e => e.Message.Contains("exposureBias", StringComparison.Ordinal));
     }
 
     [Fact]

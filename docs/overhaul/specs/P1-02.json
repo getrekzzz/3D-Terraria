@@ -1,0 +1,58 @@
+{
+ "id": "P1-02",
+ "title": "Core: lighting config, deterministic exposure model, per-biome exposure bias",
+ "player_outcome": "No visible change yet. This adds the tuning data and the pure logic that P1-03/P1-04 use to stop desert and snow blowing out while caves still adapt.",
+ "design": [
+  "Add src/Strata.Core/Presentation/LightingConfig.cs (Path = data/config/lighting.json), following the GraphicsConfig/GrassConfig pattern: Load(IDataSource) via ContentJson.Options, List<string> Validate().",
+  "Exposure section fields: CaveBoost 1.7, NightBoost 1.2, BrightenPerSecond 0.5, DarkenPerSecond 2.5, AutoKey 0.35, AutoMin 0.72, AutoMax 1.45, AutoSpeed 1.0.",
+  "Glow section: Threshold 1.6, Softness 2.5, Intensity 0.6, LuminanceCap 8, Levels[7] = [0,0,1,1,0.8,0.5,0.25].",
+  "Fog section: NearCap 70 m. ScreenSpace section: SsilIntensity 0.9, VolumetricAlbedo 0.8.",
+  "Torch section: PlacedEnergy 1.5, PlacedRangeBase 4, PlacedRangePerPeak 9.5, PlacedAttenuation 0.6, HeldEnergy 2.0, HeldRangeBase 4, HeldRangePerPeak 12, HeldAttenuation 0.6. BlockLight section: Linear 0.62, Gain 1.35, DaylitSuppression 0.65.",
+  "Validate ranges: 0 < AutoMin <= 1 <= AutoMax <= 4; CaveBoost 1-3; per-second rates > 0; Levels has 7 non-negative values with sum > 0; energies > 0; attenuation 0.2-2.",
+  "Add src/Strata.Core/Presentation/ExposureModel.cs, a pure class. static float Target(ExposureSettings s, float outdoor, float daylight, float biomeBias) = Lerp(s.CaveBoost, Lerp(s.NightBoost, 1, daylight) * Lerp(1, biomeBias, daylight), outdoor).",
+  "ExposureModel also gets float Current (starts at 1) and void Step(float target, float dt): asymmetric exponential, rising at BrightenPerSecond and falling at DarkenPerSecond, so leaving a cave darkens fast and never flashbangs.",
+  "ExposureModel also gets static (float MinSensitivity, float MaxSensitivity) AutoWindow(ExposureSettings) = (AutoKey/AutoMax/0.00125, AutoKey/AutoMin/0.00125). Document the Godot conversion: luminance = ISO * 12.5/100/100 at exposure_sensitivity 100. This is why today's 85/170 window pins the multiplier to 1.65-3.3x.",
+  "BiomeDef: add public float ExposureBias { get; init; } = 1f with the doc 'open-air daytime exposure multiplier; bright sand and snow < 1'.",
+  "ContentValidator.World.ValidateBiomes: report an error when ExposureBias is outside 0.4-1.5.",
+  "ValidateCommand: load and validate lighting.json next to graphics.json (Error: lines on problems).",
+  "Write data/config/lighting.json with a comment on every value. Files under config/ are excluded from the content manifest, so no manifest change is needed."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/BiomeDef.cs \u2014 ExposureBias",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 ExposureBias range check",
+  "tools/Strata.Tools/Commands/ValidateCommand.cs \u2014 validate lighting.json",
+  "data/biomes.json \u2014 exposureBias values"
+ ],
+ "files_add": [
+  "src/Strata.Core/Presentation/LightingConfig.cs \u2014 exposure/glow/fog/torch/block-light tuning with Validate()",
+  "src/Strata.Core/Presentation/ExposureModel.cs \u2014 target, asymmetric adaptation, Godot AE window conversion",
+  "data/config/lighting.json \u2014 shipped tuning values",
+  "tests/Strata.Core.Tests/Content/LightingConfigTests.cs \u2014 shipped file valid, bad values reported",
+  "tests/Strata.Core.Tests/Presentation/ExposureModelTests.cs \u2014 model behaviour"
+ ],
+ "data_changes": [
+  "data/biomes.json: desert exposureBias 0.85, tundra 0.82, sky 0.9, hallow 0.92, ocean 0.92 (others default 1.0)",
+  "data/config/lighting.json: new file with the values listed in design"
+ ],
+ "tests": [
+  "LightingConfigTests.ShippedLightingIsValid: Load(FileSystemDataSource(ProjectRoot)).Validate() is empty",
+  "LightingConfigTests.OutOfRangeValuesAreReported: AutoMin 0, AutoMax 0.5, Levels length 3, negative energy each produce a problem",
+  "ExposureModelTests.DesertNoonIsDarkerThanForest: Target(outdoor 1, daylight 1, bias 0.85) < Target(1,1,1) == 1",
+  "ExposureModelTests.SealedCaveAdapts: Target(outdoor 0, *, *) == CaveBoost",
+  "ExposureModelTests.MonotoneInOutdoor: over outdoor 0..1 in steps of 0.1 the target never rises",
+  "ExposureModelTests.LeavingACaveDarkensFastEnteringBrightensSlowly: from 1.7 to a 0.85 target, within 10% in <= 1.0 s of 1/60 s steps; from 0.85 to 1.7, still below 90% after 2 s",
+  "ExposureModelTests.AutoWindowMatchesGodotConversion: (0.35, 0.72, 1.45) gives (193.1, 388.9) within 0.1",
+  "BiomeTests.BrightBiomesHaveExposureBias: shipped desert and tundra have ExposureBias < 1; the validator rejects 3.0 on a synthetic biome"
+ ],
+ "verification": [
+  "dotnet test (new tests green)",
+  "dotnet run --project tools/Strata.Tools -- validate: no errors; a deliberately bad lighting.json value prints Error: data/config/lighting.json",
+  "manifest --check unchanged"
+ ],
+ "depends_on": [],
+ "risks": [
+  "These numbers are starting points. P1-03/P1-04 calibrate them from screenshots, so keep every value in data, not code.",
+  "The ISO-to-luminance factor is Godot's internal convention. Add a comment linking CameraAttributesPractical._update_auto_exposure."
+ ],
+ "effort": "M"
+}

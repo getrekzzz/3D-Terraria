@@ -7,8 +7,8 @@ using Strata.Game.Settings;
 namespace Strata.Game.Menu;
 
 /// <summary>
-/// The settings menu (title screen and pause menu): Gameplay, Video, Audio, Controls and Interface tabs. Every change
-/// applies immediately; settings are saved when the screen is closed.
+/// The settings menu (title screen and pause menu): Gameplay, Video, Audio, Controls, Interface and Accessibility
+/// tabs. Every change applies immediately; settings are saved when the screen is closed.
 /// </summary>
 public sealed partial class SettingsScreen : PanelContainer
 {
@@ -20,8 +20,8 @@ public sealed partial class SettingsScreen : PanelContainer
     {
         _services = services;
         _viewport = viewport;
-        CustomMinimumSize = new Vector2(900, 620);
-        Theme = UI.UiTheme.Theme;
+        // fits the smallest logical viewport the UI scale guard allows (1024×600) with a margin; the tabs scroll
+        CustomMinimumSize = new Vector2(900, 560);
         var style = UI.UiTheme.Panel(0.96f);
         style.ContentMarginLeft = style.ContentMarginRight = 20;
         style.ContentMarginTop = style.ContentMarginBottom = 16;
@@ -30,7 +30,7 @@ public sealed partial class SettingsScreen : PanelContainer
         box.AddThemeConstantOverride("separation", 10);
         AddChild(box);
         box.AddChild(MenuKit.Title("Settings", 40));
-        var tabs = new TabContainer { SizeFlagsVertical = SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(0, 460) };
+        var tabs = new TabContainer { SizeFlagsVertical = SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(0, 400) };
         tabs.AddThemeFontSizeOverride("font_size", 18);
         box.AddChild(tabs);
         tabs.AddChild(Tab("Gameplay", Gameplay));
@@ -38,6 +38,7 @@ public sealed partial class SettingsScreen : PanelContainer
         tabs.AddChild(Tab("Audio", Audio));
         tabs.AddChild(Tab("Controls", Controls));
         tabs.AddChild(Tab("Interface", Interface));
+        tabs.AddChild(Tab("Accessibility", Accessibility));
         var buttons = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
         buttons.AddThemeConstantOverride("separation", 24);
         buttons.AddChild(MenuKit.Big("Back", () =>
@@ -50,7 +51,8 @@ public sealed partial class SettingsScreen : PanelContainer
 
     private static ScrollContainer Tab(string name, Action<VBoxContainer> build)
     {
-        var scroll = new ScrollContainer { Name = name, HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        // FollowFocus: a controller stepping the focus down a long tab (Controls) scrolls it into view.
+        var scroll = new ScrollContainer { Name = name, HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled, FollowFocus = true };
         var margin = new MarginContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         margin.AddThemeConstantOverride("margin_left", 12);
         margin.AddThemeConstantOverride("margin_right", 18);
@@ -79,15 +81,23 @@ public sealed partial class SettingsScreen : PanelContainer
             "Blocks are mined and placed as 1 m grid blocks, or as single 0.5 m cells. Holding Alt swaps while held."));
         box.AddChild(MenuKit.Row("Smart dig", MenuKit.Toggle(S.SmartDig, v => { S.SmartDig = v; Changed(); }),
             "Looking steeply down with a pickaxe digs the ground under your feet."));
+        box.AddChild(MenuKit.Row("Smart cursor", MenuKit.Toggle(S.SmartCursor, v => { S.SmartCursor = v; Changed(); }),
+            $"Pickaxes snap to the nearest block they can mine near your aim (ores first), axes to the nearest tree. {KeyBindings.Label("smart_cursor")} toggles it in game."));
         box.AddChild(Header("Camera"));
         box.AddChild(MenuKit.Row("First person by default", MenuKit.Toggle(S.FirstPerson, v => { S.FirstPerson = v; Changed(); })));
         box.AddChild(MenuKit.Row("Field of view", MenuKit.Slider(50, 110, 1, S.FieldOfView, v => { S.FieldOfView = (float)v; Changed(); }, v => $"{v:0}°")));
         box.AddChild(MenuKit.Row("Camera distance", MenuKit.Slider(1.5, 9, 0.1, S.CameraDistance, v => { S.CameraDistance = (float)v; Changed(); }, v => $"{v:0.0} m")));
         box.AddChild(MenuKit.Row("Mouse sensitivity", MenuKit.Slider(0.1, 3, 0.05, S.MouseSensitivity, v => { S.MouseSensitivity = (float)v; Changed(); }, v => $"{v:0.00}x")));
         box.AddChild(MenuKit.Row("Invert mouse Y", MenuKit.Toggle(S.InvertY, v => { S.InvertY = v; Changed(); })));
+        box.AddChild(MenuKit.Row("Camera shake", MenuKit.Toggle(S.CameraShake, v => { S.CameraShake = v; Changed(); }),
+            "Shakes and jolts from explosions, bosses, heavy hits and hard landings."));
+        box.AddChild(MenuKit.Row("Hurt flash", MenuKit.Toggle(S.HurtFlash, v => { S.HurtFlash = v; Changed(); }),
+            "The screen edges flash red when you are hurt."));
         box.AddChild(Header("World"));
         box.AddChild(MenuKit.Row("Pause when inventory is open", MenuKit.Toggle(S.AutoPause, v => { S.AutoPause = v; Changed(); })));
         box.AddChild(MenuKit.Row("Damage numbers", MenuKit.Toggle(S.DamageNumbers, v => { S.DamageNumbers = v; Changed(); })));
+        box.AddChild(MenuKit.Row("Seasonal events", MenuKit.Toggle(S.SeasonalEvents, v => { S.SeasonalEvents = v; Changed(); }),
+            "Halloween (Oct 10 - Nov 1) and Christmas (Dec 15 - 31) by your computer's date: goodie bags, presents, hats and Santa."));
     }
 
     private void Audio(VBoxContainer box)
@@ -128,14 +138,29 @@ public sealed partial class SettingsScreen : PanelContainer
         return text;
     }
 
+    /// <summary>"125%", or "150% (effective 125%)" when the window is too small for the chosen scale.</summary>
+    private static string UiScaleText(double v)
+    {
+        float effective = DisplaySettings.Effective((float)v, (Engine.GetMainLoop() as SceneTree)?.Root.Size ?? Vector2I.Zero);
+        return effective < v - 0.001 ? $"{v * 100:0}% (effective {effective * 100:0}%)" : $"{v * 100:0}%";
+    }
+
     private void Interface(VBoxContainer box)
     {
         box.AddChild(Header("Interface"));
-        box.AddChild(MenuKit.Row("UI scale", MenuKit.Slider(0.75, 2, 0.05, S.UiScale, v => { S.UiScale = (float)v; Changed(); }, v => $"{v * 100:0}%")));
+        box.AddChild(MenuKit.Row("UI scale", MenuKit.Slider(0.75, 2, 0.05, S.UiScale, v => { S.UiScale = (float)v; Changed(); }, UiScaleText),
+            "The interface never grows past what fits a 1024×600 layout in the window; a smaller effective scale is shown."));
         box.AddChild(MenuKit.Row("Show target name", MenuKit.Toggle(S.ShowTargetName, v => { S.ShowTargetName = v; Changed(); }),
             "Names the block or object under the crosshair."));
+        box.AddChild(MenuKit.Row("Boss banners", MenuKit.Toggle(S.BigAnnouncements, v => { S.BigAnnouncements = v; Changed(); }),
+            "Also shows \"… has awoken!\" as a big banner at the top; every message is in the chat log (Enter for the history)."));
+        box.AddChild(MenuKit.Row("Boss intros", MenuKit.Toggle(S.BossIntros, v => { S.BossIntros = v; Changed(); }),
+            "A boss's arrival shows its name on a title card, with thin cinema bars and the camera pulled back for a moment; its fall a \"Defeated\" card and a brief slow motion. You keep control throughout."));
         box.AddChild(MenuKit.Row("Show FPS", MenuKit.Toggle(S.ShowFps, v => { S.ShowFps = v; Changed(); })));
         box.AddChild(MenuKit.Row("Minimap", MenuKit.Toggle(S.ShowMinimap, v => { S.ShowMinimap = v; Changed(); }), "The discovered map around you, top right. M opens the full map."));
+        box.AddChild(MenuKit.Row("Life display", MenuKit.Choice(new[] { "Hearts and stars", "Bars" }, S.LifeDisplay == UserSettings.BarsLifeDisplay ? 1 : 0,
+            i => { S.LifeDisplay = i == 1 ? UserSettings.BarsLifeDisplay : UserSettings.ClassicLifeDisplay; Changed(); }),
+            "Life as rows of hearts (20 each, golden with Life Fruit) and mana as a column of stars, or as two bars."));
         box.AddChild(MenuKit.Row("Cursor colour", MenuKit.ColorField(S.CursorColor, h => { S.CursorColor = h; Changed(); })));
     }
 }

@@ -1,0 +1,210 @@
+{
+ "comment": "P5-16 shops II: the Painter's paintings (bgen/town_shop.py painting), the Dye Trader's dyes and Dye Vat, the Party Girl's goods and the Tavernkeep's medals, Ale and crystal stand.",
+ "objects": {
+  "land": {
+   "generator": "painting",
+   "params": {
+    "colors": [
+     "#7ab0e0",
+     "#a8c870",
+     "#5a8a3a"
+    ],
+    "style": "sun"
+   }
+  },
+  "trapped_ghost": {
+   "generator": "painting",
+   "params": {
+    "colors": [
+     "#1a1a2a",
+     "#3a3a5a"
+    ],
+    "style": "figure",
+    "motif": "#d8e8ff"
+   }
+  },
+  "outcast": {
+   "generator": "painting",
+   "params": {
+    "colors": [
+     "#5a4a3a",
+     "#8a6a4a"
+    ],
+    "style": "figure"
+   }
+  },
+  "dark_soul_reaper": {
+   "generator": "painting",
+   "params": {
+    "colors": [
+     "#2a1a2a",
+     "#5a2a3a"
+    ],
+    "style": "figure",
+    "motif": "#0a0a0a"
+   }
+  },
+  "waldo": {
+   "generator": "painting",
+   "params": {
+    "colors": [
+     "#e8e0c8",
+     "#c83a3a",
+     "#e8e0c8"
+    ],
+    "style": "figure",
+    "motif": "#c83a3a"
+   }
+  },
+  "sparky": {
+   "generator": "painting",
+   "params": {
+    "colors": [
+     "#8ab0d0",
+     "#c89060"
+    ],
+    "style": "figure",
+    "motif": "#8a5a2a"
+   }
+  },
+  "the_truth_is_up_there": {
+   "generator": "painting",
+   "params": {
+    "colors": [
+     "#0a1a3a",
+     "#1a3a1a"
+    ],
+    "style": "sun",
+    "motif": "#9aff9a"
+   }
+  },
+  "dye_vat": {
+   "generator": "pot",
+   "params": {
+    "tint": "#8a6a4a",
+    "bands": [
+     "#d02a2a",
+     "#2a5ae0",
+     "#f0d020"
+    ]
+   }
+  },
+  "bubble_machine": {
+   "generator": "safe",
+   "params": {}
+  },
+  "eternia_crystal_stand": {
+   "generator": "altar",
+   "params": {
+    "stone": "#8a7a6a",
+    "glow": "#9a6aff"
+   }
+  }
+ },
+ "items": {
+  "explicit": {
+   "silver_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#c8ccd4"
+    }
+   },
+   "brown_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#7a5030"
+    }
+   },
+   "black_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#2a2a2e"
+    }
+   },
+   "red_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#d02a2a"
+    }
+   },
+   "orange_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#e8801a"
+    }
+   },
+   "yellow_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#f0d020"
+    }
+   },
+   "green_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#3ab03a"
+    }
+   },
+   "blue_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#2a5ae0"
+    }
+   },
+   "purple_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#8a3ad0"
+    }
+   },
+   "pink_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#f070c0"
+    }
+   },
+   "confetti": {
+    "generator": "chunk",
+    "params": {
+     "layer": "plain",
+     "color": "#ff70d0"
+    }
+   },
+   "confetti_gun": {
+    "generator": "gun",
+    "params": {
+     "style": "pistol",
+     "accent": "#ff70d0"
+    }
+   },
+   "defender_medal": {
+    "generator": "coin",
+    "params": {
+     "metal": "#d8a040",
+     "metalLayer": "gold",
+     "stack": 1
+    }
+   },
+   "ale": {
+    "generator": "potion",
+    "params": {
+     "color": "#d8a040"
+    }
+   },
+   "party_hat": {
+    "generator": "seasonal_hat",
+    "params": {
+     "style": "witch"
+    }
+   }
+  }
+ },
+ "armor": {
+  "party_hat": {
+   "preset": "wizard",
+   "layer": "cloth",
+   "metal": "#ff60c0",
+   "trim": "#ffe060"
+  }
+ }
+}

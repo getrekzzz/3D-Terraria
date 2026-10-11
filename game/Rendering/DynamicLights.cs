@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 using Strata.Core.Common;
+using Strata.Core.Presentation;
 using Strata.Core.Session;
 
 namespace Strata.Game.Rendering;
@@ -10,8 +10,9 @@ namespace Strata.Game.Rendering;
 /// <summary>
 /// Real (shadowless) lights for the light sources nearest the camera: placed torches and stations, lava hotspots and
 /// glowing creatures. Baked voxel light gives every source its soft glow; these add a longer reach and directional
-/// shading to the few that matter most. The pool size comes from the graphics preset (<c>dynamicLights</c>), so a
-/// swarm of fireflies can never turn into dozens of lights.
+/// shading to the few that matter most: a placed torch's light carries to about 13 m (data/config/lighting.json
+/// <c>torch</c>), well past the 7.5 m edge of its baked light. The pool size comes from the graphics preset
+/// (<c>dynamicLights</c>, 4 even on low), so a swarm of fireflies can never turn into dozens of lights.
 /// </summary>
 public sealed partial class DynamicLights : Node3D
 {
@@ -23,19 +24,29 @@ public sealed partial class DynamicLights : Node3D
     /// <summary>
     /// A candidate light: colour normalised to its brightest channel, <paramref name="Peak"/> its 0..1 level;
     /// <paramref name="Seed"/> desynchronises flicker (a stable value per source); <paramref name="Track"/> follows a
-    /// moving source every frame.
+    /// moving source every frame; <paramref name="Attenuation"/> is Godot's omni falloff (lower carries further).
     /// </summary>
-    public readonly record struct Source(Vector3 Position, Color Color, float Peak, Kind Kind, float Range, float Energy, float Seed, Func<Vector3>? Track = null);
+    public readonly record struct Source(Vector3 Position, Color Color, float Peak, Kind Kind, float Range, float Energy, float Seed,
+        Func<Vector3>? Track = null, float Attenuation = 1.1f);
 
     private readonly List<OmniLight3D> _pool = new();
     private readonly List<Func<Vector3, float, IEnumerable<Source>>> _providers = new();
     private readonly List<Source> _assigned = new();
+    // Reused by the 4 Hz refresh: ranking the candidates allocates nothing.
+    private readonly List<Candidate> _candidates = new();
+    private TorchSettings _torch = null!;
     private double _refresh;
     private float _time;
+
+    /// <summary>A source and its rank (lower is chosen first).</summary>
+    private readonly record struct Candidate(float Score, Source Source);
+
+    private static readonly Comparison<Candidate> ByScore = (a, b) => a.Score.CompareTo(b.Score);
 
     public void Initialize(GraphicsSettings graphics)
     {
         Name = "DynamicLights";
+        _torch = graphics.Lighting.Torch;
         Resize(graphics.Preset.DynamicLights);
         graphics.Changed += p => Resize(p.DynamicLights);
     }
@@ -43,8 +54,11 @@ public sealed partial class DynamicLights : Node3D
     /// <summary>Adds a source of candidates: (camera position, radius) → sources.</summary>
     public void AddProvider(Func<Vector3, float, IEnumerable<Source>> provider) => _providers.Add(provider);
 
-    /// <summary>Placed objects that give light (torches, candles, furnaces), switched-off ones excluded.</summary>
-    public static IEnumerable<Source> PlacedLights(GameWorld game, World.ObjectPlacement placement, Vector3 eye, float radius)
+    /// <summary>
+    /// Placed objects that give light (torches, candles, furnaces), switched-off ones excluded. Energy and range scale
+    /// with the light's peak channel (lighting.json <c>torch.placed*</c>): a full torch reaches about 13 m.
+    /// </summary>
+    public IEnumerable<Source> PlacedLights(GameWorld game, World.ObjectPlacement placement, Vector3 eye, float radius)
     {
         int r = (int)(radius / Units.CellSize);
         var c = new Int3((int)MathF.Floor(eye.X / Units.CellSize), (int)MathF.Floor(eye.Y / Units.CellSize), (int)MathF.Floor(eye.Z / Units.CellSize));
@@ -62,7 +76,8 @@ public sealed partial class DynamicLights : Node3D
             }
             float peak = max / 15f;
             yield return new Source(at, new Color(l[0] / (float)max, l[1] / (float)max, l[2] / (float)max), peak,
-                o.Def.Flame != null ? Kind.Fire : Kind.Steady, 3f + peak * 8.5f, 0.85f * peak, Seed(at));
+                o.Def.Flame != null ? Kind.Fire : Kind.Steady, _torch.PlacedRangeBase + peak * _torch.PlacedRangePerPeak,
+                _torch.PlacedEnergy * peak, Seed(at), Attenuation: _torch.PlacedAttenuation);
         }
     }
 
@@ -89,25 +104,28 @@ public sealed partial class DynamicLights : Node3D
 
     private void Assign(Vector3 eye)
     {
-        var candidates = new List<Source>();
-        foreach (var provider in _providers) candidates.AddRange(provider(eye, Radius));
+        _candidates.Clear();
         // Nearest first, a dim source counting as further away than a bright one at the same distance.
-        var chosen = candidates.OrderBy(s => s.Position.DistanceTo(eye) / (0.4f + s.Peak)).Take(_pool.Count).ToList();
+        foreach (var provider in _providers)
+            foreach (var s in provider(eye, Radius))
+                _candidates.Add(new Candidate(s.Position.DistanceTo(eye) / (0.4f + s.Peak), s));
+        _candidates.Sort(ByScore);
         _assigned.Clear();
-        _assigned.AddRange(chosen);
         for (int i = 0; i < _pool.Count; i++)
         {
             var light = _pool[i];
-            if (i >= chosen.Count)
+            if (i >= _candidates.Count)
             {
                 light.Visible = false;
                 continue;
             }
-            var s = chosen[i];
+            var s = _candidates[i].Source;
+            _assigned.Add(s);
             light.Visible = true;
             light.GlobalPosition = s.Position;
             light.LightColor = s.Color;
             light.OmniRange = s.Range;
+            light.OmniAttenuation = s.Attenuation;
         }
     }
 
@@ -124,7 +142,6 @@ public sealed partial class DynamicLights : Node3D
             {
                 ShadowEnabled = false,
                 Visible = false,
-                OmniAttenuation = 1.1f,
                 LightSpecular = 0.4f,
                 LightVolumetricFogEnergy = 0.6f,
                 DistanceFadeEnabled = true,

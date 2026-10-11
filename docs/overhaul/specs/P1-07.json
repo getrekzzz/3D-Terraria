@@ -1,0 +1,54 @@
+{
+ "id": "P1-07",
+ "title": "Crosshair names for creatures, bosses (incl. worm segments) and town residents",
+ "player_outcome": "Pointing at any creature, boss segment or townsperson shows its name and life under the crosshair ('Blue Slime 25/25', 'Eater of Worlds 3920/4000', 'Andrew the Guide 250/250'). Walls hide names of what is behind them. Right-click talks to the resident under the crosshair.",
+ "design": [
+  "Add Core src/Strata.Core/Gameplay/Interaction/EntityPicking.cs with public readonly record struct EntityPick(Npc? Npc, TownNpc? Resident, float Distance).",
+  "EntityPicking.Pick(GameWorld w, Vector3 origin, Vector3 dir, float minT, float maxT, float pad = 0.1f): ray-vs-AABB slab test against each live, non-Removed npc's Box, each of its Segments (box of half SegmentRadius ?? 0.5) and each live resident (Center \u00b1 TownNpc.HalfExtents), all padded. Iterate Box/Segments directly: no Volumes() iterator and no LINQ, so nothing allocates per tick. The nearest t in [minT, maxT] wins; a segment hit returns its owning npc.",
+  "EntityPicking.Describe(EntityPick) returns (Name, Life, MaxLife). Residents: Title, Life, Def.Life. Npcs: IsBoss && Def.Boss.Title != '' ? Title : Def.DisplayName, with Life and MaxLife. Parts and followers are their own npcs and show their own name and life.",
+  "InteractionController, after the convergence cast (P1-06): Hovered = EntityPicking.Pick(Game, castOrigin, dir, 0, terrainT or 60), so terrain occludes names. The aim point becomes the nearer of the entity and terrain hits.",
+  "InteractionController: TalkTarget = Hovered?.Resident when it is within Town.Config.TalkRange of Entity.Center. This replaces UpdateTalkTarget, which is deleted.",
+  "New game/UI/TargetLabel.cs (a Label with an outline). When ShowTargetName is on and an entity is hovered, it shows 'Name  life/max' at any distance, coloured green->yellow->red by life fraction (bosses use the boss-bar red). Otherwise it shows the existing block/object name when InReach (TargetName() moves here). Text is updated only when it changes.",
+  "Hud.cs: replace the _targetName construction (lines 101-109) and its update (lines 211, 220-226) with TargetLabel, a net reduction of about 15 lines.",
+  "GodotCommandHost probes: hover.npc, hover.resident, and a prefix probe hover.<enemy id> (1 when the hovered npc has that id).",
+  "docs/architecture/gameplay.md: entity picking."
+ ],
+ "files_modify": [
+  "game/Player/InteractionController.cs \u2014 Hovered pick, talk target from pick, remove UpdateTalkTarget",
+  "game/UI/Hud.cs \u2014 use TargetLabel",
+  "game/Debug/GodotCommandHost.cs \u2014 hover.* probes",
+  "game/Testing/Scripts/combat.cmds \u2014 hover asserts",
+  "game/Testing/Scripts/town.cmds \u2014 hover resident assert",
+  "docs/architecture/gameplay.md \u2014 picking"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Interaction/EntityPicking.cs \u2014 allocation-free ray picking over npcs, segments and residents",
+  "game/UI/TargetLabel.cs \u2014 crosshair name/life label",
+  "tests/Strata.Core.Tests/Gameplay/EntityPickingTests.cs \u2014 picking rules"
+ ],
+ "data_changes": [],
+ "tests": [
+  "EntityPickingTests.PicksCreatureInFront: a green_slime 4 m ahead is picked and Distance is about 4 - half width",
+  "EntityPickingTests.TerrainOccludes: passing maxT = the distance of a stone wall between returns null",
+  "EntityPickingTests.WormSegmentResolvesToHead: spawn eater_of_worlds (or devourer) and aim at Segments[3]; Pick.Npc is the head npc",
+  "EntityPickingTests.BehindMinTIsIgnored: a slime between origin and minT is not picked",
+  "EntityPickingTests.NearestWins: of two slimes on the ray, the nearer is picked",
+  "EntityPickingTests.ResidentsArePickedAndDescribed: a town resident on the ray is picked and Describe returns its Title and life",
+  "combat.cmds: 'killall' / 'camera first' / 'aim 0 0 1' / 'spawn zombie 1 5' / 'ai off' / 'aim 0 -0.14 1' / 'wait 0.3' / 'assert hover.npc == 1' / 'assert hover.zombie == 1' / 'fill -2 0 3 2 4 3 stone' / 'wait 0.2' / 'assert hover.npc == 0' / 'fill -2 0 3 2 4 3 air' / 'ai on' / 'killall' / 'camera third'",
+  "town.cmds, where a resident stands in front: 'camera first' / aim at it / 'wait 0.3' / 'assert hover.resident == 1' / 'camera third'"
+ ],
+ "verification": [
+  "dotnet test; smoke combat.cmds and town.cmds PASS",
+  "Manual: hover slimes, a boss, a worm's tail and a Guide in third and first person; names never show through walls; right-click talks to the hovered resident",
+  "PerfOverlay: gd.interaction.physics stays under 0.1 ms with 100 creatures (spawn 100 green_slime)"
+ ],
+ "depends_on": [
+  "P1-06"
+ ],
+ "risks": [
+  "Touches Hud.cs (373 lines), which the UI phase restyles; keep TargetLabel self-contained so the UI phase only restyles it.",
+  "Flying creatures with tiny boxes are hard to hover; the 0.1 m pad helps and can be tuned.",
+  "A Terraria-style mouse-over name for invisible or invulnerable phases (burrowed worm) may look odd; skip npcs with Invulnerable && Pose == 'teleport' if needed."
+ ],
+ "effort": "M"
+}

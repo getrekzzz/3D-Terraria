@@ -12,6 +12,11 @@ surfaces offset from the bare skull (headshape) so they hug it whatever the face
 - Tied hair is pulled back flat to a tie and ends in a ponytail or a bun (hairtails.py).
 - A buzz cut is a close crop: a tinted layer on the scalp that thins into the skin at the hairline (crop.py).
 
+The player's hair catalogue (hair_styles.py) adds cuts made the same way: a pixie cut and a deep side parting (short
+hair, fuller and swept further across), hair slicked straight back from the forehead (``comb`` back), spiky hair
+(short locks tousled and lifted at their ends), a top knot (tied hair gathered to a bun on the crown), an undercut
+(locks only above ``above``, combed back, over a crop) and long hair falling in waves (``wave``).
+
 hairsdf sculpts the traced locks into the hair's mesh.
 """
 import math
@@ -42,6 +47,10 @@ class Style:
     mess: float           # random direction and lift
     fall: float = 0.0     # how far long hair hangs below the head (fraction of the frame scale)
     tie: tuple = None     # where tied hair is gathered (head-local)
+    comb: str = "crown"   # combed out from the crown or straight back from the forehead ("back")
+    above: float = None   # locks grow only above this height (head-local z): an undercut's top, over a crop
+    lift: float = 0.0     # every lock's end lifted this far off the head (spikes)
+    wave: float = 0.0     # long hair falling in waves this deep (head-local)
 
 
 STYLES = {
@@ -52,6 +61,14 @@ STYLES = {
     "ponytail": Style(0.0025, 0.002, 0.0, 0.0, 0.026, 0.0065, 90, 0.0, 0.02, tie=(0.0, -0.096, 0.048)),
     "bun": Style(0.0025, 0.002, 0.0, 0.0, 0.026, 0.0065, 90, 0.0, 0.02, tie=(0.0, -0.092, 0.058)),
     "buzz": Style(0.0007, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0),
+    # The player's catalogue (hair_styles.py).
+    "pixie": Style(0.003, 0.007, 0.07, 0.25, 0.021, 0.0085, 110, 1.0, 0.15),
+    "side_part": Style(0.003, 0.011, 0.095, 0.12, 0.025, 0.0095, 100, 1.0, 0.03),
+    "slicked_back": Style(0.0025, 0.004, 0.1, 0.08, 0.026, 0.0075, 100, 0.0, 0.02, comb="back"),
+    "spiky": Style(0.003, 0.01, 0.06, 0.35, 0.017, 0.0095, 130, 0.0, 0.7, lift=0.004),
+    "topknot": Style(0.0025, 0.002, 0.0, 0.0, 0.026, 0.0065, 90, 0.0, 0.02, tie=(0.0, -0.035, 0.1)),
+    "undercut": Style(0.003, 0.009, 0.1, 0.1, 0.024, 0.009, 110, 0.0, 0.05, comb="back", above=0.052),
+    "wavy_long": Style(0.003, 0.006, 0.11, 0.1, 0.036, 0.015, 150, 0.55, 0.08, fall=0.38, wave=0.009),
 }
 
 DOWN = np.asarray((0.0, 0.0, -1.0), dtype=F)
@@ -76,9 +93,10 @@ def _unit(v):
 class Groom:
     RINGS = 8
 
-    def __init__(self, head, style, color, under_hat=None, body_tree=None, seed=1, worn_tree=None, tie_color=None):
+    def __init__(self, head, style, color, under_hat=None, body_tree=None, seed=1, worn_tree=None, tie_color=None,
+                 bob=True):
         self.head = head
-        if style == "short" and head.frame.female:      # a woman's short hair is a chin-length bob
+        if style == "short" and head.frame.female and bob:      # a woman's short hair is a chin-length bob (``bob``)
             style = "bob"
         self.st = STYLES[style]
         # Hair is laid over the bare skull (short hair grows round the ears, so it ignores them; long hair falls over
@@ -89,6 +107,7 @@ class Groom:
                       (lambda p: head.shape.field(p, ears=False, face=False)))
         self.hang = self.field if self.st.fall else self.full
         self.name = style
+        self.skin_edge = True       # a crop thins into the skin's own colour (not in a hair model of its own: hair_styles)
         self.color = hex3(color)
         self.tie_color = hex3(tie_color) if tie_color else tuple(c * 0.45 for c in self.color)
         self.under_hat = under_hat                          # the hat it is cut back under (underhat), or None
@@ -145,6 +164,8 @@ class Groom:
         return (base * lie + self.st.thick * lie * (arch * (0.1 + layer * 0.12) * rise - 0.6 * (1 - t) ** 3)).astype(F)
 
     def _grows(self, q, slack=0.0):
+        if self.st.above is not None and q[2] < self.st.above - slack:
+            return False
         return coverage(Vector(q), self.part, self.sideburns, 0.002) > 0.5 if slack == 0 else (
             q[2] - hairline(Vector(q), self.part, self.sideburns) > -slack and ear_clear(Vector(q)) > 0.3)
 
@@ -163,6 +184,8 @@ class Groom:
         p = self._onto(np.asarray((0, -0.01, 0.0)) + dirs * 0.13, self.st.cap * 0.5, steps=5)
         # Under a hat from well up inside it, so the locks come out from under its edge combed, not as stubs.
         keep = np.array([self._grows(q) for q in p]) & (p[:, 2] < self.top(p) + (0.025 if self.under_hat else 0.0))
+        if self.st.above is not None:              # an undercut: only the top
+            keep &= p[:, 2] > self.st.above + 0.004
         return p[keep]
 
     def _rows(self):
@@ -184,8 +207,11 @@ class Groom:
                 to[:, 0] += np.where(p[:, 0] < 0, F(-0.12), F(0.12)) * _ss(-0.03, 0.05, p[:, 1])
             return _unit(to)
         # Combed out from the crown; over the forehead swept across, away from the parting; the sideburns, the hair
-        # round the ears and the nape lie down.
+        # round the ears and the nape lie down. (Slicked back: straight back from the forehead, round the sides to
+        # the nape.)
         v = _unit(p - self.crown)
+        if st.comb == "back":
+            v = _unit(np.stack([p[:, 0] * 1.5, np.full(len(p), -1.0), -0.15 - _ss(-0.06, -0.12, p[:, 1]) * 2.0], 1))
         front = _ss(-0.01, 0.05, p[:, 1]) * _ss(0.0, 0.07, p[:, 2])
         sweep = np.asarray((-math.copysign(1.0, self.part), 0.4, -0.15), dtype=F) * abs(self.part)
         low = (_ss(0.025, -0.015, p[:, 2]) * _ss(-0.06, -0.02, p[:, 1]))[:, None]
@@ -264,6 +290,7 @@ class Groom:
         lengths = np.minimum(lengths * 2.0, edge * np.where((end[:, 1] > 0.03) | (mess & (end[:, 2] > 0.0)), rough, even))
         tuft = self.rng.random(n) < st.mess * 0.6
         lift = np.where(tuft, self.rng.uniform(0.002, 0.0055, n) * st.mess / 0.45, 0.0) * _ss(0.0, 0.04, roots[:, 2])
+        lift = lift + st.lift * self.rng.uniform(0.7, 1.15, n) * _ss(-0.01, 0.05, roots[:, 2])
         keep = lengths > 0.02                       # nubs at the hairline: the locks from above cover it
         rings = 10
         P = self.trace(roots[keep], lengths[keep], layers[keep], turn[keep], rings, lift[keep])
@@ -310,6 +337,17 @@ class Groom:
         from .crop import crop
         if self.st.count == 0:
             return [crop(self, head_obj)]
+        if self.st.above is not None:              # an undercut's cropped sides and back
+            return self._sculpt(head_obj) + [crop(self.under_crop(), head_obj)]
+        return self._sculpt(head_obj)
+
+    def under_crop(self):
+        """A close crop in this hair's colour (under an undercut or a crest), thinning into the skin as this does."""
+        under = Groom(self.head, "buzz", "#" + "".join(f"{round(c * 255):02x}" for c in self.color), self.under_hat)
+        under.skin_edge = self.skin_edge
+        return under
+
+    def _sculpt(self, head_obj):
         from . import hairtails
         from .hairsdf import Sculpt
         from .longhair import long_locks
@@ -319,7 +357,7 @@ class Groom:
             parts.append(tail)
             solids.append(gather)
             extra.append(band)
-        elif self.name == "bun":
+        elif self.name in ("bun", "topknot"):
             bun, core = hairtails.bun(self)
             parts.append(bun)
             solids += core

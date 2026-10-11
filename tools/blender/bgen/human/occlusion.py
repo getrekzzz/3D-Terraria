@@ -20,12 +20,18 @@ def _hemisphere(count):
     return out
 
 
-def vertex_occlusion(obj, reach, rays=48):
-    """Per-vertex openness (0..1) of a mesh in its own space."""
+def vertex_occlusion(obj, reach, rays=48, occluders=None):
+    """Per-vertex openness (0..1) of a mesh in its own space; ``occluders`` (vertices, polygons in the same space)
+    shade it too (the head and body under a hair model of its own)."""
     me = obj.data
     verts = [v.co.copy() for v in me.vertices]
     clear = {i for i, m in enumerate(me.materials) if m is not None and m.name == "char:glass"}   # (light passes it)
-    bvh = BVHTree.FromPolygons(verts, [tuple(p.vertices) for p in me.polygons if p.material_index not in clear], epsilon=0.0)
+    polys = [tuple(p.vertices) for p in me.polygons if p.material_index not in clear]
+    if occluders is not None:
+        base = len(verts)
+        verts = verts + list(occluders[0])
+        polys = polys + [tuple(base + i for i in p) for p in occluders[1]]
+    bvh = BVHTree.FromPolygons(verts, polys, epsilon=0.0)
     dirs = _hemisphere(rays)
     eps = reach * 0.004
     open_ = []
@@ -61,13 +67,13 @@ def vertex_occlusion(obj, reach, rays=48):
     return open_
 
 
-def bake(obj, reach, rays=48, floor=0.0):
+def bake(obj, reach, rays=48, floor=0.0, occluders=None):
     """Writes the occlusion into the alpha of the mesh's "Color" corner attribute (created white if missing)."""
     me = obj.data
     if "Color" not in me.color_attributes:
         me.color_attributes.new("Color", "BYTE_COLOR", "CORNER")
     layer = me.color_attributes["Color"]
-    ao = vertex_occlusion(obj, reach, rays)
+    ao = vertex_occlusion(obj, reach, rays, occluders)
     for loop in me.loops:
         c = layer.data[loop.index].color_srgb
         layer.data[loop.index].color_srgb = (c[0], c[1], c[2], max(floor, ao[loop.vertex_index]))

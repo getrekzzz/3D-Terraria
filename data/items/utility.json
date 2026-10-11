@@ -1,11 +1,12 @@
 {
-  // Getting around and living off the land: the Magic Mirror and Recall Potions, fishing (rods, bobbers, the catch
-  // table, crates), cooking fish into Well Fed, and the Cooking Pot.
+  // Getting around and living off the land: the Magic Mirror and Recall Potions, fishing (rods, bobbers, fish, the
+  // basic crates; catch and crate tables live in loot/fishing.json and loot/crates.json), cooking fish into Well Fed,
+  // and the Cooking Pot.
   "projectiles": [
     { "id": "bobber", "name": "Bobber", "visual": "orb", "color": "#e83a3a", "gravity": 12, "lifetime": 60, "radius": 0.3, "contact": false, "bobber": true }
   ],
   "buffs": [
-    { "id": "well_fed", "name": "Well Fed", "description": "Minor improvements to all stats.", "color": "#e0b070",
+    { "id": "well_fed", "name": "Well Fed", "description": "Minor improvements to all stats.", "color": "#e0b070", "foodTier": 1, "visual": { "particle": "dust", "color": "#ffe0a0", "rate": 1.5, "rise": 0.8 },
       "effects": [{ "type": "stat", "stat": "defense", "add": 2 }, { "type": "stat", "stat": "genericDamage", "add": 0.05 }, { "type": "stat", "stat": "genericCrit", "add": 2 },
         { "type": "stat", "stat": "meleeSpeed", "add": 0.05 }, { "type": "stat", "stat": "moveSpeed", "add": 0.2 }, { "type": "stat", "stat": "lifeRegen", "add": 1 }],
       "covers": ["terraria:well_fed"] }
@@ -14,20 +15,20 @@
     { "id": "cooking_pot", "name": "Cooking Pot", "description": "Used for cooking food.", "size": [3, 2, 3], "interaction": "station", "stations": ["cooking_pot"], "hitPoints": 3, "itemCategory": "station", "itemValue": 2000 }
   ],
   "items": [
-    { "id": "magic_mirror", "name": "Magic Mirror", "description": "Gaze in the mirror to return home.", "category": "tool", "rarity": 1, "value": 50000, "useStyle": "consume", "useTime": 90, "useAnimation": 90,
+    { "id": "magic_mirror", "name": "Magic Mirror", "description": "Gaze in the mirror to return home.", "category": "tool", "rarity": 1, "value": 50000, "useStyle": "holdUp", "useTime": 90, "useAnimation": 90,
       "heldLight": [5, 8, 12], "behaviors": [{ "type": "consume", "recall": true }], "covers": ["terraria:magic_mirror"] },
-    { "id": "recall_potion", "name": "Recall Potion", "description": "Teleports you home.", "category": "potion", "maxStack": 30, "value": 1000, "useStyle": "consume", "useTime": 17, "useAnimation": 17,
+    { "id": "recall_potion", "name": "Recall Potion", "description": "Teleports you home.", "category": "potion", "maxStack": 9999, "value": 1000, "useStyle": "drink", "useTime": 17, "useAnimation": 17,
       "consumable": true, "behaviors": [{ "type": "consume", "recall": true }], "covers": ["terraria:recall_potion"] },
 
-    { "id": "wooden_fishing_pole", "name": "Wooden Fishing Pole", "description": "Cast into water, then use again when the bobber dips.", "category": "fishing", "value": 1000, "useStyle": "shoot", "useTime": 8, "useAnimation": 8,
+    { "id": "wooden_fishing_pole", "name": "Wooden Fishing Pole", "description": "Cast into water, then use again when the bobber dips.", "category": "fishing", "value": 1000, "useStyle": "swing", "useTime": 8, "useAnimation": 8,
       "projectile": "bobber", "shootSpeed": 11, "behaviors": [{ "type": "fishing", "power": 5 }], "covers": ["terraria:wooden_fishing_pole"] },
-    { "id": "reinforced_fishing_pole", "name": "Reinforced Fishing Pole", "category": "fishing", "rarity": 1, "value": 10000, "tags": ["shop"], "useStyle": "shoot", "useTime": 8, "useAnimation": 8,
+    { "id": "reinforced_fishing_pole", "name": "Reinforced Fishing Pole", "category": "fishing", "rarity": 1, "value": 10000, "tags": ["shop"], "useStyle": "swing", "useTime": 8, "useAnimation": 8,
       "projectile": "bobber", "shootSpeed": 12, "behaviors": [{ "type": "fishing", "power": 20 }] },
-    { "id": "fisher_of_souls", "name": "Fisher of Souls", "category": "fishing", "rarity": 1, "value": 10000, "useStyle": "shoot", "useTime": 8, "useAnimation": 8,
+    { "id": "fisher_of_souls", "name": "Fisher of Souls", "category": "fishing", "rarity": 1, "value": 10000, "useStyle": "swing", "useTime": 8, "useAnimation": 8,
       "projectile": "bobber", "shootSpeed": 13, "behaviors": [{ "type": "fishing", "power": 20 }] },
-    { "id": "fleshcatcher", "name": "Fleshcatcher", "category": "fishing", "rarity": 1, "value": 10000, "useStyle": "shoot", "useTime": 8, "useAnimation": 8,
+    { "id": "fleshcatcher", "name": "Fleshcatcher", "category": "fishing", "rarity": 1, "value": 10000, "useStyle": "swing", "useTime": 8, "useAnimation": 8,
       "projectile": "bobber", "shootSpeed": 13, "behaviors": [{ "type": "fishing", "power": 22 }], "covers": ["terraria:fleshcatcher"] },
-    { "id": "golden_fishing_rod", "name": "Golden Fishing Rod", "category": "fishing", "rarity": 3, "value": 500000, "tags": ["shop"], "useStyle": "shoot", "useTime": 8, "useAnimation": 8,
+    { "id": "golden_fishing_rod", "name": "Golden Fishing Rod", "category": "fishing", "rarity": 3, "value": 500000, "tags": ["shop"], "useStyle": "swing", "useTime": 8, "useAnimation": 8,
       "projectile": "bobber", "shootSpeed": 17, "behaviors": [{ "type": "fishing", "power": 50 }], "covers": ["terraria:golden_fishing_rod"] },
 
     { "id": "bass", "name": "Bass", "category": "material", "maxStack": 9999, "value": 100, "tags": ["fish"] },
@@ -42,14 +43,14 @@
     { "id": "prismite", "name": "Prismite", "category": "material", "rarity": 2, "maxStack": 9999, "value": 5000, "tags": ["fish"] },
     { "id": "specular_fish", "name": "Specular Fish", "category": "material", "maxStack": 9999, "value": 1500, "tags": ["fish"] },
     { "id": "armored_cavefish", "name": "Armored Cavefish", "category": "material", "maxStack": 9999, "value": 1500, "tags": ["fish"] },
-    { "id": "cooked_fish", "name": "Cooked Fish", "description": "Minor improvements to all stats.", "category": "consumable", "maxStack": 30, "value": 500, "useStyle": "consume", "useTime": 17, "useAnimation": 17,
+    { "id": "cooked_fish", "name": "Cooked Fish", "description": "Minor improvements to all stats.", "category": "consumable", "maxStack": 9999, "value": 500, "useStyle": "eat", "useTime": 17, "useAnimation": 17,
       "consumable": true, "buff": { "id": "well_fed", "ticks": 72000 } },
 
-    { "id": "wooden_crate", "name": "Wooden Crate", "description": "Right click to open.", "category": "container", "maxStack": 9999, "value": 5000, "useStyle": "consume", "useTime": 20, "useAnimation": 20,
+    { "id": "wooden_crate", "name": "Wooden Crate", "description": "Right click to open.", "category": "container", "maxStack": 9999, "value": 5000, "useStyle": "holdUp", "useTime": 20, "useAnimation": 20,
       "consumable": true, "behaviors": [{ "type": "consume", "loot": "wooden_crate" }] },
-    { "id": "iron_crate", "name": "Iron Crate", "description": "Right click to open.", "category": "container", "rarity": 1, "maxStack": 9999, "value": 10000, "useStyle": "consume", "useTime": 20, "useAnimation": 20,
+    { "id": "iron_crate", "name": "Iron Crate", "description": "Right click to open.", "category": "container", "rarity": 1, "maxStack": 9999, "value": 10000, "useStyle": "holdUp", "useTime": 20, "useAnimation": 20,
       "consumable": true, "behaviors": [{ "type": "consume", "loot": "iron_crate" }] },
-    { "id": "golden_crate", "name": "Golden Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "consume", "useTime": 20, "useAnimation": 20,
+    { "id": "golden_crate", "name": "Golden Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "holdUp", "useTime": 20, "useAnimation": 20,
       "consumable": true, "behaviors": [{ "type": "consume", "loot": "golden_crate" }] }
   ],
   "recipes": [
@@ -61,54 +62,5 @@
   ],
   "recipeGroups": [
     { "id": "any_edible_fish", "name": "Any Fish", "items": ["bass", "trout", "salmon", "atlantic_cod", "neon_tetra", "tuna", "red_snapper", "specular_fish", "armored_cavefish"] }
-  ],
-  "lootTables": [
-    { "id": "fishing", "mode": "weighted", "entries": [
-      { "item": "wooden_crate", "weight": 6 },
-      { "item": "iron_crate", "weight": 3, "conditions": [{ "type": "fishingPower", "min": 15 }] },
-      { "item": "golden_crate", "weight": 1, "conditions": [{ "type": "fishingPower", "min": 30 }] },
-      { "item": "bass", "weight": 50, "conditions": [{ "type": "depth", "max": 30 }] },
-      { "item": "trout", "weight": 15, "conditions": [{ "type": "depth", "max": 30 }, { "type": "biome", "any": ["forest", "hallow", "tundra"] }] },
-      { "item": "salmon", "weight": 12, "conditions": [{ "type": "depth", "max": 30 }, { "type": "biome", "any": ["forest"] }] },
-      { "item": "atlantic_cod", "weight": 25, "conditions": [{ "type": "biome", "any": ["tundra"] }] },
-      { "item": "neon_tetra", "weight": 25, "conditions": [{ "type": "biome", "any": ["jungle"] }] },
-      { "item": "tuna", "weight": 25, "conditions": [{ "type": "biome", "any": ["ocean"] }] },
-      { "item": "red_snapper", "weight": 25, "conditions": [{ "type": "biome", "any": ["ocean"] }] },
-      { "item": "trident", "weight": 1, "conditions": [{ "type": "biome", "any": ["ocean"] }] },
-      { "item": "reaver_shark", "weight": 1, "conditions": [{ "type": "biome", "any": ["ocean"] }, { "type": "fishingPower", "min": 25 }] },
-      { "item": "ebonkoi", "weight": 25, "conditions": [{ "type": "biome", "any": ["corruption"] }] },
-      { "item": "hemopiranha", "weight": 25, "conditions": [{ "type": "biome", "any": ["crimson"] }] },
-      { "item": "prismite", "weight": 8, "conditions": [{ "type": "biome", "any": ["hallow"] }] },
-      { "item": "specular_fish", "weight": 25, "conditions": [{ "type": "depth", "min": 30 }] },
-      { "item": "armored_cavefish", "weight": 20, "conditions": [{ "type": "depth", "min": 30 }] }
-    ] },
-    { "id": "wooden_crate", "coins": [1000, 5000], "entries": [
-      { "table": "wooden_crate_treasure", "chance": 0.25 },
-      { "item": "copper_bar", "min": 4, "max": 10, "chance": 0.25 }, { "item": "iron_bar", "min": 4, "max": 10, "chance": 0.2 },
-      { "item": "lesser_healing_potion", "min": 2, "max": 4, "chance": 0.4 }, { "item": "recall_potion", "min": 1, "max": 2, "chance": 0.2 },
-      { "item": "bomb", "min": 2, "max": 5, "chance": 0.2 }
-    ] },
-    { "id": "wooden_crate_treasure", "mode": "weighted", "entries": [
-      { "item": "aglet", "weight": 1 }, { "item": "wooden_boomerang", "weight": 1 }, { "item": "spear", "weight": 1 }, { "item": "shiny_red_balloon", "weight": 0.5 },
-      { "item": "trident", "weight": 0.5 }, { "item": "wood_yoyo", "weight": 1 }, { "item": "flipper", "weight": 0.5 }
-    ] },
-    { "id": "iron_crate", "coins": [2500, 10000], "entries": [
-      { "table": "iron_crate_treasure", "chance": 0.3 },
-      { "item": "silver_bar", "min": 4, "max": 12, "chance": 0.3 }, { "item": "gold_bar", "min": 4, "max": 10, "chance": 0.2 },
-      { "item": "lesser_healing_potion", "min": 3, "max": 5, "chance": 0.5 }, { "item": "recall_potion", "min": 1, "max": 3, "chance": 0.25 }
-    ] },
-    { "id": "iron_crate_treasure", "mode": "weighted", "entries": [
-      { "item": "magic_mirror", "weight": 1 }, { "item": "cloud_in_a_bottle", "weight": 1 }, { "item": "hermes_boots", "weight": 1 }, { "item": "trident", "weight": 1 },
-      { "item": "boomstick", "weight": 1, "conditions": [{ "type": "biome", "any": ["jungle"] }] }
-    ] },
-    { "id": "golden_crate", "coins": [10000, 40000], "entries": [
-      { "table": "golden_crate_treasure", "chance": 0.5 },
-      { "item": "gold_bar", "min": 8, "max": 16, "chance": 0.4 }, { "item": "platinum_bar", "min": 8, "max": 16, "chance": 0.3 },
-      { "item": "life_crystal", "chance": 0.2 }, { "item": "recall_potion", "min": 2, "max": 4, "chance": 0.3 }
-    ] },
-    { "id": "golden_crate_treasure", "mode": "weighted", "entries": [
-      { "item": "enchanted_sword", "weight": 0.5 }, { "item": "lucky_horseshoe", "weight": 1 }, { "item": "starfury", "weight": 1 }, { "item": "magic_mirror", "weight": 1 },
-      { "item": "fledgling_wings", "weight": 0.5 }, { "item": "reaver_shark", "weight": 0.3, "conditions": [{ "type": "biome", "any": ["ocean"] }] }
-    ] }
   ]
 }

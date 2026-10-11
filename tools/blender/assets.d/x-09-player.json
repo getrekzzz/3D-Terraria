@@ -1,0 +1,11 @@
+{
+ "comment": "X-09: player bodies per clothing style, generated bald with marker colours (red shirt or vest/coat, blue undershirt and irises, green trousers, grey hair, belt and boots) that the character shader recolours; hair is a separate model per style (build_all.py --hair).",
+ "creatures": {
+  "player_m_shirt": {"generator": "humanoid", "params": {"body": "male", "age": "young", "hairStyle": "bald", "hair": "#808080", "pants": "#50a050", "boots": "#808080", "belt": "#808080", "eyes": "#5050b0", "recolorable": true, "shirt": "#b05050"}},
+  "player_m_vest": {"generator": "humanoid", "params": {"body": "male", "age": "young", "hairStyle": "bald", "hair": "#808080", "pants": "#50a050", "boots": "#808080", "belt": "#808080", "eyes": "#5050b0", "recolorable": true, "shirt": "#5050b0", "vest": "#b05050"}},
+  "player_m_coat": {"generator": "humanoid", "params": {"body": "male", "age": "young", "hairStyle": "bald", "hair": "#808080", "pants": "#50a050", "boots": "#808080", "belt": "#808080", "eyes": "#5050b0", "recolorable": true, "shirt": "#5050b0", "coat": "#b05050", "coatOpen": true}},
+  "player_f_shirt": {"generator": "humanoid", "params": {"body": "female", "age": "young", "hairStyle": "bald", "hair": "#808080", "pants": "#50a050", "boots": "#808080", "belt": "#808080", "eyes": "#5050b0", "recolorable": true, "shirt": "#b05050"}},
+  "player_f_vest": {"generator": "humanoid", "params": {"body": "female", "age": "young", "hairStyle": "bald", "hair": "#808080", "pants": "#50a050", "boots": "#808080", "belt": "#808080", "eyes": "#5050b0", "recolorable": true, "shirt": "#5050b0", "vest": "#b05050"}},
+  "player_f_coat": {"generator": "humanoid", "params": {"body": "female", "age": "young", "hairStyle": "bald", "hair": "#808080", "pants": "#50a050", "boots": "#808080", "belt": "#808080", "eyes": "#5050b0", "recolorable": true, "shirt": "#5050b0", "coat": "#b05050", "coatOpen": true}}
+ }
+}

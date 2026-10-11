@@ -9,9 +9,11 @@ namespace Strata.Game.Entities;
 
 /// <summary>
 /// Projectiles: arrows and thrown items use their item model aligned with the flight direction (boomerangs spin);
-/// minions with a creature model face where they fly; magic bolts are glowing orbs with a dynamic light (the plan
-/// reserves dynamic lights for moving sources like these). Fishing bobbers bob on the water, dip when a fish bites,
-/// and hang from a line to the rod tip.
+/// minions with a creature model face where they fly; magic bolts are glowing orbs. Glowing shots near the camera
+/// borrow one of a few pooled lights (ProjectileRenderer.Lights.cs). Fishing bobbers bob on the water, dip when a fish
+/// bites, and hang from a line to the rod tip. Pets: ProjectileRenderer.Pets.cs. Materials and meshes are shared and
+/// finished nodes go back to a pool per projectile type when their shot ends (P1b-15). The local player's shots are
+/// drawn leaving the held item's muzzle: the view starts there and eases onto the simulated path (P3-10).
 /// </summary>
 public sealed partial class ProjectileRenderer : Node3D
 {
@@ -28,8 +30,13 @@ public sealed partial class ProjectileRenderer : Node3D
         Name = "Projectiles";
         game.Projectiles.Removed += p =>
         {
-            if (_views.Remove(p.Id, out var node)) node.QueueFree();
+            if (_views.Remove(p.Id, out var node)) Release(p, node);
+            _petAnims.Remove(p.Id);
+            _awaiting.Remove(p.Id);
+            _offsets.Remove(p.Id);
+            EndTrail(p.Id);
         };
+        game.Projectiles.Spawned += StartAtMuzzle;
         AddChild(new MeshInstance3D
         {
             Mesh = _lines, CastShadow = GeometryInstance3D.ShadowCastingSetting.Off,
@@ -43,15 +50,17 @@ public sealed partial class ProjectileRenderer : Node3D
         _clock += (float)delta;
         _lines.ClearSurfaces();
         bool anyLine = false;
+        _retryNow = _awaiting.Count > 0 && _clock - _retryClock >= 0.25f;
+        if (_retryNow) _retryClock = _clock;
         foreach (var p in _game.Projectiles.All)
         {
-            if (!_views.TryGetValue(p.Id, out var node))
+            if (!_views.TryGetValue(p.Id, out var node) || (_awaiting.Contains(p.Id) && RetryModel(p, ref node)))
             {
-                node = Create(p);
-                AddChild(node);
+                node ??= Create(p);
+                if (node.GetParent() == null) AddChild(node);
                 _views[p.Id] = node;
             }
-            var pos = new Vector3(p.Position.X, p.Position.Y, p.Position.Z);
+            var pos = new Vector3(p.Position.X, p.Position.Y, p.Position.Z) + MuzzleOffset(p.Id, (float)delta);
             var vel = new Vector3(p.Velocity.X, p.Velocity.Y, p.Velocity.Z);
             if (p.Def.Bobber)
             {
@@ -69,6 +78,11 @@ public sealed partial class ProjectileRenderer : Node3D
                 continue;
             }
             node.Position = pos;
+            if (p.PetSlot != null)
+            {
+                AnimatePet(p, node, vel);
+                continue;
+            }
             if (p.Def.Minion != null)
             {
                 // Creatures stay upright and turn to face their flight.
@@ -81,69 +95,31 @@ public sealed partial class ProjectileRenderer : Node3D
                 var dir = vel.Normalized();
                 var axis = Vector3.Up.Cross(dir);
                 float angle = Mathf.Acos(Mathf.Clamp(Vector3.Up.Dot(dir), -1f, 1f));
-                node.Basis = axis.LengthSquared() > 1e-6f ? new Basis(axis.Normalized(), angle) : (dir.Y < 0 ? new Basis(Vector3.Right, Mathf.Pi) : Basis.Identity);
-                if (p.Def.Returns > 0 || p.Def.Fuse) node.Basis *= new Basis(Vector3.Right, _clock * (p.Def.Fuse ? 6f : 22f)); // tumbling throws
+                var along = axis.LengthSquared() > 1e-6f ? new Basis(axis.Normalized(), angle) : (dir.Y < 0 ? new Basis(Vector3.Right, Mathf.Pi) : Basis.Identity);
+                node.Basis = Spun(p, along);
             }
+            Sample(p, pos); // its trail (ProjectileRenderer.Trails)
+            QueueString(p, pos); // a yoyo's string (ProjectileRenderer.Tethers)
         }
         if (anyLine) _lines.SurfaceEnd();
+        DrawTrails((float)delta);
+        DrawStrings();
+        PlaceLights(); // the pooled lights go to the glowing shots nearest the camera
     }
 
+    /// <summary>A view for a new projectile: a pooled one of its type when there is one, else a fresh one.</summary>
     private Node3D Create(Projectile p)
     {
-        var root = new Node3D();
-        var color = Color.FromHtml(p.Def.Color);
-        var content = _game.Session.Content;
-        if (p.Def.Visual == "creature" && CreatureVisual.Create($"assets/models/creatures/{p.Def.Model ?? p.Def.Id}.glb", _props) is { } creature)
+        if (Poolable(p) && _pool.TryGetValue(p.Def.Id, out var stack) && stack.Count > 0)
         {
-            creature.Scale = Vector3.One * p.Def.Scale;
-            root.AddChild(creature);
-            creature.SetTint(color);
-            creature.Play("idle");
-            AddLight(root, p);
-            return root;
+            var reused = stack.Pop();
+            Pooled--;
+            reused.Transform = Transform3D.Identity;
+            reused.Visible = true;
+            return reused;
         }
-        Mesh? mesh = null;
-        if (p.Def.Visual == "item" && content.Items.TryGet(p.Def.Model ?? p.Def.Id, out var thrown) && AssetPaths.ItemModel(thrown, content) is { } itemPath)
-            mesh = _props.Model(itemPath, multimesh: false);
-        else if (p.Def.Model != null)
-            mesh = _props.Model(AssetPaths.ProjectileModel(p.Def), multimesh: false);
-        else if (p.Def.Visual == "arrow" && content.Items.TryGet(p.Def.Id, out var ammo) && AssetPaths.ItemModel(ammo, content) is { } path)
-            mesh = _props.Model(path, multimesh: false); // ammo projectiles reuse their ammo item's model
-        if (mesh != null)
-        {
-            root.AddChild(new MeshInstance3D { Mesh = mesh, Position = new Vector3(0, -0.1f, 0), Scale = Vector3.One * p.Def.Scale });
-        }
-        else if (p.Def.Visual == "bullet")
-        {
-            // A short bright streak along the flight direction.
-            root.AddChild(new MeshInstance3D
-            {
-                Mesh = new CapsuleMesh { Radius = 0.025f, Height = 0.45f, RadialSegments = 6, Rings = 1 },
-                MaterialOverride = Glow(color, 4f), CastShadow = GeometryInstance3D.ShadowCastingSetting.Off,
-            });
-        }
-        else
-        {
-            float r = p.Def.Bobber ? 0.07f : p.Def.Radius * 0.25f;
-            root.AddChild(new MeshInstance3D
-            {
-                Mesh = new SphereMesh { Radius = r, Height = r * 2f, RadialSegments = 10, Rings = 6 },
-                MaterialOverride = p.Def.Bobber ? new StandardMaterial3D { AlbedoColor = color, Roughness = 0.4f } : Glow(color, 3f),
-                CastShadow = GeometryInstance3D.ShadowCastingSetting.Off,
-            });
-        }
-        AddLight(root, p);
-        return root;
-    }
-
-    private static StandardMaterial3D Glow(Color color, float energy) => new()
-    {
-        AlbedoColor = color, EmissionEnabled = true, Emission = color, EmissionEnergyMultiplier = energy, ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
-    };
-
-    private static void AddLight(Node3D root, Projectile p)
-    {
-        if (p.Def.Light is { Length: 3 } l)
-            root.AddChild(new OmniLight3D { LightColor = new Color(l[0] / 15f, l[1] / 15f, l[2] / 15f), OmniRange = 4f, LightEnergy = 1.5f, ShadowEnabled = false });
+        var node = Build(p);
+        if (Poolable(p) && !_awaiting.Contains(p.Id)) _pooledType[node] = p.Def.Id;
+        return node;
     }
 }

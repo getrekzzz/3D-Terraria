@@ -49,8 +49,9 @@ public sealed class RenderTables
         Cutout = new bool[n];
         var surfaces = new List<SurfaceLayers>();
         // Blocks share a surface when they look alike: same texture layers and the same grass.
-        var bySurface = new Dictionary<(SurfaceLayers, int), ushort>();
+        var bySurface = new Dictionary<(SurfaceLayers, int, float), ushort>();
         var grassKinds = new List<int>();
+        var glows = new List<float>();
         var kindIndex = new Dictionary<string, int>(StringComparer.Ordinal);
         if (grass != null)
             for (int k = 0; k < grass.Ordered.Count; k++) kindIndex[grass.Ordered[k].Key] = k;
@@ -71,17 +72,20 @@ public sealed class RenderTables
             if (b.Render == BlockRender.None) continue;
             var layers = new SurfaceLayers(layerIndex(b.Textures.TopLayer), layerIndex(b.Textures.SideLayer), layerIndex(b.Textures.BottomLayer));
             int kind = kindIndex.TryGetValue(b.Id, out int k) ? k : -1;
-            if (!bySurface.TryGetValue((layers, kind), out var s))
+            float glow = b.Glow ?? 0f;
+            if (!bySurface.TryGetValue((layers, kind, glow), out var s))
             {
                 s = (ushort)surfaces.Count;
                 surfaces.Add(layers);
                 grassKinds.Add(kind);
-                bySurface[(layers, kind)] = s;
+                glows.Add(glow);
+                bySurface[(layers, kind, glow)] = s;
             }
             Surface[id] = s;
         }
         Surfaces = surfaces;
         GrassKind = grassKinds.ToArray();
+        SurfaceGlow = glows.ToArray();
         Grass = grass;
     }
 
@@ -108,6 +112,9 @@ public sealed class RenderTables
     public ushort[] LiquidEmission { get; }
 
     public IReadOnlyList<SurfaceLayers> Surfaces { get; }
+
+    /// <summary>Shader-only self-glow per render surface (<see cref="BlockDef.Glow"/>, 0 for none).</summary>
+    public float[] SurfaceGlow { get; }
 
     /// <summary>Grass kind per render surface (index into <see cref="GrassConfig.Ordered"/>), -1 for none.</summary>
     public int[] GrassKind { get; }

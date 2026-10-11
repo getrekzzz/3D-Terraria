@@ -1,0 +1,43 @@
+{
+ "id": "P1b-01",
+ "title": "Terrain metrics: SurfaceProfile analyzer + worldgen-report terrain section (baseline before any terrain change)",
+ "player_outcome": "Nothing changes in game yet. This WP produces before/after evidence (hillshade maps, overhang maps, slope and roughness numbers) that later WPs use to show the hills are smoother without losing Terraria's rolling character.",
+ "design": [
+  "Checked against the code: TerrainField.cs:33 amp = 1.5 + rug*11 with 3-octave fBm at \u03bb34 and y*1.4 (:19,:40). BiomeRelief.cs uses ridged fBm for tundra (48 cells), jagged (3 oct), dunes and mountains (5 oct, 30+55*ridged), a Blur(1) and Clamp01(Membership*3) ramps. The audit's line numbers for that file are stale (the file has 94 lines) but its claims are correct. Ruggedness is never blurred.",
+  "Add src/Strata.Core/WorldGen/Analysis/SurfaceProfile.cs (pure Core). Add `static SurfaceProfile FromChunks(ContentDatabase db, Func<Int3, ChunkData?> chunkAt, int x0, int z0, int width, int depth, int yMin, int yMax, Func<float,float,float> surfaceHeight)` and a convenience `Measure(WorldGenerator gen, int x0, int z0, int width, int depth, int threads = 1)`. Measure generates, per chunk column, the chunks from CellToChunk(maxSurface + OverhangAmplitude + 8) down to CellToChunk(minSurface - 24), with the surface bounds sampled every 4 cells like WorldPlan.RaiseTerrainColumnTops. It uses Parallel.For when threads > 1.",
+  "Per column, record Top (highest cell where Blocks[b].IsSolid) and flag bits: Lip = the topmost solid run is 6 cells thick or less with air under it (overhang or thin roof). Floating = a solid cell with 2 or more air cells below it, within 12 cells of Top. Breach = Top is more than 3 cells below Terrain.SurfaceHeight (trench or cave breaking through). Water = liquid above Top.",
+  "Add src/Strata.Core/WorldGen/Analysis/TerrainStats.cs (record). `SurfaceProfile.Stats(Func<int,int,bool>? include)` returns: a histogram of |\u0394Top| between 4-neighbours in buckets 0/1/2/3/4-7/8+; p95, p99 and max step; lip %; floating cells per 10k columns; breach %; roughness = mean |Top(x+1)+Top(x-1)-2Top(x)| over both axes; relief = mean std-dev of Top in 128\u00d7128 blocks (guards against flattening); and a per-surface-biome breakdown via gen.Biomes.SurfaceBiome.",
+  "WorldgenReportCommand: add options --terrain-window=N (default 512 cells centred on spawn, clamped to the world) and --compare=<older stats.json>. Measure with the command's Threads setting. Add a `terrain` object to stats.json. With --compare, print a table of metric / before / after / delta.",
+  "Add tools/Strata.Tools/Commands/TerrainPainter.cs (keeps ReportPainter.cs at 170 lines). It writes terrain_hillshade.png (1 px per cell, NW light on the Top gradient, tinted by biome MapColor) and terrain_flags.png (grey hillshade with red lips, yellow floating cells, blue breaches, cyan water).",
+  "docs/architecture/worldgen.md, Inspect section: describe the new outputs and the evidence procedure. Run on the parent commit with --out=build/wg-before, then after each terrain WP run --out=build/wg-after --compare=build/wg-before/stats.json. build/ is gitignored, so paste the numbers and images into the PR."
+ ],
+ "files_modify": [
+  "tools/Strata.Tools/Commands/WorldgenReportCommand.cs \u2014 --terrain-window, --compare, terrain stats in stats.json, call TerrainPainter",
+  "docs/architecture/worldgen.md \u2014 terrain metrics and before/after procedure"
+ ],
+ "files_add": [
+  "src/Strata.Core/WorldGen/Analysis/SurfaceProfile.cs \u2014 per-column Top and flag analysis of generated chunks",
+  "src/Strata.Core/WorldGen/Analysis/TerrainStats.cs \u2014 aggregated slope, roughness, lip, breach and relief metrics with per-biome breakdown",
+  "tools/Strata.Tools/Commands/TerrainPainter.cs \u2014 hillshade and flag PNGs",
+  "tests/Strata.Core.Tests/WorldGen/SurfaceProfileTests.cs \u2014 synthetic and generated-world metric tests"
+ ],
+ "data_changes": [],
+ "tests": [
+  "SurfaceProfileTests.FlatPlaneHasNoSteps: VoxelWorld plane gives step histogram all in bucket 0, lip 0, breach 0",
+  "SurfaceProfileTests.ShelfOverAirIsALip: a 2-cell-thick shelf over air is flagged Lip; a 1-column hole of depth 6 is flagged Breach",
+  "SurfaceProfileTests.GeneratedWindowIsMeasurable: Tiny seed 1234, 96\u00d796 around spawn, finite stats, completes in under 5 s"
+ ],
+ "verification": [
+  "dotnet build Strata.sln && dotnet test tests/Strata.Core.Tests",
+  "dotnet run --project tools/Strata.Tools -- worldgen-report --seed=1234 --size=small --out=build/wg-before: terrain_hillshade.png, terrain_flags.png and stats.json.terrain exist",
+  "Repeat for seed 77 tiny. Record the baseline table (lip %, breach %, p99 step, roughness, relief) in the PR",
+  "python3 tools/ci/check_file_length.py"
+ ],
+ "depends_on": [],
+ "risks": [
+  "Metric definitions must not change between the before and after runs: land this WP first and do not tune it inside terrain WPs",
+  "The y-range must cover the overhang amplitude, otherwise lips above the scanned band are missed",
+  "A 512\u00b2 window on a small world generates about 1000 chunks: keep it threaded in the tool and use small windows in tests"
+ ],
+ "effort": "M"
+}

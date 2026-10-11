@@ -1,0 +1,41 @@
+{
+ "id": "P3-40",
+ "title": "Iconic unique weapons get bespoke models",
+ "player_outcome": "Zenith, Terra Blade, Night's Edge, Excalibur, Muramasa, Meowmere, Star Wrath, Starfury, Enchanted Sword, Breaker Blade, Influx Waver, Lucy the Axe and the Death Sickle look like themselves, and so do the Minishark, Megashark, Star Cannon and Space Gun.",
+ "design": [
+  "New bgen/weapons_unique.py with bespoke generators built on blade_profiles and detail helpers.",
+  "zenith: a layered prismatic blade with glow. terra_blade: a jagged green blade with a crossguard gem. nights_edge: a hooked purple blade. true_nights_edge / true_excalibur: variants of theirs. excalibur: golden ornate. muramasa: a thin blue katana with tsuba. meowmere: a cat-head hilt and rainbow edge.",
+  "star_wrath: a crimson star blade. starfury: gold with a star pommel. enchanted_sword: a blue glowing edge. breaker_blade: a huge cleaver. influx_waver: a tech blade with glow strips. lucy_the_axe: an axe with a face. death_sickle: a scythe (extrude_polygon curve).",
+  "Only include ids that exist in data (verify each).",
+  "Sockets (grip/tip) set explicitly. Budget 300\u20131,500 tris.",
+  "Register in build_all's generators dict; assets.json explicit entries switch to the new generators.",
+  "Iconic guns via P3-38's gun style params (already); confirm minishark vs megashark differ.",
+  "Rebuild these items (models + icons)."
+ ],
+ "files_modify": [
+  "tools/blender/build_all.py \u2014 register weapons_unique",
+  "tools/blender/assets.json \u2014 explicit entries",
+  "assets/models/items/*, assets/icons/items/* \u2014 rebuilt subset"
+ ],
+ "files_add": [
+  "tools/blender/bgen/weapons_unique.py \u2014 bespoke weapon generators"
+ ],
+ "data_changes": [
+  "assets.json generator switch for the listed ids"
+ ],
+ "tests": [
+  "python3 tools/blender/build_all.py --check",
+  "Smoke: props.problems == 0"
+ ],
+ "verification": [
+  "preview.py contact sheet of the uniques next to reference descriptions",
+  "In-game held/drop screenshots"
+ ],
+ "depends_on": [
+  "P3-39"
+ ],
+ "risks": [
+  "weapons_unique.py can exceed 400 lines; split swords vs tools/scythes (weapons_unique_2.py)."
+ ],
+ "effort": "M"
+}

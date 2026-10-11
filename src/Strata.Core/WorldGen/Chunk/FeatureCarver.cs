@@ -39,6 +39,7 @@ public static class FeatureCarver
                     float dist = DetMath.DistanceToSegment(x + 0.5f, cy, z + 0.5f, a.X, a.Y, a.Z, b.X, by, b.Z, out float t);
                     if (dist >= maxR) continue;
                     int i = ctx.WorldIndex(x, y, z);
+                    if (ctx.IsStructure(i)) continue;
                     float r = DetMath.Lerp(f.RadiusA, f.RadiusB, t);
                     if (dist < r)
                     {
@@ -65,8 +66,10 @@ public static class FeatureCarver
         var padded = new Aabb3i(ctx.Origin, ctx.Origin + Int3.One * ChunkGenContext.Size);
         if (!padded.Intersects(blueprint.Bounds)) return;
         byte flag = (byte)blueprint.Flags;
-        foreach (var op in blueprint.Ops)
+        var ops = blueprint.Ops;
+        foreach (int opIndex in blueprint.OpIndicesFor(ctx.Coord))
         {
+            var op = ops[opIndex];
             if (!padded.Intersects(op.Bounds)) continue;
             switch (op)
             {
@@ -141,7 +144,7 @@ public static class FeatureCarver
                 {
                     if (!ctx.InCore(obj.Anchor.X, obj.Anchor.Y, obj.Anchor.Z)) break;
                     var def = ctx.Gen.Content.TileObjects.Get(obj.ObjectId);
-                    var inst = new Voxels.TileObjects.TileObjectInstance(def, obj.Anchor, obj.Rotation, obj.Variant) { PendingLoot = obj.Loot };
+                    var inst = new Voxels.TileObjects.TileObjectInstance(def, obj.Anchor, obj.Rotation, obj.Variant) { PendingLoot = obj.Loot, Locked = obj.Locked };
                     ctx.AddObject(inst);
                     break;
                 }

@@ -28,6 +28,11 @@ public sealed class ChunkMeshResult
     /// <summary>Grass clumps on the chunk's grass surfaces (empty when the tables carry no grass settings).</summary>
     public List<GrassClump> Grass { get; } = new();
 
+    /// <summary>See <see cref="GrassScatter.Hashes"/>: equal shape hashes mean the same clumps, maybe relit.</summary>
+    public ulong GrassShapeHash { get; set; }
+
+    public ulong GrassLightHash { get; set; }
+
     /// <summary>Light of the centre chunk's cells (for gameplay queries).</summary>
     public required ushort[] Light { get; init; }
 
@@ -57,10 +62,10 @@ public static class ChunkMesher
     [ThreadStatic] private static ushort[]? _light;
 
     public static ChunkMeshResult Build(Neighborhood nb, RenderTables tables, Func<int, int, int> skyTop, IReadOnlyList<LightSource> lightSources,
-        Func<int, int, int>? shadeTop = null)
+        Func<int, int, int>? shadeTop = null, Func<int, int, int>? shadeCap = null)
     {
         long start = Stopwatch.GetTimestamp();
-        var light = LightEngine.Compute(nb, tables, skyTop, lightSources, _light ??= new ushort[Neighborhood.Volume], shadeTop);
+        var light = LightEngine.Compute(nb, tables, skyTop, lightSources, _light ??= new ushort[Neighborhood.Volume], shadeTop, shadeCap);
         var result = new ChunkMeshResult
         {
             Coord = nb.Chunk,
@@ -68,11 +73,13 @@ public static class ChunkMesher
             NeighbourVersions = (int[])nb.Versions.Clone(),
             Light = ExtractCore(light),
         };
-        var vol = new MeshVolume(nb, tables, light);
+        var vol = MeshVolume.Rent(nb, tables, light);
         SurfaceNetsMesher.Build(vol, result.Opaque, result.Collision);
         CellMesher.Build(vol, result.Opaque, result.Transparent, result.Cutout, result.Collision);
+        result.Collision.ComputeHashes();
         LiquidMesher.Build(vol, result.Liquid, result.Lava, result.LavaTops);
         GrassScatter.Build(vol, result.Opaque, result.Grass);
+        (result.GrassShapeHash, result.GrassLightHash) = GrassScatter.Hashes(result.Grass);
         result.Visibility = ChunkVisibility.Compute(nb, tables);
         result.SkyExposed = AnySky(light);
         result.BuildMs = Stopwatch.GetElapsedTime(start).TotalMilliseconds;

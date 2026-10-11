@@ -3036,6 +3036,20 @@
    "source": "world"
   },
   {
+   "id": "terraria:piggy_bank",
+   "name": "Piggy Bank",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "shop"
+  },
+  {
+   "id": "terraria:safe",
+   "name": "Safe",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "shop"
+  },
+  {
    "id": "terraria:wooden_door",
    "name": "Wooden Door",
    "kind": "furniture",
@@ -3237,6 +3251,76 @@
    "kind": "placeable",
    "stage": "early",
    "source": "tree"
+  },
+  {
+   "id": "terraria:piranha_gun",
+   "name": "Piranha Gun",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "jungle chest"
+  },
+  {
+   "id": "terraria:scourge_of_the_corruptor",
+   "name": "Scourge of the Corruptor",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "corruption chest"
+  },
+  {
+   "id": "terraria:vampire_knives",
+   "name": "Vampire Knives",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "crimson chest"
+  },
+  {
+   "id": "terraria:rainbow_gun",
+   "name": "Rainbow Gun",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "hallowed chest"
+  },
+  {
+   "id": "terraria:staff_of_the_frost_hydra",
+   "name": "Staff of the Frost Hydra",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "frozen chest"
+  },
+  {
+   "id": "terraria:desert_tiger_staff",
+   "name": "Desert Tiger Staff",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "desert chest"
+  },
+  {
+   "id": "terraria:aqua_scepter",
+   "name": "Aqua Scepter",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:handgun",
+   "name": "Handgun",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:magic_missile",
+   "name": "Magic Missile",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:valor",
+   "name": "Valor",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "dungeon"
   },
   {
    "id": "terraria:silver_bullet",
@@ -3561,6 +3645,104 @@
    "source": "mimic"
   },
   {
+   "id": "terraria:titan_glove",
+   "name": "Titan Glove",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "mimic"
+  },
+  {
+   "id": "terraria:philosophers_stone",
+   "name": "Philosopher's Stone",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "mimic"
+  },
+  {
+   "id": "terraria:star_cloak",
+   "name": "Star Cloak",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "mimic"
+  },
+  {
+   "id": "terraria:worm_hook",
+   "name": "Worm Hook",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "corrupt mimic"
+  },
+  {
+   "id": "terraria:chain_guillotines",
+   "name": "Chain Guillotines",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "corrupt mimic"
+  },
+  {
+   "id": "terraria:clinger_staff",
+   "name": "Clinger Staff",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "corrupt mimic"
+  },
+  {
+   "id": "terraria:putrid_scent",
+   "name": "Putrid Scent",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "corrupt mimic"
+  },
+  {
+   "id": "terraria:tendon_hook",
+   "name": "Tendon Hook",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "crimson mimic"
+  },
+  {
+   "id": "terraria:fetid_baghnakhs",
+   "name": "Fetid Baghnakhs",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "crimson mimic"
+  },
+  {
+   "id": "terraria:life_drain",
+   "name": "Life Drain",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "crimson mimic"
+  },
+  {
+   "id": "terraria:flesh_knuckles",
+   "name": "Flesh Knuckles",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "crimson mimic"
+  },
+  {
+   "id": "terraria:flying_knife",
+   "name": "Flying Knife",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "hallowed mimic"
+  },
+  {
+   "id": "terraria:crystal_vile_shard",
+   "name": "Crystal Vile Shard",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "hallowed mimic"
+  },
+  {
+   "id": "terraria:illuminant_hook",
+   "name": "Illuminant Hook",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "hallowed mimic"
+  },
+  {
    "id": "terraria:wizard_hat",
    "name": "Wizard Hat",
    "kind": "weapon",
@@ -3736,6 +3918,13 @@
    "source": "moth"
   },
   {
+   "id": "terraria:purification_powder",
+   "name": "Purification Powder",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "dryad"
+  },
+  {
    "id": "terraria:wire_cutter",
    "name": "Wire Cutter",
    "kind": "tool",
@@ -3771,10 +3960,402 @@
    "source": "world"
   },
   {
+   "id": "terraria:slimy_saddle",
+   "name": "Slimy Saddle",
+   "kind": "mount",
+   "stage": "prehardmode",
+   "source": "king slime"
+  },
+  {
+   "id": "terraria:fuzzy_carrot",
+   "name": "Fuzzy Carrot",
+   "kind": "mount",
+   "stage": "prehardmode",
+   "source": "goodie bag"
+  },
+  {
+   "id": "terraria:honeyed_goggles",
+   "name": "Honeyed Goggles",
+   "kind": "mount",
+   "stage": "prehardmode",
+   "source": "queen bee"
+  },
+  {
+   "id": "terraria:cosmic_car_key",
+   "name": "Cosmic Car Key",
+   "kind": "mount",
+   "stage": "hardmode",
+   "source": "martian saucer"
+  },
+  {
    "id": "terraria:firefly_in_a_bottle",
    "name": "Firefly in a Bottle",
    "kind": "furniture",
    "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:blue_dungeon_door",
+   "name": "Blue Dungeon Door",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_chair",
+   "name": "Blue Dungeon Chair",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_table",
+   "name": "Blue Dungeon Table",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_bookcase",
+   "name": "Blue Dungeon Bookcase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_candelabra",
+   "name": "Blue Dungeon Candelabra",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_chandelier",
+   "name": "Blue Dungeon Chandelier",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_lamp",
+   "name": "Blue Dungeon Lamp",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_vase",
+   "name": "Blue Dungeon Vase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_door",
+   "name": "Green Dungeon Door",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_chair",
+   "name": "Green Dungeon Chair",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_table",
+   "name": "Green Dungeon Table",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_bookcase",
+   "name": "Green Dungeon Bookcase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_candelabra",
+   "name": "Green Dungeon Candelabra",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_chandelier",
+   "name": "Green Dungeon Chandelier",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_lamp",
+   "name": "Green Dungeon Lamp",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_vase",
+   "name": "Green Dungeon Vase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_door",
+   "name": "Pink Dungeon Door",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_chair",
+   "name": "Pink Dungeon Chair",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_table",
+   "name": "Pink Dungeon Table",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_bookcase",
+   "name": "Pink Dungeon Bookcase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_candelabra",
+   "name": "Pink Dungeon Candelabra",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_chandelier",
+   "name": "Pink Dungeon Chandelier",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_lamp",
+   "name": "Pink Dungeon Lamp",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_vase",
+   "name": "Pink Dungeon Vase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:marching_bones_banner",
+   "name": "Marching Bones Banner",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:necromantic_sign",
+   "name": "Necromantic Sign",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:rusted_company_standard",
+   "name": "Rusted Company Standard",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:ragged_brotherhood_sigil",
+   "name": "Ragged Brotherhood Sigil",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:molten_legion_flag",
+   "name": "Molten Legion Flag",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:diabolic_sigil",
+   "name": "Diabolic Sigil",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:skeleton_statue",
+   "name": "Skeleton Statue",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "world"
+  },
+  {
+   "id": "terraria:armor_statue",
+   "name": "Armor Statue",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "world"
+  },
+  {
+   "id": "terraria:angel_statue",
+   "name": "Angel Statue",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "world"
+  },
+  {
+   "id": "terraria:spike",
+   "name": "Spike",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:bone_welder",
+   "name": "Bone Welder",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:shadow_chest",
+   "name": "Shadow Chest",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "underworld"
+  },
+  {
+   "id": "terraria:jungle_chest",
+   "name": "Jungle Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:corruption_chest",
+   "name": "Corruption Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:crimson_chest",
+   "name": "Crimson Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:hallowed_chest",
+   "name": "Hallowed Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:frozen_chest",
+   "name": "Frozen Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:desert_chest",
+   "name": "Desert Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:book",
+   "name": "Book",
+   "kind": "material",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:golden_key",
+   "name": "Golden Key",
+   "kind": "material",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:shadow_key",
+   "name": "Shadow Key",
+   "kind": "material",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:jungle_key",
+   "name": "Jungle Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:corruption_key",
+   "name": "Corruption Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:crimson_key",
+   "name": "Crimson Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:hallowed_key",
+   "name": "Hallowed Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:frozen_key",
+   "name": "Frozen Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:desert_key",
+   "name": "Desert Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:red_hat",
+   "name": "Red Hat",
+   "kind": "armor",
+   "stage": "prehardmode",
    "source": "craft"
   },
   {
@@ -3902,6 +4483,853 @@
    "kind": "paint",
    "stage": "early",
    "source": "painter"
+  },
+  {
+   "id": "terraria:toy_sled",
+   "name": "Toy Sled",
+   "kind": "pet",
+   "stage": "hardmode",
+   "source": "ice mimic"
+  },
+  {
+   "id": "terraria:shadow_orb_light_pet",
+   "name": "Shadow Orb (light pet)",
+   "kind": "pet",
+   "stage": "early",
+   "source": "shadow orb"
+  },
+  {
+   "id": "terraria:crimson_heart_light_pet",
+   "name": "Crimson Heart (light pet)",
+   "kind": "pet",
+   "stage": "early",
+   "source": "crimson heart"
+  },
+  {
+   "id": "terraria:fairy_bell",
+   "name": "Fairy Bell",
+   "kind": "pet",
+   "stage": "early",
+   "source": "gold chest"
+  },
+  {
+   "id": "terraria:magic_lantern",
+   "name": "Magic Lantern",
+   "kind": "pet",
+   "stage": "early",
+   "source": "skeleton merchant"
+  },
+  {
+   "id": "terraria:wisp_in_a_bottle",
+   "name": "Wisp in a Bottle",
+   "kind": "pet",
+   "stage": "post-plantera",
+   "source": "dungeon spirit"
+  },
+  {
+   "id": "terraria:fish",
+   "name": "Fish",
+   "kind": "pet",
+   "stage": "early",
+   "source": "fishing"
+  },
+  {
+   "id": "terraria:zephyr_fish",
+   "name": "Zephyr Fish",
+   "kind": "pet",
+   "stage": "early",
+   "source": "fishing"
+  },
+  {
+   "id": "terraria:strange_glowing_mushroom",
+   "name": "Strange Glowing Mushroom",
+   "kind": "pet",
+   "stage": "hardmode",
+   "source": "truffle"
+  },
+  {
+   "id": "terraria:treasure_bag",
+   "name": "Treasure Bag",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "boss (expert)"
+  },
+  {
+   "id": "terraria:demon_heart",
+   "name": "Demon Heart",
+   "kind": "consumable",
+   "stage": "hardmode",
+   "source": "wall of flesh (expert)"
+  },
+  {
+   "id": "terraria:minecart_upgrade_kit",
+   "name": "Minecart Upgrade Kit",
+   "kind": "consumable",
+   "stage": "hardmode",
+   "source": "mechanical pieces"
+  },
+  {
+   "id": "terraria:skeletron_mask",
+   "name": "Skeletron Mask",
+   "kind": "armor",
+   "stage": "early",
+   "source": "skeletron"
+  },
+  {
+   "id": "terraria:bone_glove",
+   "name": "Bone Glove",
+   "kind": "accessory",
+   "stage": "early",
+   "source": "skeletron (expert)"
+  },
+  {
+   "id": "terraria:mechanical_wheel_piece",
+   "name": "Mechanical Wheel Piece",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "the twins (expert)"
+  },
+  {
+   "id": "terraria:mechanical_battery_piece",
+   "name": "Mechanical Battery Piece",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "the destroyer (expert)"
+  },
+  {
+   "id": "terraria:mechanical_wagon_piece",
+   "name": "Mechanical Wagon Piece",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "skeletron prime (expert)"
+  },
+  {
+   "id": "terraria:skeletron_hand",
+   "name": "Skeletron Hand",
+   "kind": "tool",
+   "stage": "early",
+   "source": "skeletron"
+  },
+  {
+   "id": "terraria:clothier_voodoo_doll",
+   "name": "Clothier Voodoo Doll",
+   "kind": "tool",
+   "stage": "early",
+   "source": "clothier"
+  },
+  {
+   "id": "terraria:king_slime_trophy",
+   "name": "King Slime Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "king slime"
+  },
+  {
+   "id": "terraria:eye_of_cthulhu_trophy",
+   "name": "Eye of Cthulhu Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "eye of cthulhu"
+  },
+  {
+   "id": "terraria:eater_of_worlds_trophy",
+   "name": "Eater of Worlds Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "eater of worlds"
+  },
+  {
+   "id": "terraria:brain_of_cthulhu_trophy",
+   "name": "Brain of Cthulhu Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "brain of cthulhu"
+  },
+  {
+   "id": "terraria:queen_bee_trophy",
+   "name": "Queen Bee Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "queen bee"
+  },
+  {
+   "id": "terraria:skeletron_trophy",
+   "name": "Skeletron Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "skeletron"
+  },
+  {
+   "id": "terraria:deerclops_trophy",
+   "name": "Deerclops Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "deerclops"
+  },
+  {
+   "id": "terraria:wall_of_flesh_trophy",
+   "name": "Wall of Flesh Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "wall of flesh"
+  },
+  {
+   "id": "terraria:queen_slime_trophy",
+   "name": "Queen Slime Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "queen slime"
+  },
+  {
+   "id": "terraria:retinazer_trophy",
+   "name": "Retinazer Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "retinazer"
+  },
+  {
+   "id": "terraria:spazmatism_trophy",
+   "name": "Spazmatism Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "spazmatism"
+  },
+  {
+   "id": "terraria:destroyer_trophy",
+   "name": "Destroyer Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "destroyer"
+  },
+  {
+   "id": "terraria:skeletron_prime_trophy",
+   "name": "Skeletron Prime Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "skeletron prime"
+  },
+  {
+   "id": "terraria:plantera_trophy",
+   "name": "Plantera Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "plantera"
+  },
+  {
+   "id": "terraria:golem_trophy",
+   "name": "Golem Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "golem"
+  },
+  {
+   "id": "terraria:duke_fishron_trophy",
+   "name": "Duke Fishron Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "duke fishron"
+  },
+  {
+   "id": "terraria:empress_of_light_trophy",
+   "name": "Empress of Light Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "empress of light"
+  },
+  {
+   "id": "terraria:ancient_cultist_trophy",
+   "name": "Ancient Cultist Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "ancient cultist"
+  },
+  {
+   "id": "terraria:moon_lord_trophy",
+   "name": "Moon Lord Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "moon lord"
+  },
+  {
+   "id": "terraria:glowstick",
+   "name": "Glowstick",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "merchant"
+  },
+  {
+   "id": "terraria:mining_shirt",
+   "name": "Mining Shirt",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "merchant"
+  },
+  {
+   "id": "terraria:mining_pants",
+   "name": "Mining Pants",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "merchant"
+  },
+  {
+   "id": "terraria:grass_seeds",
+   "name": "Grass Seeds",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:jungle_grass_seeds",
+   "name": "Jungle Grass Seeds",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:mushroom_grass_seeds",
+   "name": "Mushroom Grass Seeds",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:corrupt_seeds",
+   "name": "Corrupt Seeds",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:crimson_seeds",
+   "name": "Crimson Seeds",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:hallowed_seeds",
+   "name": "Hallowed Seeds",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:herb_bag",
+   "name": "Herb Bag",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:sunflower",
+   "name": "Sunflower",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:empty_bullet",
+   "name": "Empty Bullet",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "arms dealer"
+  },
+  {
+   "id": "terraria:illegal_gun_parts",
+   "name": "Illegal Gun Parts",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "arms dealer"
+  },
+  {
+   "id": "terraria:top_hat",
+   "name": "Top Hat",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "clothier"
+  },
+  {
+   "id": "terraria:tuxedo_shirt",
+   "name": "Tuxedo Shirt",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "clothier"
+  },
+  {
+   "id": "terraria:tuxedo_pants",
+   "name": "Tuxedo Pants",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "clothier"
+  },
+  {
+   "id": "terraria:bewitching_table",
+   "name": "Bewitching Table",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "witch doctor"
+  },
+  {
+   "id": "terraria:land",
+   "name": "Land",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:trapped_ghost",
+   "name": "Trapped Ghost",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:outcast",
+   "name": "Outcast",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:dark_soul_reaper",
+   "name": "Dark Soul Reaper",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:waldo",
+   "name": "Waldo",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:sparky",
+   "name": "Sparky",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:the_truth_is_up_there",
+   "name": "The Truth Is Up There",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:silver_dye",
+   "name": "Silver Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:brown_dye",
+   "name": "Brown Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:black_dye",
+   "name": "Black Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:red_dye",
+   "name": "Red Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:orange_dye",
+   "name": "Orange Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:yellow_dye",
+   "name": "Yellow Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:green_dye",
+   "name": "Green Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:blue_dye",
+   "name": "Blue Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:purple_dye",
+   "name": "Purple Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:pink_dye",
+   "name": "Pink Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:dye_vat",
+   "name": "Dye Vat",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:confetti",
+   "name": "Confetti",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "party girl"
+  },
+  {
+   "id": "terraria:confetti_gun",
+   "name": "Confetti Gun",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "party girl"
+  },
+  {
+   "id": "terraria:party_hat",
+   "name": "Party Hat",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "party girl"
+  },
+  {
+   "id": "terraria:bubble_machine",
+   "name": "Bubble Machine",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "party girl"
+  },
+  {
+   "id": "terraria:defender_medal",
+   "name": "Defender Medal",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "old one's army"
+  },
+  {
+   "id": "terraria:ale",
+   "name": "Ale",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "tavernkeep"
+  },
+  {
+   "id": "terraria:eternia_crystal_stand",
+   "name": "Eternia Crystal Stand",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "tavernkeep"
+  },
+  {
+   "id": "terraria:crystal_ball",
+   "name": "Crystal Ball",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "wizard"
+  },
+  {
+   "id": "terraria:magic_hat",
+   "name": "Magic Hat",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "wizard"
+  },
+  {
+   "id": "terraria:cog",
+   "name": "Cog",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "steampunker"
+  },
+  {
+   "id": "terraria:rocket_ii",
+   "name": "Rocket II",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "cyborg"
+  },
+  {
+   "id": "terraria:rocket_iii",
+   "name": "Rocket III",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "cyborg"
+  },
+  {
+   "id": "terraria:nanites",
+   "name": "Nanites",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "cyborg"
+  },
+  {
+   "id": "terraria:mushroom_cap",
+   "name": "Mushroom Cap",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "truffle"
+  },
+  {
+   "id": "terraria:pirate_hat",
+   "name": "Pirate Hat",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "pirate"
+  },
+  {
+   "id": "terraria:pirate_shirt",
+   "name": "Pirate Shirt",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "pirate"
+  },
+  {
+   "id": "terraria:pirate_pants",
+   "name": "Pirate Pants",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "pirate"
+  },
+  {
+   "id": "terraria:star_topper",
+   "name": "Star Topper",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "santa claus"
+  },
+  {
+   "id": "terraria:princess_hat",
+   "name": "Princess Hat",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "princess"
+  },
+  {
+   "id": "terraria:princess_dress",
+   "name": "Princess Dress",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "princess"
+  },
+  {
+   "id": "terraria:resplendent_dessert",
+   "name": "Resplendent Dessert",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "princess"
+  },
+  {
+   "id": "terraria:golf_club_iron",
+   "name": "Golf Club (Iron)",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "golfer"
+  },
+  {
+   "id": "terraria:golf_club_driver",
+   "name": "Golf Club (Driver)",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "golfer"
+  },
+  {
+   "id": "terraria:golf_club_wedge",
+   "name": "Golf Club (Wedge)",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "golfer"
+  },
+  {
+   "id": "terraria:golf_club_putter",
+   "name": "Golf Club (Putter)",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "golfer"
+  },
+  {
+   "id": "terraria:golf_ball",
+   "name": "Golf Ball",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "golfer"
+  },
+  {
+   "id": "terraria:golf_cup",
+   "name": "Golf Cup",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "golfer"
+  },
+  {
+   "id": "terraria:golf_tee",
+   "name": "Golf Tee",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "golfer"
+  },
+  {
+   "id": "terraria:golf_visor",
+   "name": "Golf Visor",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "golfer"
+  },
+  {
+   "id": "terraria:golf_shirt",
+   "name": "Golf Shirt",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "golfer"
+  },
+  {
+   "id": "terraria:golf_pants",
+   "name": "Golf Pants",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "golfer"
+  },
+  {
+   "id": "terraria:fairy_glowstick",
+   "name": "Fairy Glowstick",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "zoologist"
+  },
+  {
+   "id": "terraria:critter_shampoo",
+   "name": "Critter Shampoo",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "zoologist"
+  },
+  {
+   "id": "terraria:revolver",
+   "name": "Revolver",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "travelling merchant"
+  },
+  {
+   "id": "terraria:pulse_bow",
+   "name": "Pulse Bow",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "travelling merchant"
+  },
+  {
+   "id": "terraria:sitting_ducks_fishing_pole",
+   "name": "Sitting Duck's Fishing Pole",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "travelling merchant"
+  },
+  {
+   "id": "terraria:bone_arrow",
+   "name": "Bone Arrow",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "skeleton merchant"
+  },
+  {
+   "id": "terraria:license_cat",
+   "name": "Cat License",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "zoologist"
+  },
+  {
+   "id": "terraria:license_dog",
+   "name": "Dog License",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "zoologist"
+  },
+  {
+   "id": "terraria:license_bunny",
+   "name": "Bunny License",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "zoologist"
+  },
+  {
+   "id": "terraria:forest_pylon",
+   "name": "Forest Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:snow_pylon",
+   "name": "Snow Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:desert_pylon",
+   "name": "Desert Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:jungle_pylon",
+   "name": "Jungle Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:ocean_pylon",
+   "name": "Ocean Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:mushroom_pylon",
+   "name": "Mushroom Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:hallow_pylon",
+   "name": "Hallow Pylon",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:cavern_pylon",
+   "name": "Cavern Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
   }
  ]
 }

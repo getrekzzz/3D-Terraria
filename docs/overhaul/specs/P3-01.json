@@ -1,0 +1,66 @@
+{
+ "id": "P3-01",
+ "title": "Use timing model: item animation vs item time (swings never restart, real bursts)",
+ "player_outcome": "Pickaxes, axes and swords always finish their swing: holding a pickaxe reads as one smooth continuous chop while tiles are hit on the tool's own cadence. Melee-speed accessories and speed prefixes make the whole swing faster, not just the cooldown. The Clockwork Assault Rifle fires a real 3-round burst. The cursor's reach finally includes reach bonuses (Builder Potion).",
+ "design": [
+  "Verified: ItemUseSystem.cs:161-162 sets UseCooldown=useTime and UseAnimation=item.UseAnimation on every use. PlayerAvatar.Motion.cs:194 replays when UseAnimation jumps back up, so copper pickaxe (15/21) restarts at 71%. Speed stats divide useTime only (lines 97, 110, 158). MeleeSystem.cs:51 uses unscaled item.UseAnimation. InteractionController.cs:101 ignores the Reach stat.",
+  "Pre-split for the 400-line cap, with no behaviour change, and run the tests. Move PlayerEntity out of src/Strata.Core/Session/GameWorld.cs (387 lines) into Session/PlayerEntity.cs. Split ItemUseSystem.cs (375 lines) three ways: ItemUseSystem.cs (Use, UseTool, Place, anchors), ItemUseSystem.Shooting.cs (Shoot, FindAmmo) and ItemUseSystem.Consume.cs (Consume, Summon, StartEvent, ConsumeHeld).",
+  "PlayerEntity: UseCooldown is Terraria's itemTime and UseAnimation its itemAnimation. Add three fields. UseAnimationMax is the effective length of the current animation. UseSerial is an int that goes up by 1 whenever a new animation starts; all presentation keys off it. ReuseDelay counts ticks before the next animation may start.",
+  "ItemDef: add ReuseDelay (ticks, default 0; Terraria reuseDelay).",
+  "New Core UseTiming.For(ItemStack, ItemUseInfo, StatSheet) returns (Animation, Time). The prefix UseSpeed divides both. MeleeSpeed divides both for Melee/Thrust weapons that are not tools. MiningSpeed divides Time only, for tools. Both are clamped to at least 1. Also add UseTiming.ReachMeters(PlayerEntity, ItemDef) = (item.Reach + Reach stat) * CellSize.",
+  "ItemUseSystem.Use, mid-animation (UseAnimation > 0): return Cooldown unless UseCooldown == 0 and the item repeats within an animation (tools; shooters with Time < Animation). If it does, act again (UseTool or Shoot) without touching UseAnimation or UseSerial and without raising Swung.",
+  "ItemUseSystem.Use, idle: respect ReuseDelay, then perform the action. Only on success, start an animation: set UseAnimation = UseAnimationMax = Animation, increment UseSerial, set UseCooldown = Time, and raise Swung for melee. Failed outcomes start nothing.",
+  "Add ItemUseSystem.Continue(PlayerEntity), called from GameWorld.TickPlayer. When the player is mid-animation with UseCooldown 0 and holds a burst shooter, it fires the next shot without input: a started burst always completes, as in Terraria.",
+  "GameWorld.TickPlayer: decrement UseCooldown, UseAnimation and ReuseDelay. When UseAnimation hits 0, set ReuseDelay = held.ReuseDelay. Then call ItemUse.Continue(p).",
+  "MeleeSystem.Start: Duration = player.UseAnimationMax.",
+  "Game side: PlayerAvatar.Motion plays the action when UseSerial changes, over UseAnimationMax/60 s. ViewModel phase t = 1 - (UseAnimation - Engine.GetPhysicsInterpolationFraction())/UseAnimationMax (smooth, no one-frame snap). SwingTrail duration = UseAnimationMax/60. InteractionController.UpdateTarget uses UseTiming.ReachMeters so the cursor, ghost and cracks agree with the use.",
+  "Commands and probes: the 'use' command also clears UseAnimation and ReuseDelay. Add probes player.swings (UseSerial) and player.use_anim."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Session/GameWorld.cs \u2014 PlayerEntity removed; TickPlayer decrements new timers, sets ReuseDelay, calls ItemUse.Continue",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 split out; Use() gets the animation/time state machine",
+  "src/Strata.Core/Content/Defs/ItemDef.cs \u2014 ReuseDelay",
+  "src/Strata.Core/Gameplay/Entities/MeleeSystem.cs \u2014 duration from UseAnimationMax",
+  "src/Strata.Core/Commands/BuiltinCommands.cs \u2014 'use' clears UseAnimation/ReuseDelay",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 player.swings, player.use_anim",
+  "game/Player/PlayerAvatar.Motion.cs \u2014 play on UseSerial change",
+  "game/Player/ViewModel.cs \u2014 smooth phase from UseAnimationMax",
+  "game/Entities/SwingTrail.cs \u2014 duration from UseAnimationMax",
+  "game/Player/InteractionController.cs \u2014 reach via UseTiming.ReachMeters",
+  "docs/architecture/gameplay.md \u2014 describe itemAnimation/itemTime/reuseDelay"
+ ],
+ "files_add": [
+  "src/Strata.Core/Session/PlayerEntity.cs \u2014 moved class plus UseAnimationMax/UseSerial/ReuseDelay",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs \u2014 Shoot/FindAmmo (moved)",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consume.cs \u2014 Consume/Summon/StartEvent/ConsumeHeld (moved)",
+  "src/Strata.Core/Gameplay/Interaction/UseTiming.cs \u2014 effective animation/time and reach",
+  "tests/Strata.Core.Tests/Gameplay/UseTimingTests.cs \u2014 timing tests"
+ ],
+ "data_changes": [
+  "data/items/hardmode_arsenal.json clockwork_assault_rifle: useTime 4, useAnimation 12, reuseDelay 14; its shootProjectile count 3 \u2192 1 (spread 2 kept), so the burst comes from the timing model"
+ ],
+ "tests": [
+  "UseTimingTests: copper_pickaxe held against a stone wall for 126 ticks \u2192 UseSerial == 6 and Editor.Struck raised 9 times",
+  "UseTimingTests: UseSerial increments only after UseAnimation reached 0 (no mid-swing restart)",
+  "UseTimingTests: equipping feral_claws shortens copper_broadsword UseAnimationMax and UseCooldown by the same factor",
+  "UseTimingTests: clockwork_assault_rifle fresh press \u2192 Shot at ticks 0, 4 and 8, then nothing before tick 26",
+  "UseTimingTests: a UseSpeed prefix shortens the animation; ReachMeters includes the builder buff",
+  "Existing ItemUseTests, CombatTests and ArsenalTests stay green",
+  "Smoke basic.cmds, after the pickaxe hold: 'assert player.swings >= 6'",
+  "Smoke combat.cmds: 'give clockwork_assault_rifle 1' / 'give musket_ball 30' / 'wield clockwork_assault_rifle' / 'aim 0 0.02 1' / 'use' / 'wait 0.5' / 'assert inv.musket_ball == 27'"
+ ],
+ "verification": [
+  "dotnet build Strata.sln && dotnet test tests/Strata.Core.Tests",
+  "python3 tools/ci/check_file_length.py (GameWorld.cs and ItemUseSystem.cs well under 400)",
+  "dotnet run --project tools/Strata.Tools -- validate",
+  "Godot headless: basic, combat and builder .cmds print SMOKE PASS",
+  "Animation tour (game/Testing/Tours/animation.cmds) with lavapipe: holding the pickaxe shows full arcs"
+ ],
+ "depends_on": [],
+ "risks": [
+  "SoundEvents plays 'swing' on every Used; tools now raise Used per tile hit. Key the swing sound on UseSerial (done in P3-21).",
+  "The smoke 'use' command bypasses timing; scripts relying on back-to-back 'use' must still work (it clears the timers).",
+  "P1 (facing/aim-ray) edits InteractionController.cs and PlayerAvatar.Motion.cs; land in sequence and rebase."
+ ],
+ "effort": "M"
+}

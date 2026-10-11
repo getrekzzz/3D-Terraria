@@ -1,0 +1,45 @@
+{
+ "id": "P3-10",
+ "title": "Shot presentation: muzzle flash, recoil punch, projectiles drawn out of the barrel, summon puffs",
+ "player_outcome": "Every gunshot flashes and briefly lights the barrel with a wisp of smoke. Heavy guns punch the camera. Bullets visibly leave the barrel in both views, staffs spark at their tip, and minions pop in with a puff where you point.",
+ "design": [
+  "New game/Entities/CombatEffects.Muzzle.cs (partial) subscribes to ItemUse.Shot for the local player.",
+  "The muzzle position is ViewModel.TrySocket('muzzle') in FP or PlayerAvatar.TrySocket('muzzle') in 3P, falling back to ShotRequest.Origin.",
+  "Guns: a pooled additive billboard flash quad (4 in the pool, 0.05 s), FlashLights.Flash(colour from the projectile colour, 0.06 s, range 4) and a small EffectKit puff. Staffs and tomes get a sparks burst at the tip in the projectile colour.",
+  "ProjectileRenderer: a new view starts at the socket position with a visual offset (socket \u2212 SpawnOrigin) that decays to zero over ~4 frames, so the projectile reads as leaving the barrel while the sim stays authoritative.",
+  "Recoil: ViewModel.Kick (from P3-07) per style recoil values. CameraShake.Kick(0.08) for heavy guns (item soundSet gun_heavy/shotgun/sniper or UseTime \u2265 30); later replaced by P3-25's Punch.",
+  "Minion summon: EffectKit Puff in the minion colour on Projectiles.Spawned when Def.Minion != null.",
+  "use_styles.json: muzzleFlash flag and flash colour source per style."
+ ],
+ "files_modify": [
+  "game/Entities/ProjectileRenderer.cs \u2014 spawn-offset decay",
+  "game/Entities/CombatEffects.cs \u2014 partial wiring",
+  "data/config/use_styles.json \u2014 muzzleFlash per style",
+  "src/Strata.Core/Presentation/UseStyleConfig.cs \u2014 muzzleFlash field"
+ ],
+ "files_add": [
+  "game/Entities/CombatEffects.Muzzle.cs \u2014 flashes, tip sparks, summon puffs"
+ ],
+ "data_changes": [
+  "use_styles.json gun: muzzleFlash true; staff/tome: tipSparks true"
+ ],
+ "tests": [
+  "Smoke combat.cmds (bow + clockwork sections from P3-01): errors == 0",
+  "Tour: 3P and FP timescale-0.01 screenshots right after 'use' with flintlock_pistol"
+ ],
+ "verification": [
+  "Screenshots show the flash at the barrel tip in both views",
+  "perf report: gd.combat_effects < 0.2 ms firing the minishark continuously"
+ ],
+ "depends_on": [
+  "P3-06",
+  "P3-07",
+  "P3-08",
+  "P3-09"
+ ],
+ "risks": [
+  "FP and 3P sockets differ: only the active view's socket is used.",
+  "ProjectileRenderer is also edited by P3-11/12/13 and P1 (pooling); sequence them."
+ ],
+ "effort": "S"
+}

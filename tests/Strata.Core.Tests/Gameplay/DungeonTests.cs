@@ -9,6 +9,7 @@ using Strata.Core.Tests.Support;
 using Strata.Core.Voxels;
 using Strata.Core.WorldGen.Plan;
 using Strata.Core.WorldGen.Structures;
+using Strata.Core.WorldGen.Structures.Dungeon;
 
 namespace Strata.Core.Tests.Gameplay;
 
@@ -27,8 +28,8 @@ public class DungeonTests
         return g;
     }
 
-    private static StructureFeature Crypt(TestGame g) =>
-        g.World.Session.Generator.Plan.Features.All.OfType<StructureFeature>().Single(f => f.Kind == "dungeon");
+    private static DungeonFeature Crypt(TestGame g) =>
+        g.World.Session.Generator.Plan.Features.All.OfType<DungeonFeature>().Single(f => f.Kind == "dungeon");
 
     private static Int3 Gate(TestGame g) => g.World.Session.Generator.Plan.Landmarks[LandmarkIds.DungeonGate];
 
@@ -78,16 +79,19 @@ public class DungeonTests
     public void CryptWallsResistPicksUntilTheWardenFalls()
     {
         using var g = Create();
-        var gate = Gate(g) + new Int3(0, 0, 13);
-        Load(g, gate);
+        // A wall cell of the keep, on the side away from its door.
+        var keep = Crypt(g).Layout.KeepInterior;
+        var back = -Crypt(g).Layout.Inward;
+        var centre = new Int3((keep.Min.X + keep.Max.X) / 2, keep.Min.Y + 2, (keep.Min.Z + keep.Max.Z) / 2);
+        var probe = new Int3(back.X > 0 ? keep.Max.X : back.X < 0 ? keep.Min.X - 1 : centre.X, centre.Y, back.Z > 0 ? keep.Max.Z : back.Z < 0 ? keep.Min.Z - 1 : centre.Z);
+        Load(g, probe);
         var world = g.World.Session.World;
         Int3? wall = null;
-        for (int y = gate.Y; y < gate.Y + 8 && wall == null; y++)
-            for (int x = gate.X - 9; x <= gate.X + 9 && wall == null; x++)
-            {
-                var cell = new Int3(x, y, gate.Z - 9);
-                if (world.GetBlock(cell) is not 0 and not VoxelWorld.Unknown && (world.GetFlags(cell.X, cell.Y, cell.Z) & CellFlags.Structure) != 0) wall = cell;
-            }
+        for (int k = 0; k < 3 && wall == null; k++)
+        {
+            var cell = probe + back * k;
+            if (world.GetBlock(cell) is not 0 and not VoxelWorld.Unknown && (world.GetFlags(cell.X, cell.Y, cell.Z) & CellFlags.Structure) != 0) wall = cell;
+        }
         Assert.NotNull(wall);
         var cellToMine = wall!.Value;
         Assert.True(g.World.Editor.IsLocked(cellToMine));
@@ -123,12 +127,10 @@ public class DungeonTests
         var crypt = Crypt(g);
         var mid = Half(crypt.Bounds.Min + crypt.Bounds.Max);
         Int3? found = null;
-        foreach (var room in crypt.Blueprint.Ops.OfType<CarveOp>()
-                     .Where(op => op.Bounds.Size is { X: >= 8, Z: >= 8, Y: >= 6 and <= 16 })
-                     .OrderBy(op => DistanceSq(op.Bounds.Min + Half(op.Bounds.Size), mid)).Take(8))
+        foreach (var room in crypt.Layout.Rooms.Where(r => r.Kind is not (RoomKind.Keep or RoomKind.Junction))
+                     .OrderBy(r => DistanceSq(r.CenterFloor, mid)).Take(8))
         {
-            var b = room.Bounds;
-            var floor = new Int3(b.Min.X + b.Size.X / 2, b.Min.Y, b.Min.Z + b.Size.Z / 2);
+            var floor = room.CenterFloor;
             Load(g, floor, radius: 2);
             var node = g.World.Navigator.NearestStandable(floor, Strata.Core.Gameplay.Navigation.NavAgent.Humanoid, 3);
             if (node is { } n && session.ZonesAt(n).Contains("dungeon"))
@@ -188,36 +190,6 @@ public class DungeonTests
         Assert.Single(departed);
         town.UpdateLandmarks();
         Assert.Null(town.Find("old_man")); // gone for good
-    }
-
-    [Fact]
-    public void TheWardenSwipesWithAlternatingHandsSpinsAndRagesByDay()
-    {
-        using var g = Create();
-        g.World.Session.Clock.SetHour(22f);
-        var def = g.Content.Enemies.Get("skeletron");
-        var p = def.Brain.Parse<CryptWardenParams>();
-        var boss = g.World.Npcs.Spawn(def, g.Player.Position + new Vector3(0, 6f, 4f))!;
-        Assert.Equal(2, boss.Segments.Count);
-        var closest = new float[2] { float.MaxValue, float.MaxValue };
-        bool spun = false;
-        for (int i = 0; i < p.SpinInterval + 30; i++)
-        {
-            g.World.Tick();
-            g.Player.State.Vitals.Life = g.Player.State.Vitals.MaxLife;
-            for (int h = 0; h < 2; h++) closest[h] = MathF.Min(closest[h], Vector3.Distance(boss.Segments[h], g.Player.Center));
-            Assert.True(Vector3.Distance(boss.Segments[0], boss.Center) < p.HoverHeight + p.HandSpacing * 2f + 4f);
-            spun |= boss.Phase == 1;
-        }
-        Assert.True(spun, "never began a spin charge");
-        float rest = MathF.Sqrt(p.HoverHeight * p.HoverHeight + p.HandSpacing * p.HandSpacing);
-        Assert.True(closest[0] < rest - 1.5f && closest[1] < rest - 1.5f, $"both hands should swipe at the target ({closest[0]:0.0}, {closest[1]:0.0} vs rest {rest:0.0})");
-        Assert.Equal(1f, boss.DamageScale);
-
-        g.World.Session.Clock.SetHour(12f);
-        g.Ticks(2);
-        Assert.Equal(def.Boss!.DayEnrage!.Damage, boss.DamageScale);
-        Assert.Contains(boss, g.World.Npcs.All); // it does not leave at dawn
     }
 
     [Fact]

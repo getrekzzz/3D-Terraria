@@ -206,6 +206,8 @@ def _layer(g, phi, roots, rings, K1, K2, width, thick, length, taper, root):
     if not bob:
         P, gathered = _gather(g, P, K1, _groups(phi, fa), radius, fa, phi)
         rest = np.where(np.abs(gathered).sum(2, keepdims=True) > 0, gathered, rest)
+    if g.st.wave:                       # waves: each lock swings out from what it lies on and back, more toward its end
+        P = _waves(g, P, K1, phi)
     # Thin along the hairline, so the hair's edge there is soft rather than a ledge.
     edge = P[:K1, :, 2] - hairlines(P[:K1].reshape(-1, 3), g.part, False).reshape(K1, n)
     up = _ss(0.004, 0.03, edge)
@@ -222,6 +224,24 @@ def _layer(g, phi, roots, rings, K1, K2, width, thick, length, taper, root):
     hung = 0.25 + 0.2 * face
     rnd[K1:] = hung + (rnd[K1 - 1] - hung) * (1 - _ss(0.0, 0.4, hang[K1:]))
     return Strands(P, W, T, taper=taper, root=root, N=N, round=rnd, blunt=0.4, merge=0.35)
+
+
+def _waves(g, P, K1, phi):
+    """Long hair falling in waves (the style's ``wave``, head-local): below the head each lock bends out from the
+    hair's axis and back (never in, so it stays off whatever it rests on) and sways a little sideways, the crests
+    a hand's width apart, deeper toward the ends, neighbouring locks a little out of step."""
+    P = P.copy()
+    K = P.shape[0]
+    hang = np.r_[np.zeros(K1), np.linspace(0.0, 1.0, K - K1)][:, None]
+    arc = np.concatenate([np.zeros((1, P.shape[1])), np.cumsum(np.linalg.norm(np.diff(P, axis=0), axis=2), axis=0)])
+    phase = 2 * np.pi * arc / 0.075 + 0.6 * np.sin(phi * 3.0)[None, :]
+    out = P - MIDDLE
+    out[..., 2] = 0.0
+    out = _unit(out)
+    side = np.cross(np.asarray((0.0, 0.0, 1.0)), out)
+    amp = g.st.wave * _ss(0.0, 0.35, hang) * (0.7 + 0.3 * hang)
+    P += (out * (0.5 + 0.5 * np.sin(phase))[..., None] + side * 0.35 * np.cos(phase)[..., None]) * amp[..., None]
+    return P.astype(F)
 
 
 def _fringe(g, n=6):

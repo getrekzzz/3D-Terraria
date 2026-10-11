@@ -81,6 +81,7 @@ public sealed partial class PlayerAvatar
         if (wings != _wingItem)
         {
             _wingItem = wings;
+            LightWings(_wings, null);
             _wings?.QueueFree();
             _wings = null;
             var path = wings == null ? null : AssetPaths.ItemModel(wings, _game.Session.Content);
@@ -89,6 +90,7 @@ public sealed partial class PlayerAvatar
                 // Modelled upright with the wings spread along ±X; worn on the back (+Z faces behind the avatar).
                 _wings = new MeshInstance3D { Mesh = mesh, Position = new Vector3(0, 0.98f, 0.15f), Scale = Vector3.One * 2.2f };
                 AddChild(_wings);
+                LightWings(null, _wings);
             }
         }
         if (_wings == null) return;
@@ -101,10 +103,10 @@ public sealed partial class PlayerAvatar
 
     private ItemDef? WornWings()
     {
-        var acc = _controller.Entity.State.Inventory.Accessories;
-        for (int i = 0; i < acc.Size; i++)
+        var inv = _controller.Entity.State.Inventory;
+        for (int i = 0; i < inv.AccessorySlotsUnlocked; i++)
         {
-            var item = acc[i].Item;
+            var item = inv.Accessories[i].Item;
             if (item == null) continue;
             foreach (var e in item.EquipEffects)
                 if (e.Type == EffectSpecs.Flight && !(e.Raw.TryGetProperty("boots", out var boots) && boots.ValueKind == System.Text.Json.JsonValueKind.True)) return item;

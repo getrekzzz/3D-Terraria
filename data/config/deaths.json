@@ -1,0 +1,57 @@
+{
+  // Death messages, Terraria-style, by what dealt the killing blow (Gameplay/Combat/Harm.cs, HarmKind). {player} is the
+  // character's name and {source} what killed them ("a Zombie", "King Slime", "a Poison Dart"). The line is picked by
+  // the character's death count, so it changes from death to death but never at random. Every kind needs a line.
+  "lines": {
+    "enemy": [
+      "{player} was slain by {source}.",
+      "{player} was eviscerated by {source}.",
+      "{player} was murdered by {source}.",
+      "{player}'s face was torn off by {source}.",
+      "{player}'s skull was crushed by {source}.",
+      "{player} got massacred by {source}.",
+      "{player} was torn in half by {source}.",
+      "{player}'s vital organs were ruptured by {source}."
+    ],
+    "projectile": [
+      "{player} was slain by {source}.",
+      "{player} was shot down by {source}.",
+      "{player} was riddled by {source}."
+    ],
+    "fall": [
+      "{player} fell to their death.",
+      "{player} didn't bounce.",
+      "{player} faceplanted the ground."
+    ],
+    "lava": [
+      "{player} tried to swim in lava.",
+      "{player} got melted.",
+      "{player} likes to play in magma."
+    ],
+    "drowning": [
+      "{player} forgot to breathe.",
+      "{player} is sleeping with the fish.",
+      "{player} drowned.",
+      "{player} is shark food."
+    ],
+    "debuff": [
+      "{player} was consumed by {source}.",
+      "{player} succumbed to {source}."
+    ],
+    "trap": [
+      "{player} was impaled by {source}.",
+      "{player} stepped on {source}."
+    ],
+    "other": [
+      "{player} was slain.",
+      "{player} met their end."
+    ]
+  },
+  // Lines of their own for some sources (a buff or creature id), used in place of the kind's.
+  "sources": {
+    "on_fire": ["{player} burned to death.", "{player} couldn't put the fire out."],
+    "poisoned": ["{player} succumbed to poison.", "{player} was poisoned."],
+    "frostburn": ["{player} froze and burned at once.", "{player}'s flesh was frostburnt away."],
+    "cursed_inferno": ["{player} was consumed by cursed flames.", "{player} burned in green fire."]
+  }
+}

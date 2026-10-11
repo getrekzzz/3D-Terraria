@@ -1,0 +1,54 @@
+# X-12 photo mode smoke test: P pauses the world, swaps to the free camera and hides the HUD; F12 takes a picture
+# (counted but not saved by the headless renderer); Esc leaves and restores the simulation and HUD.
+# Runs with: godot --headless --path . -- --world=smoke-photo --size=tiny --new --player=smoke --fresh-player --view=2 --smoke=res://game/Testing/Scripts/photo.cmds
+
+wait_until player.frozen == 0 180
+wait 0.5
+assert errors == 0
+assert photo.active == 0
+assert world.simulating == 1
+
+# The photo_mode key (P) enters.
+press photo_mode
+wait 0.2
+press photo_mode off
+assert photo.active == 1
+assert world.simulating == 0
+assert photo.hud_hidden == 1
+
+# The lens: depth of field, exposure and a colour filter.
+photo dof 6 0.6
+assert photo.dof == 1
+photo exposure 1
+photo filter sepia
+assert photo.filter == 4
+wait 0.2
+
+# The photo_shot key (F12) takes a picture; so does the command.
+press photo_shot
+wait 0.3
+press photo_shot off
+assert photo.shots == 1
+photo shot
+wait 0.3
+assert photo.shots == 2
+photo filter none
+photo dof 6 0
+
+# Esc leaves: simulation and HUD come back.
+press pause
+wait 0.2
+press pause off
+assert photo.active == 0
+assert world.simulating == 1
+assert photo.hud_hidden == 0
+
+# The command path round trip.
+photo on
+assert photo.active == 1
+assert world.simulating == 0
+photo off
+assert photo.active == 0
+assert world.simulating == 1
+wait 0.3
+assert errors == 0

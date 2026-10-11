@@ -16,7 +16,7 @@ namespace Strata.Core.Session;
 /// A live world: content, generator, loaded voxels, tile objects, sky map, clock and persistence.
 /// Engine-agnostic; the Godot layer only renders it and feeds input.
 /// </summary>
-public sealed partial class WorldSession
+public sealed partial class WorldSession : IDisposable
 {
     private WorldSession(ContentDatabase content, WorldMeta meta, WorldSaveStore? store, RenderTables render, ILog log)
     {
@@ -36,18 +36,25 @@ public sealed partial class WorldSession
             (x, z) => (int)MathF.Ceiling(Generator.Terrain.SurfaceHeight(x, z)) + 1,
             (cx, cz) => cx >= 0 && cz >= 0 && cx < World.ChunkCounts.X && cz < World.ChunkCounts.Z
                 ? (plan.ColumnTop[plan.ColumnIndex(cx, cz)] - 1) >> ChunkMath.Shift
-                : plan.Bands.SeaLevel >> ChunkMath.Shift);
+                : plan.Bands.SeaLevel >> ChunkMath.Shift,
+            plan.Bands.Inverted ? (x, z) => (int)MathF.Ceiling(Generator.Terrain.CeilingHeight(x, z)) : null);
         Flags = new HashSet<string>(meta.Flags, StringComparer.Ordinal);
-        var wires = meta.Wires ?? new();
-        for (int i = 0; i + 2 < wires.Count; i += 3) Wires.Add(new Int3(wires[i], wires[i + 1], wires[i + 2]));
+        Wires.Load(meta, content);
         Counters = new Dictionary<string, int>(meta.Counters ?? new(), StringComparer.Ordinal);
         Mutations = new WorldGen.Mutations.MutationLog(Generator, content, Settings);
         Mutations.Load(meta, log);
         Events = new HashSet<string>(StringComparer.Ordinal);
+        if (store != null)
+        {
+            Saver = new WorldSaver(store, content, Ids, log);
+            Saver.SetBaseMeta(SerializeMeta());
+        }
         World.TileObjects.Added += o => MarkModified(o);
         World.TileObjects.Removed += o => MarkModified(o);
 
-        if (meta.PlanHash.Length > 0 && meta.PlanHash != plan.Hash)
+        if (SaveCatalog.IsOldGenerator(meta))
+            log.Warn("session", $"World made with generator version {meta.GeneratorVersion} (current {GenVersion.Current}); newly explored terrain will not match the saved regions.");
+        else if (meta.PlanHash.Length > 0 && meta.PlanHash != plan.Hash)
             log.Warn("session", $"World plan hash changed ({meta.PlanHash} -> {plan.Hash}); unexplored regions will differ from the original generator.");
     }
 
@@ -55,6 +62,9 @@ public sealed partial class WorldSession
     public WorldMeta Meta { get; }
     public WorldSettings Settings { get; }
     public WorldSaveStore? Store { get; }
+
+    /// <summary>The single background writer of this world's files (null for unsaved worlds).</summary>
+    public WorldSaver? Saver { get; }
     public WorldIdTables Ids { get; }
     public RenderTables Render { get; }
     public ILog Log { get; }
@@ -65,7 +75,10 @@ public sealed partial class WorldSession
     public HashSet<string> Flags { get; }
 
     /// <summary>Cells carrying red wire (see <see cref="Gameplay.Wiring.WireSystem"/>).</summary>
-    public HashSet<Int3> Wires { get; } = new();
+    public Gameplay.Wiring.WireGrid Wires { get; } = new();
+
+    /// <summary>The seasonal event by date (Halloween, Christmas), the player's setting and any console override.</summary>
+    public Gameplay.Seasons.SeasonState Seasons { get; } = new();
 
     /// <summary>World tallies kept across saves (orbs smashed, altars smashed).</summary>
     public Dictionary<string, int> Counters { get; }
@@ -75,6 +88,9 @@ public sealed partial class WorldSession
 
     /// <summary>Ids of running world events (maintained by the event director).</summary>
     public HashSet<string> Events { get; }
+
+    /// <summary>The world's weather (scheduled by the weather system, saved in world.json).</summary>
+    public Gameplay.Weather.WeatherState Weather { get; } = new();
 
     /// <summary>Kills counted by each active event (kept by the event director).</summary>
     public Dictionary<string, int> EventKills { get; } = new(StringComparer.Ordinal);
@@ -91,6 +107,7 @@ public sealed partial class WorldSession
             Size = settings.Size,
             Difficulty = settings.Difficulty,
             Evil = settings.Evil,
+            Secrets = settings.Secret == SecretSeed.None ? null : SecretSeeds.Ids(settings.Secret),
             GeneratorVersion = GenVersion.Current,
             CreatedUtc = DateTime.UtcNow,
             LastPlayedUtc = DateTime.UtcNow,
@@ -100,6 +117,7 @@ public sealed partial class WorldSession
         var spawn = session.Generator.Plan.Spawn;
         meta.Spawn = new[] { spawn.X, spawn.Y, spawn.Z };
         meta.PlanHash = session.Generator.Plan.Hash;
+        foreach (var cell in session.Generator.Plan.PlannedWires) session.Wires.Add(cell, Gameplay.Wiring.WireColor.Red); // new worlds only: a loaded world keeps its own
         session.SaveMetaOnly();
         return session;
     }
@@ -116,6 +134,13 @@ public sealed partial class WorldSession
     /// <summary>Loads or generates a chunk. Thread-safe; runs on workers.</summary>
     public ChunkProduct Produce(Int3 coord)
     {
+        if (Saver != null && Saver.TryGetPending(coord, out var pending))
+        {
+            // Unloaded but not yet written: rebuild from the snapshot so the edits survive the round trip.
+            var steps = Mutations.Steps;
+            return new ChunkProduct(coord, WorldGen.Mutations.MutationLog.Apply(pending.Data, coord, steps, pending.MutationLevel),
+                ChunkCodec.DecodeObjects(pending.Objects, Content, Ids), Math.Max(pending.MutationLevel, steps.Count), FromSave: true);
+        }
         var blob = Store?.LoadChunk(coord);
         if (blob != null)
         {
@@ -161,12 +186,12 @@ public sealed partial class WorldSession
         return sky;
     }
 
-    /// <summary>Removes a chunk from memory, returning its encoded blob when it must be saved.</summary>
-    public byte[]? Unload(Int3 coord)
+    /// <summary>Removes a chunk from memory, returning its snapshot when it must be saved (see <see cref="SaveUnloaded"/>).</summary>
+    public ChunkSnapshot? Unload(Int3 coord)
     {
-        byte[]? blob = null;
+        ChunkSnapshot? snapshot = null;
         var chunk = World.GetChunk(coord);
-        if (chunk != null && chunk.Modified) blob = Encode(chunk);
+        if (chunk != null && chunk.Modified && Saver != null) snapshot = Capture(chunk);
         _installing = true;
         try
         {
@@ -177,11 +202,8 @@ public sealed partial class WorldSession
             _installing = false;
         }
         World.RemoveChunk(coord, out _);
-        return blob;
+        return snapshot;
     }
-
-    public byte[] Encode(Chunk chunk) =>
-        ChunkCodec.Encode(chunk.Capture(), chunk.MutationLevel, World.TileObjects.InChunk(chunk.Coord), Content, Ids);
 
     private void MarkModified(TileObjectInstance obj)
     {

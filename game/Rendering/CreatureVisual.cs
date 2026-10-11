@@ -20,21 +20,49 @@ public sealed partial class CreatureVisual : Node3D
     /// <summary>Set for generated humans with an animation set (see <see cref="HumanAnimations"/>).</summary>
     public HumanoidAnimator? Humanoid { get; private set; }
 
-    /// <summary>Loads a creature model; returns null (and records a problem) if the file is missing.</summary>
+    private Ragdoll? _ragdoll;
+    private bool _ragdollTried;
+
+    /// <summary>This human's ragdoll (built on first use and kept with the pooled visual), or null for other creatures.</summary>
+    public Ragdoll? Ragdoll
+    {
+        get
+        {
+            if (!_ragdollTried && Humanoid != null && Skeleton != null) _ragdoll = Rendering.Ragdoll.Build(Skeleton);
+            _ragdollTried = true;
+            return _ragdoll;
+        }
+    }
+
+    /// <summary>
+    /// Instantiates a creature model; returns null (recording a problem once) if the file is missing, and null while
+    /// the model or its animation set is still loading on a loader thread (callers retry on a later frame).
+    /// </summary>
     /// <param name="aim">Give a human an <see cref="AimModifier"/> (the player's body).</param>
-    public static CreatureVisual? Create(string projectPath, PropLibrary props, bool aim = false)
+    /// <param name="now">Load synchronously instead (the player's body, menus): never returns null while pending.</param>
+    public static CreatureVisual? Create(string projectPath, PropLibrary props, bool aim = false, bool now = false)
     {
         var path = "res://" + projectPath;
-        if (!ResourceLoader.Exists(path))
+        PackedScene? packed;
+        if (now) packed = AssetCache.LoadNow<PackedScene>(path);
+        else
         {
-            props.Problems.Add($"missing creature model {path}");
+            var state = AssetCache.TryGet(path, out packed);
+            // Request the animation set alongside the model so both load in parallel.
+            var anims = HumanAnimations.TryFor(projectPath, now: false, out _);
+            if (state == AssetState.Pending || (state == AssetState.Ready && anims == AssetState.Pending)) return null;
+        }
+        if (packed == null)
+        {
+            props.Report($"missing creature model {path}");
             return null;
         }
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("assets.instantiate");
         var visual = new CreatureVisual { Name = "Visual" };
-        var scene = GD.Load<PackedScene>(path).Instantiate<Node3D>();
+        var scene = packed.Instantiate<Node3D>();
         visual.AddChild(scene);
         visual.Setup(scene, props, scene.Transform);
-        if (visual.Skeleton is { } skeleton && HumanAnimations.For(projectPath) is { } library)
+        if (visual.Skeleton is { } skeleton && HumanAnimations.TryFor(projectPath, now: true, out var set) == AssetState.Ready && set is { } library)
         {
             // The set's tracks address the armature by one shared name.
             if (skeleton.GetParent() is Node3D armature && armature != scene) armature.Name = HumanoidAnimator.Rig;
@@ -60,8 +88,11 @@ public sealed partial class CreatureVisual : Node3D
         return -Bottom * scale;
     }
 
+    private PropLibrary? _props;
+
     private void Setup(Node node, PropLibrary props, Transform3D xf)
     {
+        _props = props;
         if (node is MeshInstance3D mi && mi.Mesh != null)
         {
             var box = xf * mi.Mesh.GetAabb();
@@ -110,15 +141,23 @@ public sealed partial class CreatureVisual : Node3D
 
     public bool IsPlaying => Humanoid != null || (_player?.IsPlaying() ?? false);
 
-    public override void _Process(double delta) => Humanoid?.Update((float)delta);
+    public override void _Process(double delta)
+    {
+        Humanoid?.Update((float)delta);
+        UpdateSway((float)delta);
+    }
 
     public void SetTint(Color tint)
     {
         foreach (var g in _geometry) g.SetInstanceShaderParameter("tint", tint);
+        TintLit(tint);
     }
 
     private Color _light;
     private bool _lit;
+
+    /// <summary>The (eased) voxel light the model is shaded with; attachments that should match it read this.</summary>
+    public Color CurrentLight => _light;
 
     /// <summary>
     /// Sets the voxel light the model is shaded with, easing towards it (a few frames) so walking past a torch or
@@ -129,6 +168,7 @@ public sealed partial class CreatureVisual : Node3D
         _light = _lit && !immediate ? _light.Lerp(voxelLight, 0.18f) : voxelLight;
         _lit = true;
         foreach (var g in _geometry) g.SetInstanceShaderParameter("voxel_light", _light);
+        ApplyLit(_light);
     }
 
     /// <summary>Attaches a node to a bone (held items); returns false if the bone does not exist.</summary>
@@ -142,11 +182,12 @@ public sealed partial class CreatureVisual : Node3D
     }
 
     /// <summary>
-    /// Colours a recolourable player model (generated with marker colours) to a character's look: hair, skin, shirt,
-    /// trousers and shoes.
+    /// Colours a recolourable player model (generated with marker colours) to a character's look: hair, skin, eyes,
+    /// shirt, undershirt, trousers and shoes; the chosen hair model is worn on the head.
     /// </summary>
     public void SetAppearance(Strata.Core.Gameplay.Player.Appearance look)
     {
+        WearHair(look.HairModelId);
         foreach (var g in _geometry)
         {
             g.SetInstanceShaderParameter("recolor", 1f);
@@ -155,6 +196,8 @@ public sealed partial class CreatureVisual : Node3D
             g.SetInstanceShaderParameter("shirt_color", Linear(look.ShirtColor));
             g.SetInstanceShaderParameter("pants_color", Linear(look.PantsColor));
             g.SetInstanceShaderParameter("shoe_color", Linear(look.ShoeColor));
+            g.SetInstanceShaderParameter("eye_color", Linear(look.EyeColor));
+            g.SetInstanceShaderParameter("undershirt_color", Linear(look.UndershirtColor));
         }
     }
 

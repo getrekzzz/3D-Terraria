@@ -27,7 +27,7 @@ public sealed class HostileBiomePass : GenPass
                 float a = rng.NextFloat(), d = rng.Range(0f, 0.7f) * region.RadiusX;
                 float x = region.CenterX + Trig.Cos(a) * d, z = region.CenterZ + Trig.Sin(a) * d;
                 var p = new Vector3(x, ctx.Terrain.SurfaceHeight(x, z) + 4f, z);
-                float bottom = bands.YForNormalizedDepth(rng.Range(0.22f, 0.42f));
+                float bottom = bands.DescentY(rng.Range(0.22f, 0.42f));
                 float r = rng.Range(2.6f, 3.8f);
                 while (p.Y > bottom)
                 {

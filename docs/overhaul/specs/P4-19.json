@@ -1,0 +1,64 @@
+{
+ "id": "P4-19",
+ "title": "Dungeon decorator: furnishing by room role, cobwebs, pots, spike strips, dart traps on pressure plates with planned wires, prop preloading",
+ "player_outcome": "Every room tells you what it is: libraries full of bookcases and shelves, barracks with tables, treasure rooms with a chest on a dais between statues, spike pits bridged by platforms. Chandeliers and banners line the halls, cobwebs hang in corners, and pressure plates fire hidden dart traps. It streams in without hitches.",
+ "design": [
+  "New src/Strata.Core/WorldGen/Structures/Dungeon/DungeonDecorator.cs, with a Rooms partial. It emits ObjectOps and small Fills after DungeonBuilder, from rng stream 'dungeon.decor'.",
+  "Helper RotationFacing(dir): rotation 0 faces \u2212Z, 1 +X, 2 +Z, 3 \u2212X (as in WireSystem.FireTrap). Wall objects stand in the interior cell next to the wall and face inward; ceiling objects sit flush with the ceiling.",
+  "Keep an occupied-cell set so no two ObjectOps overlap (TileObjectStore.TryAdd silently rejects overlaps).",
+  "Halls: every 12\u201316 cells alternate banner, lamp and candelabra. Pots (existing 'pot', random variant) in 1\u20133 clusters per segment. Cobweb blocks (Fill onlyAir 'cobweb' 2\u00d72\u00d72) in upper corners, 40%.",
+  "Hall spike strips: 15% of flat halls get a centred strip \u2264 5 cells long (jumpable) of 'spike' objects.",
+  "Hall traps: 10% of flat halls get a pressure_plate on the floor and a dart_trap in the side wall at chest height (carve its cell first, face across the hall). Wire cells run along an L-shaped path under the floor from plate to trap.",
+  "Planned wires are recorded in a new WorldPlan.PlannedWires set. WorldSession.Create seeds Session.Wires from it (new worlds only).",
+  "Rooms by role:",
+  "  Library: 3\u20136 bookcases on the walls, plus platform-shaped brick shelves at 3 heights holding book objects at 60% fill. About 1 in 40 books gets PendingLoot 'water_bolt_book', guaranteeing \u2265 1 per dungeon. A table, chair and candle.",
+  "  Treasure: a 1-cell brick dais with a gold_chest (locked in P4-21), 2 statues, 2 candelabras and a banner.",
+  "  Barracks: 2 tables, 4 chairs, vases, pots, a chandelier.",
+  "  SpikePit: a spike floor with a platform bridge.",
+  "  Keep foyer: 2 chandeliers, 4 banners, 2 statues.",
+  "  Vault: reserve 6 chest spots for P4-34.",
+  "Budgets: \u2264 40 objects and \u2264 6 light sources per chunk (counted while placing).",
+  "Godot prop preloading. Add PropLibrary.Preload(IEnumerable<string>) with a queue that loads one GLB per frame. When the player comes within 64 m of the dungeon_gate landmark (or on load inside it), game/World/TileObjectRenderer.cs enqueues DungeonFeature.ObjectIds' model paths, so no first-use GLB load stalls a frame in the dungeon."
+ ],
+ "files_modify": [
+  "src/Strata.Core/WorldGen/Passes/DungeonPass.cs \u2014 run the decorator, fill PlannedWires, expose ObjectIds",
+  "src/Strata.Core/WorldGen/Plan/WorldPlan.cs \u2014 PlannedWires",
+  "src/Strata.Core/Session/WorldSession.cs \u2014 seed wires in Create",
+  "src/Strata.Core/WorldGen/Structures/Dungeon/DungeonFeature.cs \u2014 ObjectIds",
+  "game/Rendering/PropLibrary.cs \u2014 Preload queue",
+  "game/World/TileObjectRenderer.cs \u2014 trigger preloading near the dungeon",
+  "tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs \u2014 re-pin"
+ ],
+ "files_add": [
+  "src/Strata.Core/WorldGen/Structures/Dungeon/DungeonDecorator.cs \u2014 halls, traps, budgets",
+  "src/Strata.Core/WorldGen/Structures/Dungeon/DungeonDecorator.Rooms.cs \u2014 room-role furnishing",
+  "tests/Strata.Core.Tests/WorldGen/DungeonDecorTests.cs \u2014 decor invariants"
+ ],
+ "data_changes": [],
+ "tests": [
+  "DungeonDecorTests.NoObjectsOverlap.",
+  "DungeonDecorTests.WallObjectsHangOnWallsAndCeilingObjectsTouchCeilings (checked on stamped chunks).",
+  "DungeonDecorTests.LibrariesHoldBooksAndAtLeastOneWaterBolt.",
+  "DungeonDecorTests.TreasureRoomsHaveAChest.",
+  "DungeonDecorTests.ObjectAndLightBudgetsPerChunk.",
+  "DungeonDecorTests.PlannedWiresJoinEachPlateToItsTrap (BFS over wire cells).",
+  "DungeonDecorTests.SteppingOnADungeonPlateFiresItsDart: install the chunk, stand on the plate, projectiles increase.",
+  "Smoke dungeon.cmds: 'flag defeated_skeletron', 'tp landmark dungeon_bottom', 'wait_until stream.idle == 1 600', 'assert props.problems == 0', 'assert errors == 0'."
+ ],
+ "verification": [
+  "dotnet test; headless dungeon.cmds",
+  "perf: 'perf start', walk the halls with 'hold move_forward 20', 'perf report'. No frame > 33 ms from gd.objects/uploads on the medium preset.",
+  "lavapipe screenshots of a library and a treasure room"
+ ],
+ "depends_on": [
+  "P4-15",
+  "P4-16",
+  "P4-17",
+  "P4-18"
+ ],
+ "risks": [
+  "MultiMesh draw calls per chunk grow with object variety; the \u2264 40 objects cap and one colour per dungeon contain it. The perf phase may also change TileObjectRenderer budgets, so coordinate.",
+  "Wire seeding only for new worlds is fine: old worlds are disposable."
+ ],
+ "effort": "M"
+}

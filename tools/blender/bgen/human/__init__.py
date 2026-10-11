@@ -6,7 +6,7 @@ and ears, plus eyeballs (head) -> hands with fingers and nails (hands) -> skin p
 with ``char:<kind>`` material slots that the game maps to its character shader.
 
 Parameters: body (male|female), age (young|adult|old), height, build (muscle 0..1), weight (0..1), skin, eyes,
-hair, hairStyle, beard (its colour), beardStyle (short|full|bushy|long|pointed|goatee, default full), shirt, pants, boots,
+hair, hairStyle (bald or a style of the hair catalogue, hair_styles.py), beard (its colour), beardStyle (short|full|bushy|long|pointed|goatee, default full), shirt, pants, boots,
 coat, lapels (default true: a coat worn open, with lapels and a turned-down collar over the shirt; false: closed to the
 throat), robe, trim, apron, hat (cap|wide|hood|wreath), hatColor, visor (a cap's peak, default true), hatShape, flower
 (a wreath's flowers or a circlet's jewel), mask, horns, hornShape, wings, wingShape, tail, tailShape, brows (a colour,
@@ -17,7 +17,10 @@ armSpread (degrees the arms hang further out, for bulky bodies; keys its own ani
 burlap head, with straw, rope and patches, true or a list of colours: scarecrow.py), undead, suit (true when the shirt, pants
 and boots stand for the creature's own body, coloured like its skin: they are cut skin-tight and melt into the skin
 at their edges, with no seams, folds, collar, cuffs, buttons, boot rims or soles, and no belt unless one is given),
-hairTie (a ponytail's or bun's tie, default a darker shirt).
+hairTie (a ponytail's or bun's tie, default a darker shirt), vest (its colour: a sleeveless waistcoat over the
+shirt, open in a V with lapels like a coat unless lapels is false), eyepatch (its colour: a patch over the left
+eye with its strap round the head). Older names are understood (``vocabulary``): hat bandana, tricorne and helm,
+ears pointed, coatOpen.
 
 Build and weight above average (0.5, 0.45) add mass: muscle broadens the shoulders, back and chest and thickens the
 limbs and neck; fat adds a round belly, love handles, a fuller chest, heavy limbs and a thick neck.
@@ -51,6 +54,8 @@ from .body import build_body
 from .hands import build_hand
 from .head import Head
 from .paint import SkinPainter, brow_color, flat, hex3, paint
+from .assembly import join, rest_uvs, sway_uvs, tree
+from .params import DEFAULTS, motion_params, vocabulary
 
 
 # Material slots the game's character shader understands (game/Rendering/PropLibrary.cs).
@@ -124,22 +129,10 @@ def _all(parts):
 
 def build_preview(name: str, p: dict):
     """Unrigged parts for inspection renders."""
+    p = vocabulary(p)
     _, head, parts = _parts(p)
     head.bury_neck(parts["body"])
     return _all(parts)
-
-
-DEFAULTS = {"shirt": "#4a7ac0", "pants": "#3a4a6a", "boots": "#5a3c26", "hair": "#5a3a20", "eyes": "#5a7890"}
-
-
-def motion_params(p: dict) -> dict:
-    """The parameters a character's skeleton and actions are built from (as build() and build_skeleton() see them)."""
-    p = {**DEFAULTS, **p}
-    if p.get("undead"):
-        p = {"build": 0.25, "weight": 0.15, **p}
-    if p.get("anatomy") == "skeleton":
-        p = {**p, "undead": True}
-    return p
 
 
 def motion_key(p: dict) -> str:
@@ -175,6 +168,7 @@ def build_motion(p: dict):
 
 def build(name: str, p: dict):
     """The rigged, animated character: [armature, mesh]."""
+    p = vocabulary(p)
     if p.get("anatomy") == "skeleton":
         return build_skeleton(name, p)
     if p.get("anatomy", "human") != "human":        # stone, wood, cookie, armor (matter.py)
@@ -212,6 +206,7 @@ def build(name: str, p: dict):
     for o in objs:
         rest_uvs(o)
     mesh = join(objs, name)
+    sway_uvs(mesh)
     occlusion.bake(mesh, 0.1 * fr.s)
     mesh.parent = arm
     mod = mesh.modifiers.new("Armature", "ARMATURE")
@@ -246,6 +241,7 @@ def build_skeleton(name: str, p: dict):
     for o in objs:
         rest_uvs(o)
     mesh = join(objs, name)
+    sway_uvs(mesh)
     occlusion.bake(mesh, 0.1 * fr.s)
     mesh.parent = arm
     mod = mesh.modifiers.new("Armature", "ARMATURE")
@@ -290,6 +286,8 @@ def dress(fr, head, parts, p, lookup=None):
         add(w.shell(body, w.in_boots, "boots", 0.007, p.get("boots", "#4a3424"), "char:leather", "boots", w.boot_cuts()), w.in_boots)
     elif talons or p.get("feet") == "none":
         covers.append(w.in_boots)          # the talons take the leg's end over
+    if "vest" in p and not robe:     # a sleeveless waistcoat over the shirt, cut like a coat (on its standoff)
+        add(w.shell(body, w.in_vest, "vest", 0.009, p["vest"], "char:cloth", "coat", w.shirt_cuts(-0.015)))
     if "coat" in p:
         add(w.shell(body, w.in_coat, "coat", 0.012, p["coat"], "char:cloth", "coat", w.shirt_cuts(-0.015)))
         add(w.skirt(body, fr.j["knee.R"].z + 0.03 * fr.s, 0.35, p["coat"], "coat_tails", open_front=True, trim=p.get("trim"), under=list(out)))
@@ -298,7 +296,7 @@ def dress(fr, head, parts, p, lookup=None):
         add(w.skirt(body, fr.j["ankle.R"].z + 0.02 * fr.s, 0.55, p["robe"], "robe_skirt", trim=p.get("trim"), under=list(out)))
         out.extend(w.sash(out[-1], bodice, p.get("trim", p["robe"])))
     if w.belted and coverings.wears(p, "pants") and (not w.suit or "belt" in p):      # a body suit wears only a belt it is given
-        out.extend(w.belt(body, p.get("belt", "#3a2618"), over=[o for o in out if o.name.startswith(("coat", "shirt", "pants"))]))
+        out.extend(w.belt(body, p.get("belt", "#3a2618"), over=[o for o in out if o.name.startswith(("coat", "vest", "shirt", "pants"))]))
     if "apron" in p:
         out.extend(apron.build(w, body, parts["head"], out + w.extras, p["apron"]))
     out.extend(w.extras)
@@ -310,6 +308,8 @@ def dress(fr, head, parts, p, lookup=None):
         if p["hat"] == "hood" and lookup is not None:
             rig.head_weights(hat, head, *lookup, torso_only=True)
         add(hat)
+    if "eyepatch" in p:
+        add(accessories.eyepatch(head, parts, p["eyepatch"]))
     out.extend(accessories.wear(fr, head, parts, p, list(out)))
     out.extend(creaturewear.wear(fr, head, parts, p, w, list(out), lookup))     # a shaman's outfit, a ghost's hem
     if "sack" in p and lookup is not None:      # a scarecrow: sack head, straw, patches, rope belt (scarecrow.py)
@@ -328,14 +328,18 @@ def groom(fr, head, parts, p, lookup=None, worn=(), bare=None):
     if style != "bald" and p.get("hat") != "hood":
         hatted = underhat.UnderHat(head, p) if accessories.trims_hair(p) else None
         body_tree = worn_tree = None
-        if style in ("long", "ponytail"):
+        if style in ("long", "wavy_long", "ponytail"):
             from mathutils.bvhtree import BVHTree
             body_tree = bare or BVHTree.FromObject(parts["body"], bpy.context.evaluated_depsgraph_get())
-            worn_tree = _tree([o for o in worn if o.type == "MESH" and not o.name.startswith(LOOSE)])
+            worn_tree = tree([o for o in worn if o.type == "MESH" and not o.name.startswith(LOOSE)])
         shirt = p.get("shirt", "#6a4a3a").lstrip("#")
         tie = p.get("hairTie") or "#" + "".join(f"{int(int(shirt[i:i + 2], 16) * 0.55):02x}" for i in (0, 2, 4))
         seed = sum(ord(ch) for ch in f"{style}{p.get('skin', '')}")     # not the colour: same shape, shared mesh cache
-        out += locks.Groom(head, style, color, hatted, body_tree, seed, worn_tree, tie).build(parts["head"])
+        if style in locks.STYLES:
+            out += locks.Groom(head, style, color, hatted, body_tree, seed, worn_tree, tie).build(parts["head"])
+        else:           # the rest of the player's hair catalogue (afro, curly, mullet, braid, ...: hair_styles.py)
+            from . import hair_styles
+            out += hair_styles.build(head, parts["head"], style, color)
     if "beard" in p:
         under = [parts["body"]] + [o for o in worn if not o.name.startswith(("hat_", "mask", "horns", "wings", "tail"))]
         out.append(beard.grow(head, p, under))
@@ -351,50 +355,3 @@ def groom(fr, head, parts, p, lookup=None, worn=(), bare=None):
         from . import snakehair
         out.append(snakehair.build(head, p["snakes"]))
     return out
-
-
-def _tree(objs):
-    """One BVH (world space) over several meshes, or None."""
-    from mathutils.bvhtree import BVHTree
-    verts, polys = [], []
-    for o in objs:
-        base = len(verts)
-        verts += [o.matrix_world @ v.co for v in o.data.vertices]
-        polys += [tuple(base + i for i in poly.vertices) for poly in o.data.polygons]
-    return BVHTree.FromPolygons(verts, polys) if polys else None
-
-
-def rest_uvs(obj):
-    """UVMap (unless the part already has strand UVs) = rest (x, z); UVRest = rest (y, z): the game shader
-    rebuilds the rest position from them so surface detail stays attached to the skin and cloth."""
-    me = obj.data
-    has_strands = "UVMap" in me.uv_layers and len(me.uv_layers) > 0
-    uv = me.uv_layers.get("UVMap") or me.uv_layers.new(name="UVMap")
-    rest = me.uv_layers.get("UVRest") or me.uv_layers.new(name="UVRest")
-    for loop in me.loops:
-        co = me.vertices[loop.vertex_index].co
-        if not has_strands:
-            uv.data[loop.index].uv = (co.x, co.z)
-        rest.data[loop.index].uv = (co.y, co.z)
-
-
-def join(objs, name):
-    bpy.ops.object.select_all(action="DESELECT")
-    for o in objs:
-        o.select_set(True)
-    bpy.context.view_layer.objects.active = objs[0]
-    bpy.ops.object.join()
-    obj = bpy.context.view_layer.objects.active
-    obj.name = name
-    obj.data.name = name
-    # Faces of five or more sides (button caps, buckle plates) stop the exporter computing tangents for the whole
-    # mesh, which the hair highlights need.
-    import bmesh
-    bm = bmesh.new()
-    bm.from_mesh(obj.data)
-    ngons = [f for f in bm.faces if len(f.verts) > 4]
-    if ngons:
-        bmesh.ops.triangulate(bm, faces=ngons)
-        bm.to_mesh(obj.data)
-    bm.free()
-    return obj

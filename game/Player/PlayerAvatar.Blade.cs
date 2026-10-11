@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Godot;
 using Strata.Core.Content.Defs;
-using Strata.Core.Gameplay.Entities;
 using Strata.Core.Gameplay.Items;
 using Strata.Game.Items;
 using Strata.Game.Rendering;
@@ -11,7 +10,8 @@ namespace Strata.Game.Player;
 /// <summary>
 /// How the held item is carried and how a blade reads as it strikes: between uses the right hand tips blades and tools
 /// forward and down beside the leg (staffs, spears, bows and rods up) instead of holding everything straight out; during
-/// a swing, thrust or chop the blade leaves a trail tinted to the item.
+/// a swing, a rapier's jab, a spear's lunge or a chop the blade itself leaves a streak tinted to the item, timed by the
+/// clip's strike window (data/config/use_styles.json), over the hit ribbon the melee system draws (Entities/SwingTrail).
 /// </summary>
 public sealed partial class PlayerAvatar
 {
@@ -49,15 +49,16 @@ public sealed partial class PlayerAvatar
     private void AnimateBlade(HumanoidAnimator h, AimModifier aim, bool alive, Color light, float dt)
     {
         var info = _heldItem != null ? _game.Uses[_heldItem] : null;
-        // (Not while the hands are busy climbing, swimming or gliding.)
-        bool free = alive && h.Action == null && h.State is not ("climb" or "swim" or "glide");
+        // (Not while the hands are busy climbing, swimming or gliding, the body rests, or the right arm holds a loop.)
+        bool free = alive && h.Action == null && h.HoldIndex < 0
+            && h.State is not ("climb" or "swim" or "glide" or "sit" or "sleep" or "bound" or "lie");
         var target = free && _heldItem != null && info != null && _heldItem.HeldLight == null
-            ? CarryFor(_heldItem, info, _reach) : Vector2.Zero;
+            ? CarryFor(info, _reach) : Vector2.Zero;
         // Out of the carry as fast as an action fades in, back into it as it fades out.
         _carry = _carry.MoveToward(target, dt * (target == Vector2.Zero ? 700f : 240f));
         aim.Carry = new Vector2(Mathf.DegToRad(_carry.X), Mathf.DegToRad(_carry.Y));
         if (_trail == null) return;
-        _trail.Strength = alive && h.Action is "swing" or "thrust" or "mine" ? TrailStrength(h.Action, h.ActionPhase) : 0f;
+        _trail.Strength = alive ? TrailStrength(h.Action, h.ActionPhase) : 0f;
         _trail.Life = Mathf.Clamp(h.ActionLength * 0.3f, 0.07f, 0.16f);
         _trail.SetLight(Mathf.Max(light.R, Mathf.Max(light.G, light.B)), light.A);
     }
@@ -67,28 +68,29 @@ public sealed partial class PlayerAvatar
     /// forward and down, fanned out from the leg, long ones less steeply so the tip stays off the ground; spears, staffs,
     /// bows and rods up; guns and the rest as the grip holds them.
     /// </summary>
-    private static Vector2 CarryFor(ItemDef item, ItemUseInfo info, float reach)
+    private Vector2 CarryFor(ItemUseInfo info, float reach)
     {
         if (info.Has(ItemAction.Fish)) return new Vector2(25f, 0f);
-        return ActionFor(item, info) switch
+        return ActionFor(_game, info) switch
         {
-            "swing" or "mine" => new Vector2(Mathf.Lerp(-30f, -18f, Mathf.Clamp((reach - 0.6f) / 0.5f, 0f, 1f)), 15f),
-            "thrust" or "cast" or "bow" => new Vector2(22f, 0f),
+            "swing" or "mine" or "rapier" => new Vector2(Mathf.Lerp(-30f, -18f, Mathf.Clamp((reach - 0.6f) / 0.5f, 0f, 1f)), 15f),
+            "spear" or "staff" or "bow" => new Vector2(22f, 0f),
             _ => Vector2.Zero,
         };
     }
 
     /// <summary>
-    /// How strongly the blade trails at this point of an action: while a swing crosses in front (the window the melee
-    /// system sweeps hits in), as a thrust drives forward, and faintly as a tool comes down.
+    /// How strongly the blade trails at this point of an action: while a swing strikes and follows through (the window
+    /// the melee system sweeps hits in), as a rapier or spear drives out, and faintly as a tool comes down.
     /// </summary>
-    private static float TrailStrength(string? action, float phase) => action switch
+    private float TrailStrength(string? action, float phase)
     {
-        "swing" => Window(phase, MeleeSystem.StrikeStart - 0.01f, MeleeSystem.StrikeEnd + 0.02f),
-        "thrust" => 0.8f * Window(phase, MeleeSystem.ThrustStart, MeleeSystem.ThrustEnd),
-        "mine" => 0.3f * Window(phase, MeleeSystem.ChopStart + 0.04f, MeleeSystem.ChopEnd),
-        _ => 0f,
-    };
+        float strength = action switch { "swing" => 1f, "rapier" or "spear" => 0.8f, "mine" => 0.3f, _ => 0f };
+        if (strength <= 0f) return 0f;
+        var clip = _game.ItemUse.Timing.Clip(action!);
+        float start = clip.StrikeStart ?? 0f, end = Mathf.Min(1f, (clip.StrikeEnd ?? 1f) + UseTiming.FollowThrough);
+        return strength * Window(phase, start, end);
+    }
 
     private static float Window(float t, float start, float end) =>
         Mathf.SmoothStep(start - 0.03f, start + 0.02f, t) * (1f - Mathf.SmoothStep(end - 0.04f, end + 0.02f, t));

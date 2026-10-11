@@ -91,8 +91,58 @@ public sealed class EventDirector
         for (int i = _active.Count - 1; i >= 0; i--)
         {
             var a = _active[i];
-            if (a.TicksLeft > 0 && --a.TicksLeft == 0) End(a, completed: a.Def.KillGoal == 0);
+            if (a.TicksLeft > 0 && --a.TicksLeft == 0)
+            {
+                if (a.Def.SpawnBoss != null) CallBoss(a.Def.SpawnBoss);
+                End(a, completed: a.Def.KillGoal == 0);
+            }
         }
+    }
+
+    /// <summary>The kill goal in force for an event (lower once its <see cref="EventDef.KillGoalAfterFlag"/> is set).</summary>
+    public int GoalOf(ActiveEvent a) =>
+        a.Def.KillGoalAfterFlag is { } after && _world.Progression.IsSet(after.Flag) ? after.Goal : a.Def.KillGoal;
+
+    /// <summary>How far an invasion is towards its kill goal (0–1; 0 for an event without one): the HUD's progress bar.</summary>
+    public float Progress(ActiveEvent a)
+    {
+        int goal = GoalOf(a);
+        return goal > 0 ? Math.Clamp((float)a.Kills / goal, 0f, 1f) : 0f;
+    }
+
+    /// <summary>The latest invasion with a kill goal still going (the one the HUD's progress bar follows), or null.</summary>
+    public ActiveEvent? LatestInvasion
+    {
+        get
+        {
+            for (int i = _active.Count - 1; i >= 0; i--)
+                if (_active[i].Def.KillGoal > 0) return _active[i];
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// An arrival's countdown ran out: the boss comes for the player unless one already lives or it was beaten
+    /// meanwhile. Fliers appear 20 m ahead of the player and 12 m up; walkers drop in from 12 m overhead.
+    /// </summary>
+    private void CallBoss(string id)
+    {
+        if (!_world.Session.Content.Enemies.TryGet(id, out var boss)) return;
+        if (boss.Boss?.Flag is { } flag && _world.Progression.IsSet(flag)) return;
+        foreach (var n in _world.Npcs.All)
+            if (n.Alive && n.Def == boss) return;
+        PlayerEntity? player = null;
+        foreach (var p in _world.Players)
+            if (p.Alive)
+            {
+                player = p;
+                break;
+            }
+        if (player == null) return;
+        var up = new System.Numerics.Vector3(0, 12f, 0);
+        var ahead = AI.BrainFactory.Flat(player.Facing);
+        if (ahead == System.Numerics.Vector3.Zero) ahead = System.Numerics.Vector3.UnitX;
+        _world.Npcs.Spawn(boss, player.Position + up + (boss.Gravity ? System.Numerics.Vector3.Zero : ahead * 20f));
     }
 
     /// <summary>Starts an event now (commands, summon items). Returns false if it is already active.</summary>
@@ -123,19 +173,39 @@ public sealed class EventDirector
         meta.ActiveEvents = _active.Select(a => a.Def.Id).ToList();
     }
 
-    private void Roll(EventPhase phase)
+    /// <summary>Rolls the phase's events (dusk or dawn); tests may force every chance with <paramref name="chance"/>.</summary>
+    internal void Roll(EventPhase phase, float? chance = null)
     {
         var session = _world.Session;
         var ctx = session.ContextAt(session.SpawnCell);
-        ctx.Residents = _world.Town.Residents.Where(r => r.Alive).Select(r => r.Def.Id).ToHashSet(); // a party needs its host
+        _world.Town.FillTownFacts(ctx); // a party needs its host alive and in town
         ctx.PlayerMaxLife = _world.Players.Count == 0 ? 0 : _world.Players.Max(p => p.State.Vitals.MaxLife); // Blood Moon, invasions
+        ctx.PlayerDefense = _world.Players.Count == 0 ? 0 : _world.Players.Max(p => p.State.Defense); // the Eye's arrival
+        List<(string Group, List<EventDef> Members)>? groups = null;
         foreach (var def in session.Content.Events.All)
         {
             if (def.Phase != phase || def.Chance <= 0 || IsActive(def.Id)) continue;
             ctx.Random = _rng;
             bool ok = _conditions[def].Evaluate(ctx);
             _rng = ctx.Random;
-            if (ok && _rng.Chance(def.Chance)) Start(def);
+            if (!ok) continue;
+            if (def.Group == null)
+            {
+                if (_rng.Chance(chance ?? def.Chance)) Start(def);
+                continue;
+            }
+            groups ??= new();
+            int g = groups.FindIndex(x => x.Group == def.Group);
+            if (g < 0) groups.Add((def.Group, new List<EventDef> { def }));
+            else groups[g].Members.Add(def);
+        }
+        if (groups == null) return;
+        // A group (the mechanical bosses' warnings) starts at most one member per roll, picked among the eligible.
+        foreach (var (group, members) in groups)
+        {
+            if (_active.Any(a => a.Def.Group == group)) continue;
+            var pick = members[_rng.NextInt(members.Count)];
+            if (_rng.Chance(chance ?? pick.Chance)) Start(pick);
         }
     }
 
@@ -147,11 +217,12 @@ public sealed class EventDirector
 
     private void OnKilled(Npc npc)
     {
+        if (npc.FromStatue) return; // statue farms do not win invasions
         foreach (var a in _active.ToList())
         {
             if (a.Def.KillGoal <= 0 || a.Def.KillTag == null || !npc.Def.HasTag(a.Def.KillTag)) continue;
             _world.Session.EventKills[a.Def.Id] = ++a.Kills;
-            if (a.Kills < a.Def.KillGoal) continue;
+            if (a.Kills < GoalOf(a)) continue;
             if (a.Def.FinaleEnemy != null && _world.LocalPlayer is { } p && _world.Session.Content.Enemies.TryGet(a.Def.FinaleEnemy, out var boss))
                 _world.Npcs.Spawn(boss, p.Position + new System.Numerics.Vector3(0, 12f, 0));
             End(a, completed: true);

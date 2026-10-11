@@ -1,0 +1,46 @@
+{
+ "id": "P1b-04",
+ "title": "Mesher: rebuild sub-cell surface height from column heights (remove stair ripples)",
+ "player_outcome": "Gentle slopes are smooth ramps instead of rippling contour-line terraces every few metres. Walking, grass and placed objects follow a smooth ground.",
+ "design": [
+  "Root cause, checked in code: SurfaceNetsMesher places each vertex at the edge-crossing centroid of binary occupancy. Taubin smoothing (8 iterations, \u03bb 0.5 / \u03bc -0.53, MaxDrift 0.45) acts as a low-pass filter that preserves low frequencies, so staircases with steps 6 or more cells long survive as ripples. Sub-cell height is lost at the pass-1 threshold (GlobalDensityPass.cs:36).",
+  "Add src/Strata.Core/Meshing/HeightfieldSmoothing.cs (internal static, ThreadStatic scratch). Make SurfaceNetsMesher.Scratch internal and call HeightfieldSmoothing.Apply(vol, scratch) right after Relax(). SurfaceNetsMesher.cs is 371 lines: add only the call.",
+  "For each Free dual vertex (x,y,z), first test it is up-facing and monotone: at least 2 of the bottom 4 corners opaque, at most 2 of the top 4 opaque, and no vertical corner pair with opaque above air.",
+  "Then gather columns cx \u2208 [x+1-R, x+R], cz likewise (R = 4). For each column, find the top transition inside the local window [y-4, y+5]: opaque below, air above, solid under it within the window, no Snap (crisp or placed) cell in the window. That gives H = y'+1. Reject columns with |H - Hcentre| > 3 (cliffs). Require at least 75% valid columns.",
+  "S = tent-weighted mean of H with weight (R+0.5-|dx|)(R+0.5-|dz|). New y = clamp(S) to both the dual cell [y+0.52, y+1.48] and Initial \u00b1 MaxDrift (0.45). This keeps the \u2264 0.225 m deviation that FeetCell and IsStandable assume. x and z stay from Taubin; normals still come from the density field.",
+  "Chunk borders stay watertight because only a local window is read (\u00b14 columns, \u00b15 cells from the dual cell), inside the 16-cell margin of both neighbouring neighbourhoods. Do not use a 'topmost surface in region' scan: it differs between vertically adjacent chunks and would crack horizontal borders.",
+  "Performance: cache column scans per (cx, cz, window base) in a ThreadStatic sbyte grid over the dual range. Budget: at most +1.5 ms median per chunk in mesh-bench.",
+  "MeshBenchCommand: add --roughness, printing the RMS deviation (cm) of up-facing vertex heights from a local 3\u00d73-neighbour plane fit, for before/after evidence."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Meshing/SurfaceNetsMesher.cs \u2014 Scratch internal; call HeightfieldSmoothing after Relax",
+  "tools/Strata.Tools/Commands/MeshBenchCommand.cs \u2014 --roughness metric",
+  "docs/architecture/voxels-meshing-lighting.md \u2014 heightfield reconstruction note"
+ ],
+ "files_add": [
+  "src/Strata.Core/Meshing/HeightfieldSmoothing.cs \u2014 sub-cell height reconstruction for up-facing smooth vertices",
+  "tests/Strata.Core.Tests/Meshing/HeightfieldSmoothingTests.cs \u2014 ramp, border and safety tests"
+ ],
+ "data_changes": [],
+ "tests": [
+  "GentleRampHasNoStairs: natural stone ramp rising 1 cell per 6 along X through chunk (1,1,1); up-facing vertices away from borders deviate from the ideal plane by less than 0.15 cells max, RMS < 0.06 (today about 0.3-0.5)",
+  "VeryGentleRamp (1 per 12): max < 0.25 cells",
+  "SteepRampStaysInDualCells: 45\u00b0 ramp, no vertex leaves its dual cell or exceeds MaxDrift",
+  "HorizontalBorderMatches: like GeneratedTerrainBordersMatchBetweenChunks but between chunk a and a+(0,1,0); the existing X-border test still passes",
+  "Existing MeshingTests: single natural block not collapsed, crisp blocks exact, MeshingIsDeterministic"
+ ],
+ "verification": [
+  "dotnet test",
+  "dotnet run --project tools/Strata.Tools -- mesh-bench --seed=1234 --roughness before and after: roughness at least 50% lower, median ms \u2264 +1.5",
+  "Smoke movement.cmds and basic.cmds (walking, player.on_floor); in game with F3 on rolling forest near spawn, look along slopes at low sun"
+ ],
+ "depends_on": [
+  "P1b-03"
+ ],
+ "risks": [
+  "Thin roofs and ledges could be pulled down: the monotone-window and \u00b13 cliff rejection must hold",
+  "Colliders come from the same triangles, so ObjectPlacement.Ground and grass follow automatically; check trees and chests do not sink",
+  "Meshing cost increase on workers"
+ ],
+ "effort": "M"
+}

@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Godot;
@@ -102,6 +101,7 @@ public sealed partial class ChunkRenderer : Node3D
         visual.Visibility = r.Visibility;
         _cullDirty = true;
         TriangleCount += visual.Triangles;
+        ShownTriangles += visual.Triangles;
         if (_visuals.Remove(r.Coord, out var old)) Free(old);
         _visuals[r.Coord] = visual;
     }
@@ -145,7 +145,7 @@ public sealed partial class ChunkRenderer : Node3D
     public int HiddenCount { get; private set; }
 
     /// <summary>Triangles in chunks cave culling currently shows.</summary>
-    public long ShownTriangles => _visuals.Values.Where(v => v.Shown).Sum(v => v.Triangles);
+    public long ShownTriangles { get; private set; }
 
     /// <summary>
     /// Shows only chunks the camera could see into (see <see cref="ChunkVisibility"/>); recomputed when the camera
@@ -167,6 +167,7 @@ public sealed partial class ChunkRenderer : Node3D
             if (!show) hidden++;
             if (show == visual.Shown) continue;
             visual.Shown = show;
+            ShownTriangles += show ? visual.Triangles : -visual.Triangles;
             foreach (var (instance, _) in visual.Parts) RenderingServer.InstanceSetVisible(instance, show);
             ChunkShown?.Invoke(coord, show);
         }
@@ -180,6 +181,7 @@ public sealed partial class ChunkRenderer : Node3D
     {
         foreach (var (instance, _) in visual.Parts) RenderingServer.FreeRid(instance);
         TriangleCount -= visual.Triangles;
+        if (visual.Shown) ShownTriangles -= visual.Triangles;
         visual.Parts.Clear();
     }
 

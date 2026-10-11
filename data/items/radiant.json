@@ -4,7 +4,7 @@
     { "id": "excalibur", "name": "Excalibur", "description": "Light made into an edge.", "category": "weapon", "rarity": 5, "value": 60000,
       "useStyle": "swing", "useTime": 20, "useAnimation": 20, "autoReuse": true, "damage": 72, "damageType": "melee", "knockback": 4.5, "crit": 4,
       "behaviors": [{ "type": "meleeSwing", "arc": 170, "length": 3.8 }], "covers": ["terraria:excalibur"] },
-    { "id": "hallowed_repeater", "name": "Hallowed Repeater", "category": "weapon", "rarity": 5, "value": 60000, "useStyle": "shoot", "useTime": 16, "useAnimation": 16,
+    { "id": "hallowed_repeater", "name": "Hallowed Repeater", "category": "weapon", "rarity": 5, "value": 60000, "useStyle": "bow", "useTime": 16, "useAnimation": 16,
       "autoReuse": true, "damage": 50, "damageType": "ranged", "knockback": 2.5, "useAmmo": "arrow", "shootSpeed": 33, "covers": ["terraria:hallowed_repeater"] },
     { "id": "pickaxe_axe", "name": "Pickaxe Axe", "description": "Mines anything this side of the jungle temple, and fells trees in passing.", "category": "tool", "rarity": 5, "value": 80000,
       "useStyle": "swing", "useTime": 7, "useAnimation": 15, "autoReuse": true, "damage": 26, "damageType": "melee", "knockback": 4.5,

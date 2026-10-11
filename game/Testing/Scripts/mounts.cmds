@@ -1,0 +1,65 @@
+# Mounts: the Slimy Saddle jumps much higher than on foot and stomps; the quick-mount key toggles a mount; the
+# Honeyed Goggles' bee flies for its flight time; the Cosmic Car Key's UFO hovers.
+wait_until player.frozen == 0 180
+wait 1.5
+spawning off
+killall
+fill -14 -3 -14 14 -1 14 stone
+fill -14 0 -14 14 40 14 air
+wait 1.0
+assert player.on_floor == 1
+# On foot: a full jump stays low.
+mark
+hold jump 0.4
+wait 0.35
+assert player.from_mark < 2.6
+wait 1.5
+assert player.on_floor == 1
+# In the saddle the same jump goes several times higher.
+give slimy_saddle
+wield slimy_saddle
+use
+assert player.mounted == 1
+wait 0.3
+mark
+hold jump 0.4
+wait 0.45
+assert player.from_mark > 3
+wait 3
+assert player.on_floor == 1
+assert player.alive == 1
+use
+assert player.mounted == 0
+# The quick-mount key summons the first mount carried (the saddle) and dismisses it.
+hold quick_mount 0.05
+wait 0.2
+assert player.mounted == 1
+hold quick_mount 0.05
+wait 0.2
+assert player.mounted == 0
+# The bee flies while jump is held, for its flight time.
+give honeyed_goggles
+wield honeyed_goggles
+use
+wait 0.3
+hold jump 1.2
+assert mount.flying == 1
+assert mount.flight_left < 2
+wait 4
+assert player.on_floor == 1
+assert mount.flight_left > 2
+use
+# The UFO climbs and then hovers.
+give cosmic_car_key
+wield cosmic_car_key
+use
+wait 0.3
+mark
+hold jump 1.0
+wait 1.0
+assert player.from_mark > 3
+assert player.mounted == 1
+use
+wait 4
+assert player.alive == 1
+assert errors == 0

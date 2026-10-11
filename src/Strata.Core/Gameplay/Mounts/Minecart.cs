@@ -26,6 +26,9 @@ public sealed class MinecartRide
     public Int3 NextDir { get; internal set; }
     public float Progress { get; internal set; }
 
+    /// <summary>Top speed and acceleration multiplier (1.25 for the upgraded Mechanical Cart).</summary>
+    public float SpeedScale { get; set; } = 1f;
+
     /// <summary>Speed along the track in m/s (never negative; reversing turns the cart round).</summary>
     public float Speed { get; internal set; }
 
@@ -85,10 +88,10 @@ public static class Minecarts
             Link(world, ride);
             throttle = -throttle;
         }
-        float speed = ride.Speed + throttle * cfg.Acceleration * dt;
+        float speed = ride.Speed + throttle * cfg.Acceleration * ride.SpeedScale * dt;
         if (MathF.Abs(throttle) < 0.1f) speed -= Friction * dt;
         if (ride.Next is { } n) speed += (ride.Cell.Y - n.Y) * SlopeGravity * dt;
-        ride.Speed = Math.Clamp(speed, 0f, cfg.MaxSpeed);
+        ride.Speed = Math.Clamp(speed, 0f, cfg.MaxSpeed * ride.SpeedScale);
         if (ride.Next == null)
         {
             ride.Speed = 0;

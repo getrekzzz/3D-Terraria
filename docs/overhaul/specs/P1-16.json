@@ -1,0 +1,46 @@
+{
+ "id": "P1-16",
+ "title": "Swords that shoot still swing; Zenith is a pure projectile weapon that never blocks",
+ "player_outcome": "Starfury, Enchanted Sword, Terra Blade, Meowmere, Star Wrath and the other 10 sword-plus-projectile weapons now hit with the blade as well as firing. Zenith keeps firing on every click instead of doing nothing while its blades are out.",
+ "design": [
+  "ItemDef: add bool NoMelee (Terraria's noMelee: the swing is animation only). ItemUseTable.Resolve skips the UseStyle.Swing melee inference when NoMelee is set.",
+  "ContentValidator.Items: error when an item has NoMelee and a meleeSwing behaviour.",
+  "ShootProjectileParams: add int? MaxActive. null means 1 for returning projectiles (boomerangs, flails; today's rule) and unlimited otherwise; 0 means unlimited; Validate MaxActive >= 0.",
+  "ItemUseSystem.Shooting.Shoot: replace the 'Returns > 0 && any out' check (line 335) with limit = MaxActive ?? (Returns > 0 ? 1 : 0). When limit > 0 and this owner's live projectiles of that def + Count > limit, return Blocked.",
+  "ItemUseSystem.Use melee gate (line 154): for Melee|Thrust items also accept Shot, and NoAmmo/NoMana/Blocked produced by the shoot branch (tracked by a local flag), converting those to Swung so cooldown and animation apply. Swung is raised as before (only on new animations after P1-10).",
+  "data/items/lunar.json zenith: add \"noMelee\": true, remove its meleeSwing behaviour, set shootProjectile \"maxActive\": 0 (keep count 3, spread 16)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/ItemDef.cs \u2014 NoMelee",
+  "src/Strata.Core/Gameplay/Items/ItemUseTable.cs \u2014 honour NoMelee",
+  "src/Strata.Core/Content/Specs/ItemBehaviorSpecs.cs \u2014 ShootProjectileParams.MaxActive + validation",
+  "src/Strata.Core/Content/Validation/ContentValidator.Items.cs \u2014 noMelee vs meleeSwing",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs \u2014 MaxActive limit",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 melee gate accepts Shot and shoot failures",
+  "data/items/lunar.json \u2014 zenith noMelee/maxActive",
+  "game/Testing/Scripts/combat.cmds \u2014 starfury block"
+ ],
+ "files_add": [],
+ "data_changes": [
+  "data/items/lunar.json zenith: \"noMelee\": true; behaviors [{\"type\":\"shootProjectile\",\"count\":3,\"spread\":16,\"maxActive\":0}]"
+ ],
+ "tests": [
+  "ArsenalTests.SwordsWithProjectilesAlsoSwing: for starfury and enchanted_sword, with a slime 1.5 m ahead and Aim pitched 35\u00b0 up (the projectile misses): outcome Shot, Melee.ActiveSwings == 1, projectiles >= 1, and after 30 ticks the slime is damaged",
+  "ArsenalTests.ZenithNeverBlocks: two uses with ResetUse() between both return Shot; Projectiles.All.Count == 6; Melee.ActiveSwings == 0",
+  "ArsenalTests.BoomerangsHitAndComeBackOneAtATime unchanged and green",
+  "Validator test: an item with noMelee plus meleeSwing is rejected",
+  "combat.cmds: 'give starfury 1' / 'wield starfury' / 'killall' / 'aim 0 0 1' / 'spawn green_slime 1 2' / 'ai off' / 'use' / 'assert projectiles.count >= 1' / 'wait 0.6' / 'assert npcs.alive_life < 14' / 'ai on' / 'killall'"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate; smoke combat.cmds PASS",
+  "Manual: Enchanted Sword melee plus beam; Zenith spam fires continuously"
+ ],
+ "depends_on": [
+  "P1-01"
+ ],
+ "risks": [
+  "Balance: 14 weapons gain melee damage they never had in this build. That matches Terraria, so accept it.",
+  "Edits the same Use() melee gate that P1-10 changes; land this first (P1-10 depends on it)."
+ ],
+ "effort": "S"
+}

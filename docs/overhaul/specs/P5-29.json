@@ -1,0 +1,43 @@
+{
+ "id": "P5-29",
+ "title": "Housing menu UI: NPC banners, query, assign and evict",
+ "player_outcome": "A Housing tab in the inventory lists every resident's head banner. Press '?' and click a room to hear 'This housing is suitable.' or what is missing. Click a banner, then a room, to move that NPC in; right-click a banner to evict them. While the tab is open, banners hang in each occupied room.",
+ "design": [
+  "New game/UI/HousingPanel.cs, a Control added as a tab of the equipment column through a new InventoryScreen.Tabs.cs partial (AddTab(name, icon, control)), to limit conflicts with the UI phase's inventory layout. It holds a grid of portrait buttons (PortraitIcons) for residents that are CountsAsResident or pets: tooltip 'Name the X \u2014 lives at \u2026 / homeless', a greyed look when dead or homeless, and a '?' query button.",
+  "World picking with the mouse free: a new game/UI/WorldPicker.cs. Camera.ProjectRayOrigin/Normal from the mouse position \u2192 Core Targeting.Cast(world, origin, dir, 40 m) \u2192 the air cell (hit.Cell + hit.Normal).",
+  "Modes: query (next left click \u2192 Game.Town.QueryHousing(cell) \u2192 Message to ChatLog or Hud.Announce in Terraria yellow Color8(255,240,20), with the room outline flashed using SelectionMesh or TargetHighlight's box for 1.5 s); assign (click a banner, the cursor shows the head, click a room \u2192 AssignHome \u2192 message); evict (right-click a banner \u2192 Evict).",
+  "New game/Entities/HousingBannerRenderer.cs: while the Housing tab is open, a pooled Sprite3D per housed resident shows the head texture at BannerCell (billboard off, hanging on a small cloth quad). The nodes are hidden when the tab closes and allocated once.",
+  "Engine commands 'ui housing' (open the tab) and 'ui housing_query dx dy dz'; probe ui.housing_open."
+ ],
+ "files_modify": [
+  "game/UI/InventoryScreen.cs \u2014 call InitializeTabs() (1 line)",
+  "game/Bootstrap/WorldLauncher.cs \u2014 add HousingBannerRenderer",
+  "game/Debug/EngineCommands.Town.cs \u2014 ui housing",
+  "game/Debug/GodotCommandHost.cs \u2014 ui.housing_open"
+ ],
+ "files_add": [
+  "game/UI/InventoryScreen.Tabs.cs \u2014 tab strip (Equipment | Housing)",
+  "game/UI/HousingPanel.cs",
+  "game/UI/WorldPicker.cs",
+  "game/Entities/HousingBannerRenderer.cs"
+ ],
+ "data_changes": [
+  "none"
+ ],
+ "tests": [
+  "Core coverage is in P5-05; UI smoke in town.cmds: 'ui inventory' / 'ui housing' / 'assert ui.housing_open == 1' / 'ui housing_query 8 1 0' / 'ui close' / 'assert errors == 0'"
+ ],
+ "verification": [
+  "town.cmds SMOKE PASS",
+  "In game: the query shows the missing-requirement message; drag the Merchant into the Guide's house \u2192 they swap; banners visible only while the tab is open; F3 shows no frame spike when toggling"
+ ],
+ "depends_on": [
+  "P5-05",
+  "P5-28"
+ ],
+ "risks": [
+  "The UI phase re-anchors InventoryScreen (Terraria layout with equipment column tabs); coordinate the tab strip placement. This package only adds the partial and one call.",
+  "Inventory-open input gating (audit L) must still allow clicking the world while the Housing tab is open; the picker handles clicks itself."
+ ],
+ "effort": "M"
+}

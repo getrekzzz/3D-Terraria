@@ -6,9 +6,32 @@
   "maxVolume": 3000,
   "minBuiltBoundary": 0.5,
   "requirements": [
-    { "role": "door", "where": "boundary", "message": "needs a door" },
-    { "role": "light", "where": "any", "message": "needs a light source" },
-    { "role": "table", "where": "inside", "message": "needs a table or other flat surface" },
-    { "role": "chair", "where": "inside", "message": "needs a chair" }
-  ]
+    { "role": "door", "where": "boundary", "message": "This housing is missing a door." },
+    { "role": "light", "where": "any", "message": "This housing is missing a light source." },
+    { "role": "table", "where": "inside", "message": "This housing is missing a table." },
+    { "role": "chair", "where": "inside", "message": "This housing is missing a chair." }
+  ],
+  // Corruption/Crimson blocks (tag evil, ore excepted) within evilMargin cells of the room: evilLimit hits (every
+  // other column sampled) make it "corrupted".
+  "evilTag": "evil",
+  "evilIgnoreTag": "ore",
+  "evilMargin": 6,
+  "evilLimit": 40,
+  // Background town checks flood-fill at most this many new rooms per tick; open results expire after openRoomTtl.
+  "maxScansPerTick": 2,
+  "openRoomTtl": 1800,
+  // Terraria's housing query wording.
+  "messages": {
+    "suitable": "This housing is suitable.",
+    "notOpen": "This is not valid housing.",
+    "notEnclosed": "This is not valid housing.",
+    "tooLarge": "This is not valid housing.",
+    "tooSmall": "This room is too small.",
+    "lowCeiling": "This room is too small.",
+    "natural": "This is not valid housing.",
+    "corrupted": "This housing is corrupted.",
+    "noStand": "This room is too small.",
+    "occupied": "This housing is occupied by {name}.",
+    "notResident": "{name} cannot live in a house."
+  }
 }

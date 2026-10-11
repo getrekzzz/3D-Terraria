@@ -13,6 +13,10 @@ each leg carries the cloth on its side, front and back alike, and the shin the c
 coat's front panels each wholly with the thigh behind them), the lining
 like the outside over it; the sash and its ends are skinned like the skirt under them. Under a long skirt the skin
 of the hips, thighs and knees goes (``under_skirt``), so no stride can push it through.
+
+Skirts and the sash's hanging ends are loose cloth the game sways in the wind and as the body moves (X-17):
+``mark_sway`` gives each vertex its share, 0 where the cloth is held (the waist, the knot) growing toward 0.9 at the
+hem, which the character's mesh carries as its UVSway map (human.sway_uvs; the shader reads it as CUSTOM0.x).
 """
 import math
 
@@ -23,6 +27,24 @@ from mathutils import Vector
 from .head import smooth
 from .paint import hex3
 from .tailoring import ridge
+
+
+SWAY = "sway"
+
+
+def mark_sway(obj, weights):
+    """Marks loose cloth for the game's sway: a point attribute, one weight per vertex (0 held .. about 0.9 free),
+    which survives joining and becomes the UVSway map (human.sway_uvs)."""
+    attr = obj.data.attributes.get(SWAY) or obj.data.attributes.new(SWAY, "FLOAT", "POINT")
+    attr.data.foreach_set("value", np.clip(np.asarray(weights, dtype=np.float32), 0.0, 1.0))
+
+
+def hanging(obj, top, bottom):
+    """Sway weights for cloth hanging from height ``top`` to ``bottom``: 0 at the top, 0.9 at the bottom (t^1.2)."""
+    z = np.empty(len(obj.data.vertices) * 3, dtype=np.float32)
+    obj.data.vertices.foreach_get("co", z)
+    t = np.clip((top - z.reshape(-1, 3)[:, 2]) / max(top - bottom, 1e-3), 0.0, 1.0)
+    return 0.9 * t ** 1.2
 
 
 def smax(a, b, k):
@@ -168,6 +190,7 @@ class Skirts:
             self._tear_skirt(bm, bottom_z, cy)
         obj = mesh_from(bm, name)
         set_slot(obj, "char:cloth")
+        mark_sway(obj, hanging(obj, held, bottom_z))
         # Its top takes the weights of the waist under it (girded like the sash or belt over it, then like the hips
         # and thighs under it), handing over to ``skirt_weights`` by the top of the legs.
         at, j = self.waist_weights(body), self.f.j
@@ -332,4 +355,5 @@ class Skirts:
                 lp[layer] = (base[0] * k * edge, base[1] * k * edge, base[2] * k * edge, 1.0)
         obj = mesh_from(bm, name)
         set_slot(obj, "char:cloth")
+        mark_sway(obj, hanging(obj, z0, z0 - length))
         return obj

@@ -93,6 +93,7 @@ public sealed partial class ObjectColliders : Node3D
             case TileCollision.Solid:
                 return ObjectInteraction.Blocks(obj) ? (min, max) : null;
             case TileCollision.Trunk:
+                // Shared with targeting: only an axe can select the canopy, everything else stops at this column.
                 return Trunk(obj);
             case TileCollision.Platform:
                 layer = ColliderManager.PlatformLayer;
@@ -102,15 +103,11 @@ public sealed partial class ObjectColliders : Node3D
         }
     }
 
-    /// <summary>A tree's trunk in cell units: a central column a third of the footprint wide, up to just over half its height.</summary>
+    /// <summary>A tree's trunk column in cell units (<see cref="TileObjectInstance.TrunkBox"/>, shared with targeting).</summary>
     public static (Vector3 Min, Vector3 Max) Trunk(TileObjectInstance obj)
     {
-        var b = obj.Bounds;
-        var min = new Vector3(b.Min.X, b.Min.Y, b.Min.Z);
-        var max = new Vector3(b.Max.X, b.Max.Y, b.Max.Z);
-        var c = (min + max) * 0.5f;
-        float half = Mathf.Max(0.5f, (max.X - min.X) / 6f);
-        return (new Vector3(c.X - half, min.Y, c.Z - half), new Vector3(c.X + half, min.Y + (max.Y - min.Y) * 0.55f, c.Z + half));
+        var (min, max) = obj.TrunkBox;
+        return (new Vector3(min.X, min.Y, min.Z), new Vector3(max.X, max.Y, max.Z));
     }
 
     /// <summary>Cells of trunk above the ground that an axe bites into (about the player's height).</summary>

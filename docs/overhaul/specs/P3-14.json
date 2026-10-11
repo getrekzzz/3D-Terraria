@@ -1,0 +1,57 @@
+{
+ "id": "P3-14",
+ "title": "Whips (Core): lash hits along the path, damage falloff, minion tag and focus",
+ "player_outcome": "Whips crack out along a lash, hitting every enemy on the way (less damage per extra enemy). They tag what they strike: your minions switch to the tagged enemy and deal bonus tag damage to it. Snapthorn poisons.",
+ "design": [
+  "Verified: leather_whip and snapthorn are meleeSwing arcs. There is no whip/tag code; minions target the nearest NPC to the owner (ProjectileSystem.Special.cs:104-112).",
+  "ItemBehaviorSpecs 'whip' \u2192 WhipParams { Length (cells), Segments (20), TagBuff (buff id), TagDamage (int), Falloff (0.3) }. ItemAction.Whip; UseStyleRules maps Whip \u2192 Whip (not Melee).",
+  "New Core Gameplay/Entities/WhipGeometry.cs: pure Points(t, origin, forward, up, length, segments). A quadratic bezier animated over t: the lash winds back and up until 0.35, sweeps forward and is fully extended along the aim at t 0.6, then snaps. Shared with the renderer.",
+  "New Core Gameplay/Entities/WhipSystem.cs: ItemUseSystem raises Whipped(p, info); each active lash lasts UseAnimationMax. Each tick, test the segment points against NPC volumes; each NPC is hit once per crack, with damage \u00d7 (1 \u2212 Falloff)^hitsSoFar.",
+  "On hit: apply TagBuff through NpcSystem.AddBuff and set Npc.TaggedBy = owner and Npc.TagTick. Snapthorn also applies 'poisoned' via its projectile-style onHit list (WhipParams.OnHit TypedSpec[]).",
+  "EffectSpecs 'minionTag' \u2192 MinionTagParams { Damage }; EffectState exposes MinionTagDamage.",
+  "ProjectileSystem.TickMinion prefers the owner's most recently tagged live NPC within Range\u00d71.5.",
+  "HitCreatures adds the target's MinionTagDamage when the projectile is a minion or was fired by one (Projectile.FromMinion set in TickMinion's Spawn).",
+  "Repeat rule in ItemUseSystem: whips do not auto-repeat unless the Autoswing stat (P3-15) is > 0."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Specs/ItemBehaviorSpecs.cs \u2014 WhipParams",
+  "src/Strata.Core/Gameplay/Items/ItemUseTable.cs \u2014 ItemAction.Whip",
+  "src/Strata.Core/Gameplay/Items/UseStyleRules.cs \u2014 Whip \u2192 Whip action",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 Whip branch; Whipped event; repeat rule",
+  "src/Strata.Core/Content/Specs/EffectSpecs.cs \u2014 minionTag",
+  "src/Strata.Core/Gameplay/Stats/EffectState.cs \u2014 MinionTagDamage",
+  "src/Strata.Core/Gameplay/Entities/Npc.cs \u2014 TaggedBy, TagTick",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.Special.cs \u2014 tagged targeting",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs \u2014 tag damage; FromMinion",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 construct and tick WhipSystem"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Entities/WhipGeometry.cs \u2014 pure lash curve",
+  "src/Strata.Core/Gameplay/Entities/WhipSystem.cs \u2014 active lashes and hits",
+  "tests/Strata.Core.Tests/Gameplay/WhipTests.cs \u2014 whip tests"
+ ],
+ "data_changes": [
+  "data/items/arsenal.json leather_whip: useStyle whip; behaviors [{type: whip, length \u2248 Terraria range (verify), tagBuff: leather_whip_tag, tagDamage 4}]; remove meleeSwing",
+  "snapthorn: whip with tagBuff snapthorn_tag and onHit applyBuff poisoned",
+  "data/combat.json: buffs leather_whip_tag and snapthorn_tag (debuff, hidden, effects [{type: minionTag, damage}], duration 240)"
+ ],
+ "tests": [
+  "WhipTests: leather_whip hits a dummy at 2.5 m, not one at 8 m; the second dummy in line takes less damage",
+  "WhipTests: a slime_staff minion switches to the tagged dummy over a nearer untagged one; tag damage adds to minion hits",
+  "WhipTests: without an autoswing stat, holding does not repeat the whip",
+  "Smoke combat.cmds: 'give leather_whip 1' / 'wield leather_whip' / 'spawn zombie 1 3' / 'aim 0 0 1' / 'use' / 'wait 0.6' / 'assert npcs.alive_life < 45'"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate (spec parsing, buff refs)",
+  "Smoke combat.cmds PASS"
+ ],
+ "depends_on": [
+  "P3-01",
+  "P3-02"
+ ],
+ "risks": [
+  "Tag buffs must be hidden from the HUD buff row (BuffDef.Icon null / tag 'hidden'); coordinate with P2's buff icons.",
+  "ProjectileSystem.Special.cs grows; keep it under 400 or move minion code to ProjectileSystem.Minions.cs."
+ ],
+ "effort": "M"
+}

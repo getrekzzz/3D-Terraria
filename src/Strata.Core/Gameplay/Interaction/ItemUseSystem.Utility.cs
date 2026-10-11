@@ -1,6 +1,7 @@
 using System.Numerics;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Gameplay.Loot;
+using Strata.Core.Gameplay.Player;
 using Strata.Core.Session;
 
 namespace Strata.Core.Gameplay.Interaction;
@@ -15,6 +16,9 @@ public sealed partial class ItemUseSystem
 
     /// <summary>A catch was reeled in (item, count) — for the pickup message.</summary>
     public event Action<PlayerEntity, ItemStack>? Caught;
+
+    /// <summary>A bug net caught a critter (before it is removed) — for the journal.</summary>
+    public event Action<PlayerEntity, Entities.Npc>? NetCaught;
 
     /// <summary>
     /// Fishing rods: the first use casts the bobber; the next reels it in, landing whatever is biting. The catch goes
@@ -34,16 +38,27 @@ public sealed partial class ItemUseSystem
             return UseOutcome.Shot;
         }
         if (info.Projectile == null) return UseOutcome.None;
+        if (!HasAnyBait(p)) return Refuse(_world.Projectiles.Fishing.NoBaitMessage);
         Shot?.Invoke(new ShotRequest(p, info, info.Projectile, null, info.Item.ShootSpeed, 0, 0));
         return UseOutcome.Shot;
     }
 
+    /// <summary>Bait of any kind in the backpack (fishing bait, or a boss bait such as the Truffle Worm).</summary>
+    private bool HasAnyBait(PlayerEntity p)
+    {
+        var backpack = p.State.Inventory.Backpack;
+        for (int i = 0; i < backpack.Size; i++)
+            if (backpack[i].Item is { } item && _world.Uses[item] is { } u && (u.Bait != null || u.BaitSummon != null)) return true;
+        return false;
+    }
+
     /// <summary>
-    /// Special bait in the backpack whose biome matches the bobber's water hooks its boss instead of a fish: the bait
-    /// is used up and the boss surfaces at the bobber.
+    /// Special bait in the backpack whose biome matches the bobber's water hooks its boss instead of a fish, when it is the
+    /// first bait in the backpack (as in Terraria): the bait is used up and the boss surfaces at the bobber.
     /// </summary>
     private bool HookBoss(PlayerEntity p, Entities.Projectile bobber)
     {
+        if (!_world.Projectiles.LeadsWithBossBait(p)) return false;
         var backpack = p.State.Inventory.Backpack;
         var cell = Physics.VoxelMotion.CellOf(bobber.Position);
         var ctx = _world.Session.ContextAt(cell);
@@ -60,8 +75,21 @@ public sealed partial class ItemUseSystem
         return false;
     }
 
+    /// <summary>
+    /// Throws the held hook along the crosshair, as the grapple key does, or lets go of one already flying or latched
+    /// (pressing again releases, as in Terraria). Nothing is thrown from a minecart.
+    /// </summary>
+    private UseOutcome Grapple(PlayerEntity p, ItemUseInfo info)
+    {
+        if (info.Grapple is not { } gp || p.Minecart != null) return UseOutcome.None;
+        if (p.Hook.State is HookState.Flying or HookState.Attached) p.Hook.Release();
+        else p.Hook.Fire(_world.Session.World, gp, info.Item, p.Hand, p.Eye, p.Aim);
+        return UseOutcome.Grappled;
+    }
+
     private void Recall(PlayerEntity p)
     {
+        p.Hook.Reset();
         var home = _world.SpawnPositionFor(p.State);
         p.Position = home;
         p.Velocity = Vector3.Zero;

@@ -9,28 +9,50 @@ namespace Strata.Game.World;
 
 /// <summary>
 /// Draws the grass scattered by the mesh jobs (<see cref="ChunkMeshResult.Grass"/>): one MultiMesh of clumps (and
-/// one of flowers) per chunk, created only while the chunk is within the preset's grass distance. Clumps arrive
-/// sorted by their hashed rank, so drawing a prefix thins a chunk evenly, and a clump's place in or out of the prefix
-/// never depends on the rest of the chunk (an edit only changes the grass it touches): far chunks draw fewer, simpler
-/// clumps (the shader widens them), and the blades shrink into the ground at the distance limit.
+/// one of flowers) per chunk, created only while the chunk is within the preset's grass distance and released
+/// <see cref="ReleaseMargin"/> beyond it (no churn at the edge). Clumps arrive sorted by their hashed rank, so drawing
+/// a prefix thins a chunk evenly, and a clump's place in or out of the prefix never depends on the rest of the chunk
+/// (an edit only changes the grass it touches): far chunks draw fewer, simpler clumps (the shader widens them), and
+/// the blades shrink into the ground at the distance limit. A remesh with the same grass does nothing, one that only
+/// relit it rewrites the buffer in place; builds run nearest first, at most
+/// <see cref="GraphicsPreset.GrassBuildsPerFrame"/> a frame within the frame's grass budget, and the old grass stays
+/// visible until its rebuild. Live grass whose shape changed (an edit) is rebuilt at once: its terrain has already
+/// switched, since grass is set when the terrain mesh uploads.
 /// </summary>
 public sealed partial class GrassRenderer : Node3D
 {
-    private const int FloatsPerInstance = 20;   // 3×4 transform, colour, custom data
     private const float ChunkMeters = ChunkMath.Size * Units.CellSize;
     private const float TrampleRadius = 0.9f;
 
+    /// <summary>Live grass is released only this far (m) beyond the grass distance.</summary>
+    private const float ReleaseMargin = 8f;
+
     private sealed class ChunkGrass
     {
+        /// <summary>The clumps (first <see cref="Count"/>; the array is reused across remeshes).</summary>
         public GrassClump[] Clumps = System.Array.Empty<GrassClump>();
-        public int Flowers;
+        public int Count, Flowers;
+        public ulong Shape, Light;
+
+        /// <summary>The clumps changed since the live buffers were written.</summary>
+        public bool NeedsBuild = true;
+
+        /// <summary>The live clumps' shape changed (not only their light) since the live buffers were written.</summary>
+        public bool Reshaped;
         public Rid Instance, Multimesh, FlowerInstance, FlowerMultimesh;
+
+        /// <summary>Instances allocated in the live multimeshes.</summary>
+        public int Allocated, FlowersAllocated;
+
+        /// <summary>Ranks of the clumps in the live buffer (first <see cref="Allocated"/>), for the LOD prefix.</summary>
+        public float[] LiveRanks = System.Array.Empty<float>();
         public int Visible = -1;
         public bool Near;
         public bool Live => Multimesh.IsValid;
     }
 
     private readonly Dictionary<Int3, ChunkGrass> _chunks = new();
+    private readonly List<(float Distance, Int3 Coord)> _builds = new();
     private GrassConfig _config = null!;
     private GraphicsSettings _graphics = null!;
     private Vector3[] _kindColors = System.Array.Empty<Vector3>();
@@ -38,14 +60,24 @@ public sealed partial class GrassRenderer : Node3D
     private Color[][] _flowerColors = System.Array.Empty<Color[]>();
     private ArrayMesh _near = null!, _far = null!, _flower = null!;
     private ShaderMaterial _material = null!, _flowerMaterial = null!;
+    private bool _fadeDirty = true;
 
     public int LiveChunks { get; private set; }
     public long VisibleClumps { get; private set; }
+
+    /// <summary>Chunk grass buffers built (created or rewritten) since the last <see cref="ResetCounters"/>.</summary>
+    public int Builds { get; private set; }
+
+    /// <summary>Chunks in range waiting for a build after the last <see cref="Update"/>.</summary>
+    public int PendingBuilds { get; private set; }
+
+    public void ResetCounters() => Builds = 0;
 
     public void Initialize(GrassConfig config, GraphicsSettings graphics)
     {
         _config = config;
         _graphics = graphics;
+        graphics.Changed += _ => _fadeDirty = true;
         var kinds = config.Ordered;
         _kindColors = new Vector3[kinds.Count];
         _kindGlow = new float[kinds.Count];
@@ -72,15 +104,32 @@ public sealed partial class GrassRenderer : Node3D
         _flowerMaterial.SetShaderParameter("flower", true);
     }
 
-    /// <summary>Replaces a chunk's grass (called with every uploaded mesh).</summary>
-    public void Set(Int3 coord, List<GrassClump> clumps)
+    /// <summary>
+    /// A chunk's new grass (called with every uploaded mesh): unchanged hashes do nothing; otherwise the clumps are
+    /// kept and the chunk is rebuilt by <see cref="Update"/> (in place when it is live).
+    /// </summary>
+    public void Set(Int3 coord, List<GrassClump> clumps, ulong shapeHash, ulong lightHash)
     {
-        Remove(coord);
-        if (clumps.Count == 0) return;
-        var chunk = new ChunkGrass { Clumps = clumps.ToArray() };
-        foreach (var c in chunk.Clumps)
+        if (clumps.Count == 0)
+        {
+            Remove(coord);
+            return;
+        }
+        if (_chunks.TryGetValue(coord, out var chunk))
+        {
+            if (chunk.Shape == shapeHash && chunk.Light == lightHash) return;
+        }
+        else _chunks[coord] = chunk = new ChunkGrass();
+        chunk.Reshaped |= chunk.Live && chunk.Shape != shapeHash;
+        if (chunk.Clumps.Length < clumps.Count) chunk.Clumps = new GrassClump[clumps.Count];
+        clumps.CopyTo(chunk.Clumps);
+        chunk.Count = clumps.Count;
+        chunk.Flowers = 0;
+        foreach (var c in clumps)
             if (c.Flower != 0) chunk.Flowers++;
-        _chunks[coord] = chunk;
+        chunk.Shape = shapeHash;
+        chunk.Light = lightHash;
+        chunk.NeedsBuild = true;
     }
 
     public void Remove(Int3 coord)
@@ -89,46 +138,81 @@ public sealed partial class GrassRenderer : Node3D
         Release(chunk);
     }
 
-    /// <summary>Creates, thins and frees chunk grass around the camera; parts the grass around the player.</summary>
-    public void Update(Vector3 camera, Vector3 playerFeet)
+    /// <summary>Builds, thins and frees chunk grass around the camera; parts the grass around the player.</summary>
+    public void Update(Vector3 camera, Vector3 playerFeet, double budgetMs)
     {
         RenderingServer.GlobalShaderParameterSet("strata_trample", new Vector4(playerFeet.X, playerFeet.Y, playerFeet.Z, TrampleRadius));
         var preset = _graphics.Preset;
         float distance = preset.GrassDistance;
         float density = preset.GrassDensity;
-        _material.SetShaderParameter("fade_start", distance * 0.72f);
-        _material.SetShaderParameter("fade_end", distance);
-        _flowerMaterial.SetShaderParameter("fade_start", distance * 0.5f);
-        _flowerMaterial.SetShaderParameter("fade_end", distance * 0.7f);
+        if (_fadeDirty)
+        {
+            _material.SetShaderParameter("fade_start", distance * 0.72f);
+            _material.SetShaderParameter("fade_end", distance);
+            _flowerMaterial.SetShaderParameter("fade_start", distance * 0.5f);
+            _flowerMaterial.SetShaderParameter("fade_end", distance * 0.7f);
+            _fadeDirty = false;
+        }
         int live = 0;
         long visible = 0;
+        _builds.Clear();
         foreach (var (coord, chunk) in _chunks)
         {
             float d = DistanceToChunk(coord, camera);
-            if (density <= 0f || d > distance)
+            if (density <= 0f || d > distance + ReleaseMargin)
             {
                 Release(chunk);
                 continue;
             }
-            if (!chunk.Live) Create(coord, chunk);
-            float thin = 1f - 0.65f * Mathf.SmoothStep(distance * 0.3f, distance, d);
-            int count = GrassScatter.VisibleCount(chunk.Clumps, density * thin);
-            bool near = d < distance * 0.35f;
-            if (count != chunk.Visible)
-            {
-                RenderingServer.MultimeshSetVisibleInstances(chunk.Multimesh, count);
-                chunk.Visible = count;
-            }
-            if (near != chunk.Near)
-            {
-                RenderingServer.MultimeshSetMesh(chunk.Multimesh, (near ? _near : _far).GetRid());
-                chunk.Near = near;
-            }
+            if (!chunk.Live && d > distance) continue;
+            if (!chunk.Live || chunk.NeedsBuild) _builds.Add((d, coord));
+            if (!chunk.Live) continue;
+            visible += ApplyLod(chunk, d, distance, density);
             live++;
-            visible += count;
+        }
+        PendingBuilds = _builds.Count;
+        if (_builds.Count > 0)
+        {
+            _builds.Sort(BuildOrder.Instance);
+            long start = System.Diagnostics.Stopwatch.GetTimestamp();
+            int max = System.Math.Max(1, preset.GrassBuildsPerFrame), built = 0;
+            foreach (var (d, coord) in _builds)
+            {
+                var chunk = _chunks[coord];
+                // Reshaped live grass (an edit) is never held back: the old grass would float or stay buried.
+                bool due = chunk.Live && chunk.Reshaped;
+                if (!due && (built >= max || (built > 0 && System.Diagnostics.Stopwatch.GetElapsedTime(start).TotalMilliseconds >= budgetMs))) continue;
+                bool wasLive = chunk.Live;
+                if (wasLive) visible -= chunk.Visible;
+                Build(coord, chunk);
+                Builds++;
+                PendingBuilds--;
+                built++;
+                visible += ApplyLod(chunk, d, distance, density);
+                if (!wasLive) live++;
+            }
         }
         LiveChunks = live;
         VisibleClumps = visible;
+    }
+
+    /// <summary>Distance LOD: an even prefix of the clumps, the simpler clump mesh further out. Returns the drawn count.</summary>
+    private int ApplyLod(ChunkGrass chunk, float d, float distance, float density)
+    {
+        float thin = 1f - 0.65f * Mathf.SmoothStep(distance * 0.3f, distance, d);
+        int count = GrassScatter.VisibleCount(new System.ReadOnlySpan<float>(chunk.LiveRanks, 0, chunk.Allocated), density * thin);
+        bool near = d < distance * 0.35f;
+        if (count != chunk.Visible)
+        {
+            RenderingServer.MultimeshSetVisibleInstances(chunk.Multimesh, count);
+            chunk.Visible = count;
+        }
+        if (near != chunk.Near)
+        {
+            RenderingServer.MultimeshSetMesh(chunk.Multimesh, (near ? _near : _far).GetRid());
+            chunk.Near = near;
+        }
+        return count;
     }
 
     private static float DistanceToChunk(Int3 coord, Vector3 p)
@@ -138,94 +222,19 @@ public sealed partial class GrassRenderer : Node3D
         return p.Clamp(min, max).DistanceTo(p);
     }
 
-    private void Create(Int3 coord, ChunkGrass chunk)
+    /// <summary>Nearest first, then X, Y, Z (deterministic order).</summary>
+    private sealed class BuildOrder : IComparer<(float Distance, Int3 Coord)>
     {
-        var scenario = GetWorld3D().Scenario;
-        var transform = new Transform3D(Basis.Identity, new Vector3(coord.X, coord.Y, coord.Z) * ChunkMeters);
-        var bounds = new Aabb(new Vector3(-1f, -1f, -1f), Vector3.One * (ChunkMeters + 2f));
-        var clumps = new float[chunk.Clumps.Length * FloatsPerInstance];
-        var flowers = new float[chunk.Flowers * FloatsPerInstance];
-        int f = 0;
-        for (int i = 0; i < chunk.Clumps.Length; i++)
+        public static readonly BuildOrder Instance = new();
+
+        public int Compare((float Distance, Int3 Coord) a, (float Distance, Int3 Coord) b)
         {
-            var c = chunk.Clumps[i];
-            var basis = ClumpBasis(c);
-            var root = ToGodot(c.Position) - basis.Y.Normalized() * 0.03f;
-            float jitter = 0.86f + 0.28f * (c.Shade / 255f);
-            var tint = _kindColors[c.Kind] * new Vector3(jitter, jitter * (0.97f + 0.06f * ((c.Shade * 7) & 255) / 255f), jitter * 0.95f);
-            var light = Light(c.Light);
-            Write(clumps, i, basis, root, new Color(tint.X, tint.Y, tint.Z, _kindGlow[c.Kind]), light);
-            if (c.Flower == 0) continue;
-            var flowerBasis = basis.Scaled(new Vector3(1f, 1.15f, 1f));
-            Write(flowers, f++, flowerBasis, root, _flowerColors[c.Kind][c.Flower - 1], light);
+            int c = a.Distance.CompareTo(b.Distance);
+            if (c != 0) return c;
+            if (a.Coord.X != b.Coord.X) return a.Coord.X.CompareTo(b.Coord.X);
+            if (a.Coord.Y != b.Coord.Y) return a.Coord.Y.CompareTo(b.Coord.Y);
+            return a.Coord.Z.CompareTo(b.Coord.Z);
         }
-        chunk.Multimesh = CreateMultimesh(_near, clumps, chunk.Clumps.Length, bounds);
-        chunk.Instance = CreateInstance(chunk.Multimesh, _material, scenario, transform);
-        chunk.Near = true;
-        chunk.Visible = chunk.Clumps.Length;
-        if (chunk.Flowers > 0)
-        {
-            chunk.FlowerMultimesh = CreateMultimesh(_flower, flowers, chunk.Flowers, bounds);
-            chunk.FlowerInstance = CreateInstance(chunk.FlowerMultimesh, _flowerMaterial, scenario, transform);
-        }
-    }
-
-    /// <summary>Clump orientation: mostly upright (grass grows toward the light), yawed, scaled to its height.</summary>
-    private static Basis ClumpBasis(GrassClump c)
-    {
-        var up = ToGodot(c.Normal).Lerp(Vector3.Up, 0.7f).Normalized();
-        var yawed = new Basis(Vector3.Up, c.Yaw);
-        var tilt = new Basis(new Quaternion(Vector3.Up, up));
-        float spread = 0.75f + 0.7f * c.Height;
-        return (tilt * yawed).Scaled(new Vector3(spread, c.Height, spread));
-    }
-
-    private static Vector3 ToGodot(System.Numerics.Vector3 v) => new(v.X, v.Y, v.Z);
-
-    private static Color Light(uint packed) =>
-        new((packed & 255) / 255f, ((packed >> 8) & 255) / 255f, ((packed >> 16) & 255) / 255f, (packed >> 24) / 255f);
-
-    private static void Write(float[] buffer, int index, Basis b, Vector3 origin, Color color, Color custom)
-    {
-        int o = index * FloatsPerInstance;
-        buffer[o + 0] = b.X.X; buffer[o + 1] = b.Y.X; buffer[o + 2] = b.Z.X; buffer[o + 3] = origin.X;
-        buffer[o + 4] = b.X.Y; buffer[o + 5] = b.Y.Y; buffer[o + 6] = b.Z.Y; buffer[o + 7] = origin.Y;
-        buffer[o + 8] = b.X.Z; buffer[o + 9] = b.Y.Z; buffer[o + 10] = b.Z.Z; buffer[o + 11] = origin.Z;
-        buffer[o + 12] = color.R; buffer[o + 13] = color.G; buffer[o + 14] = color.B; buffer[o + 15] = color.A;
-        buffer[o + 16] = custom.R; buffer[o + 17] = custom.G; buffer[o + 18] = custom.B; buffer[o + 19] = custom.A;
-    }
-
-    private static Rid CreateMultimesh(Mesh mesh, float[] buffer, int count, Aabb bounds)
-    {
-        var mm = RenderingServer.MultimeshCreate();
-        RenderingServer.MultimeshAllocateData(mm, count, RenderingServer.MultimeshTransformFormat.Transform3D, true, true);
-        RenderingServer.MultimeshSetMesh(mm, mesh.GetRid());
-        RenderingServer.MultimeshSetCustomAabb(mm, bounds);
-        RenderingServer.MultimeshSetBuffer(mm, buffer);
-        return mm;
-    }
-
-    private static Rid CreateInstance(Rid multimesh, Material material, Rid scenario, Transform3D transform)
-    {
-        var instance = RenderingServer.InstanceCreate2(multimesh, scenario);
-        RenderingServer.InstanceSetTransform(instance, transform);
-        RenderingServer.InstanceGeometrySetMaterialOverride(instance, material.GetRid());
-        RenderingServer.InstanceGeometrySetCastShadowsSetting(instance, RenderingServer.ShadowCastingSetting.Off);
-        return instance;
-    }
-
-    private static void Release(ChunkGrass chunk)
-    {
-        if (!chunk.Live) return;
-        RenderingServer.FreeRid(chunk.Instance);
-        RenderingServer.FreeRid(chunk.Multimesh);
-        if (chunk.FlowerMultimesh.IsValid)
-        {
-            RenderingServer.FreeRid(chunk.FlowerInstance);
-            RenderingServer.FreeRid(chunk.FlowerMultimesh);
-        }
-        chunk.Instance = chunk.Multimesh = chunk.FlowerInstance = chunk.FlowerMultimesh = default;
-        chunk.Visible = -1;
     }
 
     public override void _ExitTree()

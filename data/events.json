@@ -1,6 +1,7 @@
 {
   // World events. Night events roll at dusk and day events at dawn (chance + conditions); manual events are
-  // started by items, progression or commands. Spawn rules react through { "type": "event", "id": ... }.
+  // started by items, progression or commands; weather events start and stop with the weather
+  // (data/config/weather.json). Spawn rules react through { "type": "event", "id": ... }.
   "events": [
     {
       "id": "blood_moon", "name": "Blood Moon", "phase": "night", "chance": 0.11,
@@ -11,7 +12,7 @@
     },
     {
       "id": "slime_rain", "name": "Slime Rain", "phase": "day", "chance": 0.03,
-      "spawnRateMultiplier": 3, "maxNearbyBonus": 6, "killGoal": 60, "killTag": "gel",
+      "spawnRateMultiplier": 3, "maxNearbyBonus": 6, "killGoal": 150, "killTag": "gel", "killGoalAfterFlag": { "flag": "defeated_king_slime", "goal": 75 }, "finaleEnemy": "king_slime",
       "startMessage": "Slime is falling from the sky!", "endMessage": "Slime has stopped falling from the sky.",
       "covers": ["terraria:slime_rain"]
     },
@@ -36,10 +37,15 @@
     {"id": "pirate_invasion", "name": "Pirate Invasion", "phase": "day", "chance": 0.04, "untilDefeated": true, "conditions": [{"type": "flag", "id": "hardmode"}, {"type": "flag", "id": "smashed_altar_1"}], "killGoal": 120, "killTag": "pirate", "completionFlag": "defeated_pirate_invasion", "spawnRateMultiplier": 4, "maxNearbyBonus": 10, "startMessage": "Pirates are approaching!", "endMessage": "The pirates have been defeated!", "covers": ["terraria:pirate_invasion"]},
     {"id": "martian_madness", "name": "Martian Madness", "phase": "day", "chance": 0.04, "untilDefeated": true, "conditions": [{"type": "flag", "id": "defeated_golem"}], "killGoal": 150, "killTag": "martian", "completionFlag": "defeated_martians", "spawnRateMultiplier": 4, "maxNearbyBonus": 10, "skyTint": "#4a8a6a", "startMessage": "Martians are invading!", "endMessage": "The martians have been defeated!", "covers": ["terraria:martian_madness"]},
     {"id": "old_ones_army", "name": "Old One's Army", "phase": "manual", "untilDefeated": true, "killGoal": 140, "killTag": "old_ones_army", "completionFlag": "defeated_old_ones_army", "spawnRateMultiplier": 4, "maxNearbyBonus": 10, "skyTint": "#6a4a8a", "startMessage": "The Old One's Army is approaching!", "endMessage": "The Old One's Army has been defeated!", "covers": ["terraria:old_ones_army"]},
-    {"id": "rain", "name": "Rain", "phase": "day", "chance": 0.12, "skyTint": "#5a6a78", "startMessage": "It's starting to rain.", "endMessage": "The rain has stopped.", "covers": ["terraria:rain"]},
-    {"id": "windy_day", "name": "Windy Day", "phase": "day", "chance": 0.1, "startMessage": "The wind is picking up!", "covers": ["terraria:windy_day"]},
-    {"id": "sandstorm", "name": "Sandstorm", "phase": "day", "chance": 0.06, "skyTint": "#b89a60", "startMessage": "A sandstorm is blowing in the desert!", "endMessage": "The sandstorm has passed.", "covers": ["terraria:sandstorm"]},
-    {"id": "party", "name": "Party", "phase": "day", "chance": 0.1, "conditions": [{"type": "resident", "id": "party_girl"}], "startMessage": "Party time!", "endMessage": "The party is over.", "covers": ["terraria:party"]},
+    {"id": "rain", "name": "Rain", "phase": "weather", "startMessage": "It's starting to rain.", "endMessage": "The rain has stopped.", "covers": ["terraria:rain"]},
+    {"id": "thunderstorm", "name": "Thunderstorm", "phase": "weather", "startMessage": "Thunder rumbles in the distance...", "endMessage": "The storm has passed."},
+    {"id": "windy_day", "name": "Windy Day", "phase": "weather", "startMessage": "The wind is picking up!", "endMessage": "The wind has died down.", "covers": ["terraria:windy_day"]},
+    {"id": "sandstorm", "name": "Sandstorm", "phase": "weather", "startMessage": "A sandstorm is blowing in the desert!", "endMessage": "The sandstorm has passed.", "covers": ["terraria:sandstorm"]},
+    {"id": "party", "name": "Party", "phase": "day", "chance": 0.1, "conditions": [{"type": "any", "of": [{"type": "resident", "id": "party_girl"}, {"type": "secretSeed", "is": "celebration"}]}], "startMessage": "Party time!", "endMessage": "The party is over.", "covers": ["terraria:party"]},
+    {"id": "evil_presence", "name": "Evil Presence", "phase": "night", "chance": 0.33, "conditions": [{"type": "flag", "id": "defeated_eye_of_cthulhu", "set": false}, {"type": "maxLife", "min": 200}, {"type": "defense", "min": 10}], "duration": 600, "spawnBoss": "eye_of_cthulhu", "startMessage": "You feel an evil presence watching you..."},
+    {"id": "mech_twins_night", "name": "Terrible Night", "phase": "night", "chance": 0.1, "group": "mech_night", "conditions": [{"type": "flag", "id": "hardmode"}, {"type": "flag", "id": "smashed_altar_1"}, {"type": "flag", "id": "defeated_the_twins", "set": false}], "duration": 600, "spawnBoss": "retinazer", "startMessage": "This is going to be a terrible night..."},
+    {"id": "mech_destroyer_night", "name": "Vibrations Below", "phase": "night", "chance": 0.1, "group": "mech_night", "conditions": [{"type": "flag", "id": "hardmode"}, {"type": "flag", "id": "smashed_altar_1"}, {"type": "flag", "id": "defeated_the_destroyer", "set": false}], "duration": 600, "spawnBoss": "the_destroyer", "startMessage": "You feel vibrations from deep below..."},
+    {"id": "mech_prime_night", "name": "Cold Air", "phase": "night", "chance": 0.1, "group": "mech_night", "conditions": [{"type": "flag", "id": "hardmode"}, {"type": "flag", "id": "smashed_altar_1"}, {"type": "flag", "id": "defeated_skeletron_prime", "set": false}], "duration": 600, "spawnBoss": "skeletron_prime", "startMessage": "The air is getting colder around you..."},
     {"id": "lantern_night", "name": "Lantern Night", "phase": "night", "chance": 0.06, "conditions": [{"type": "flag", "id": "defeated_eye_of_cthulhu"}], "skyTint": "#ffc080", "startMessage": "Lanterns are rising into the night sky!", "covers": ["terraria:lantern_night"]}
   ]
 }

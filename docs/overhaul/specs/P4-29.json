@@ -1,0 +1,38 @@
+{
+ "id": "P4-29",
+ "title": "Models: Golem body/head/fists and Plantera hooks/tentacles rebuilt realistically",
+ "player_outcome": "Golem is a carved Lihzahrd idol whose head and fists are separate stone pieces with glowing eyes and a sun disc. Plantera's hooks are thorny vine claws and her tentacles snap on fleshy stalks.",
+ "design": [
+  "New tools/blender/bgen/bosses_temple.py.",
+  "golem_body: bevelled carved stone blocks, glyph relief via displacement noise, a sun disc with glow, stubby legs, rigid bones for a jump squash clip. No head or fists.",
+  "golem_head: a carved head with glowing eye slots.",
+  "golem_head_free: the head with rocket/ember glow underneath.",
+  "golem_fist: a carved fist with knuckles and glyph bands.",
+  "plantera_hook: a thorn-studded claw of vine (detail.organic plus spikes).",
+  "plantera_tentacle: a toothy bud with a jaw clip via bosses_pre2.clips.",
+  "Tri targets: body 6\u201310k, parts 2\u20134k. Materials: prop:stone, prop:plain:glow, prop:bark or plant layers.",
+  "Register the module in build_all.py's creature lookup, add assets.json creature entries, and keep golem_idol until P4-31 switches the golem's model.",
+  "Preview sheets with tools/blender/preview.py."
+ ],
+ "files_modify": [
+  "tools/blender/assets.json \u2014 creature entries",
+  "tools/blender/build_all.py \u2014 generator lookup"
+ ],
+ "files_add": [
+  "tools/blender/bgen/bosses_temple.py \u2014 Golem parts, Plantera hook and tentacle",
+  "assets/models/creatures/{golem_body,golem_head,golem_head_free,golem_fist,plantera_hook,plantera_tentacle}.glb \u2014 generated"
+ ],
+ "data_changes": [],
+ "tests": [
+  "build_all.py --check passes once P4-30/31 reference the models; AssetCoverage passes."
+ ],
+ "verification": [
+  "python3.13 tools/blender/build_all.py --only='golem_*,plantera_hook,plantera_tentacle'",
+  "tools/blender/preview.py contact sheets reviewed against Terraria's Golem and Plantera silhouettes"
+ ],
+ "depends_on": [],
+ "risks": [
+  "bosses_lunar.golem stays in use by the current data until P4-31, so do not delete it here."
+ ],
+ "effort": "M"
+}

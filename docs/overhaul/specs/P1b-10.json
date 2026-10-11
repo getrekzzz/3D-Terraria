@@ -1,0 +1,39 @@
+{
+ "id": "P1b-10",
+ "title": "Tile objects: one rebuild per remesh, in-place MultiMesh updates, light-only refresh",
+ "player_outcome": "Trees, furniture and torches no longer flicker or hitch when nearby terrain remeshes (mining, torches, water). Objects update smoothly.",
+ "design": [
+  "Checked in code: TileObjectRenderer marks a chunk dirty on both MeshReady and BodyBuilt (TileObjectRenderer.cs:46-47), so it rebuilds twice. Each rebuild QueueFrees and recreates every MultiMeshInstance3D and MultiMesh with per-instance interop calls, allocates new List and Dictionary objects, and is budgeted by count (8 chunks per frame).",
+  "Split the file: TileObjectRenderer.cs keeps events and scheduling; new TileObjectRenderer.Groups.cs does group build and update. Per chunk keep Dictionary<(TileObjectDef, int Variant), Group>. A Group holds its MultiMeshInstance3D, MultiMesh, a reusable float[] buffer, capacity, and its Flames node.",
+  "Dirty kinds per chunk: Structure (Added / Removed / Interaction.StateChanged \u2192 regroup), Placement (BodyBuilt \u2192 recompute transforms), Light (MeshReady with unchanged geometry \u2192 custom data only). On MeshReady for a chunk where Colliders.IsPending(coord) is true, wait for BodyBuilt so the chunk rebuilds once.",
+  "Update in place: reuse group nodes. Grow MultiMesh capacity by 1.5\u00d7 and use VisibleInstanceCount. Write transforms and light custom data into one float[] and call RenderingServer.MultimeshSetBuffer once. Remove groups that disappeared. Rebuild Flames only when flame bases change.",
+  "Budget by time from runtime.Budgets.ObjectsMs (at least one chunk per frame), chunks nearest the camera first, reusable collections. Timer gd.objects.rebuild; probes objects.rebuilds and objects.light_refreshes."
+ ],
+ "files_modify": [
+  "game/World/TileObjectRenderer.cs \u2014 dirty kinds, coalescing with colliders, time budget, reusable collections",
+  "game/World/WorldRuntime.cs \u2014 expose per-chunk mesh change info (geometry changed or collider pending) to subscribers",
+  "game/Debug/GodotCommandHost.cs \u2014 object probes",
+  "game/Testing/Scripts/perf.cmds \u2014 rebuild-count asserts"
+ ],
+ "files_add": [
+  "game/World/TileObjectRenderer.Groups.cs \u2014 in-place group build and update, buffer writes, flames"
+ ],
+ "data_changes": [],
+ "tests": [
+  "Smoke builder.cmds, town.cmds, basic.cmds keep their objects.count and objects.instances asserts",
+  "perf.cmds: after 10 torches, `assert objects.rebuilds <= 14` and `assert objects.light_refreshes > 0`; `assert perf.max.gd.objects < 6`"
+ ],
+ "verification": [
+  "Headless smoke passes; rendering run: no gd.objects entries in perf spikes while walking through forest or placing torches",
+  "Visual: doors toggle, wired torches turn off, trees sit on smoothed ground (P1b-04), and chests and furniture light up next to new torches"
+ ],
+ "depends_on": [
+  "P1b-09"
+ ],
+ "risks": [
+  "Placement transforms depend on colliders: the coalescing must still rebuild after BodyBuilt",
+  "Instance-count growth must not leave stale instances visible (set VisibleInstanceCount)",
+  "P1b-13 also edits this file to handle pending models: sequence"
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,46 @@
+{
+ "id": "P4-33",
+ "title": "Biome chest weapons: Piranha Gun, Scourge of the Corruptor, Vampire Knives, Rainbow Gun, Staff of the Frost Hydra, Desert Tiger Staff",
+ "player_outcome": "The six legendary dungeon-vault weapons exist and play like Terraria's: latching piranhas, javelins that burst into tiny eaters, life-stealing knife fans, a rainbow beam, a frost-hydra sentry and a desert-tiger minion.",
+ "design": [
+  "ProjectileDef.Latch (bool; the projectile sticks to the npc it hits, keeps its offset and deals its damage every LatchInterval ticks until its lifetime ends) in ProjectileSystem.Special.cs.",
+  "New ProjectileHitSpecs: 'lifeSteal' {fraction} (heals the owner) and 'spawnProjectiles' {projectile, count, speed, homing}.",
+  "piranha_gun: ranged, a latching 'piranha' projectile.",
+  "scourge_of_the_corruptor: thrown javelin; onHit spawns 3 homing 'tiny_eater'.",
+  "vampire_knives: 4\u20135 knife spread with lifeSteal 0.075.",
+  "rainbow_gun: a slow piercing rainbow bolt with a long trail.",
+  "staff_of_the_frost_hydra: a sentry (minion speed 0) shooting frost bolts.",
+  "desert_tiger_staff: a minion (a pouncing tiger); reuse the minion system.",
+  "Stats per Terraria 1.4 (tune).",
+  "Models and icons via existing generators (gun, staff, knife) with bespoke params.",
+  "Reference rows for all six."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/ProjectileDef.cs \u2014 Latch",
+  "src/Strata.Core/Content/Specs/ProjectileHitSpecs.cs \u2014 lifeSteal, spawnProjectiles",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs, ProjectileSystem.Special.cs \u2014 latch, hit effects",
+  "tools/blender/assets.json, tools/content/reference/items_extra.py \u2014 models and rows"
+ ],
+ "files_add": [
+  "data/items/biome_chest_weapons.json \u2014 six weapons and their projectiles",
+  "tests/Strata.Core.Tests/Gameplay/BiomeWeaponTests.cs \u2014 weapon mechanics"
+ ],
+ "data_changes": [
+  "Six hardmode weapons and their projectiles."
+ ],
+ "tests": [
+  "BiomeWeaponTests.PiranhasLatchAndGnaw.",
+  "BiomeWeaponTests.ScourgeReleasesTinyEaters.",
+  "BiomeWeaponTests.VampireKnivesHealTheThrower.",
+  "BiomeWeaponTests.FrostHydraSentryFires.",
+  "BiomeWeaponTests.DesertTigerFollowsAndAttacks."
+ ],
+ "verification": [
+  "dotnet test; validate; build_all.py --check"
+ ],
+ "depends_on": [],
+ "risks": [
+  "Overlaps the items phase's projectile and animation work (muzzle sockets, trails). Keep the mechanics in Core and leave the visuals to that phase."
+ ],
+ "effort": "M"
+}

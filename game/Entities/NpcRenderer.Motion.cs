@@ -21,9 +21,10 @@ public sealed partial class NpcRenderer
         public float Age;
         public Vector3 Scale;
         public bool Human;
+        public Rendering.Ragdoll? Ragdoll;
     }
 
-    private const float CorpseTime = 1.7f, SinkTime = 0.6f, ShrinkTime = 0.3f;
+    private const float CorpseTime = 1.7f, SinkTime = 0.6f, ShrinkTime = 0.3f, PunchTime = 0.1f;
     private readonly List<Corpse> _corpses = new();
 
     /// <summary>Turns a (non-worm) creature: yaw, a look at its target or along its flight, with banking for fliers.</summary>
@@ -53,10 +54,11 @@ public sealed partial class NpcRenderer
                     view.Bank = Mathf.Lerp(view.Bank, bank, 1f - Mathf.Exp(-dt * 4f));
                     want *= new Quaternion(Vector3.Right, pitch) * new Quaternion(Vector3.Back, view.Bank);
                 }
-                view.Turn = want;
+                view.Turn = want.Normalized();
                 return;
         }
-        view.Turn = view.Turn.Slerp(want, 1f - Mathf.Exp(-dt * 8f));
+        // Renormalised each frame: repeated slerps drift off unit length, which Godot rejects.
+        view.Turn = view.Turn.Normalized().Slerp(want.Normalized(), 1f - Mathf.Exp(-dt * 8f)).Normalized();
         view.Yaw = view.Turn.GetEuler().Y;
     }
 
@@ -77,7 +79,7 @@ public sealed partial class NpcRenderer
     private void Animate(Npc npc, View view, float dt)
     {
         var visual = view.Visual;
-        float s = npc.Def.Scale;
+        float s = npc.Def.Scale * npc.VisualScale;
         var scale = Vector3.One * s;
         if (npc.Def.Squash || npc.Def.Brain.Type == BrainSpecs.SlimeHop)
         {
@@ -102,12 +104,26 @@ public sealed partial class NpcRenderer
         scale *= new Vector3(1f - view.Stretch * 0.5f, 1f - view.Stretch * 0.5f, 1f + view.Stretch);
         view.Blink = Mathf.MoveToward(view.Blink, npc.Pose == "teleport" ? 0.25f : 1f, dt * 4f);
         scale *= view.Blink;
+        // A hit swells the creature by 12% for a tenth of a second.
+        if (npc.HurtFlash > view.LastPunchFlash) view.Punch = PunchTime;
+        view.LastPunchFlash = npc.HurtFlash;
+        if (view.Punch > 0f)
+        {
+            scale *= 1f + 0.12f * view.Punch / PunchTime;
+            view.Punch = Mathf.Max(0f, view.Punch - dt);
+        }
         if (view.Spin > 0f)
         {
             // Changing form: a fast spin that slows to a stop.
             view.Spin = Mathf.Max(0f, view.Spin - dt);
             turn = new Quaternion(Vector3.Up, Mathf.Tau * 3f * Mathf.Pow(view.Spin, 2f)) * turn;
         }
+        // A spinning skull whirls about its own axis (its simulated facing holds still so its hands keep their sides);
+        // after the spin it winds on to the next full turn.
+        view.Whirl = npc.Pose == "spin" ? (view.Whirl + dt * 18f) % Mathf.Tau
+            : view.Whirl > 0f ? Mathf.MoveToward(view.Whirl, Mathf.Tau, dt * 12f) % Mathf.Tau : 0f;
+        if (view.Whirl > 0f) turn = new Quaternion(Vector3.Up, view.Whirl) * turn;
+        if (npc.Mirrored) scale.X = -scale.X; // a left hand (after the facing, so it mirrors in the model's own frame)
         if (npc.Segments.Count == 0 || npc.Def.Boss!.SegmentModels.Length > 0) visual.Basis = new Basis(turn) * Basis.FromScale(scale);
         else visual.Scale = scale;
 
@@ -142,7 +158,7 @@ public sealed partial class NpcRenderer
         if (fired && npc.Def.Ranged != null)
         {
             bool magic = npc.Def.Ranged.Projectile.Contains("bolt") || npc.Def.Ranged.Projectile.Contains("magic") || npc.Def.HasTag("caster");
-            h.Play(magic ? "cast" : npc.Def.Ranged.Projectile.Contains("arrow") ? "bow" : "shoot", 0.5f);
+            h.Play(magic ? "staff" : npc.Def.Ranged.Projectile.Contains("arrow") ? "bow" : "gun", 0.5f);
         }
         else if (npc.Def.Ranged == null && Target(npc) is { } target && npc.Def.ContactDamage)
         {
@@ -163,8 +179,9 @@ public sealed partial class NpcRenderer
     {
         if (npc.Alive || npc.Segments.Count > 0 || npc.Barrier != null) return false;
         var visual = view.Visual;
-        visual.Humanoid?.Locomotion("death");
-        _corpses.Add(new Corpse { Visual = visual, Model = view.Model, Scale = visual.Scale, Human = visual.Humanoid != null });
+        var ragdoll = TryRagdoll(npc, visual);
+        if (ragdoll == null) visual.Humanoid?.Locomotion("death");
+        _corpses.Add(new Corpse { Visual = visual, Model = view.Model, Scale = visual.Scale, Human = visual.Humanoid != null, Ragdoll = ragdoll });
         return true;
     }
 
@@ -174,12 +191,18 @@ public sealed partial class NpcRenderer
         {
             var c = _corpses[i];
             c.Age += dt;
-            float end = c.Human ? CorpseTime + SinkTime : ShrinkTime;
+            float end = c.Ragdoll != null ? RagdollTime + DropTime : c.Human ? CorpseTime + SinkTime : ShrinkTime;
             if (c.Age >= end)
             {
                 c.Visual.Scale = c.Scale;
+                EndRagdoll(c);
                 Release(c.Visual, c.Model);
                 _corpses.RemoveAt(i);
+                continue;
+            }
+            if (c.Ragdoll != null)
+            {
+                if (c.Age >= RagdollTime && c.Age - dt < RagdollTime) c.Ragdoll.Drop(); // it sinks through the ground
                 continue;
             }
             if (c.Human)

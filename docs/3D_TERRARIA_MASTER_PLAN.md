@@ -1,7 +1,9 @@
 # 3D Terraria-Style World — Master Plan (persistent project memory)
 
 > Update this file at the end of every development cycle. It is the single source of truth for what
-> exists, what is partial, what is missing, and what comes next. Last update: 2026-09-27 (cycle M4, player feedback: nights, light, lava, caves, performance).
+> exists, what is partial, what is missing, and what comes next. Last update: 2026-10-03 (the player-feedback
+> overhaul is complete: every slice merged, full CI green; status rows refreshed from the audit in
+> [`AUDIT.md`](AUDIT.md); summary, known gaps and play-test guide in [`overhaul/FINAL.md`](overhaul/FINAL.md)).
 
 ## 1. Vision
 A native-3D evolution of Terraria's design philosophy — depth, interconnectivity, freedom, discovery,
@@ -52,63 +54,81 @@ world that is played in real 3D (vertical caves, overhangs, tunnelling bosses).
 | 2026-09-27 | The world map is per player per world (`maps/<player>.map`): 1 m pixels in sparse 64² tiles remembering the surface seen outdoors and the cave floor or rock seen underground at the player's depth; M opens it, a minimap follows the player | A top-down adaptation of the reference game's discoverable map that still shows caves; block ids are saved by name. |
 | 2026-09-27 | Cabins stand in the cave tunnels with doorways along the tunnel; one or two rooms; Gold Chests in the cavern layer (also loose, with pots) | Buried cabins were only found by digging; the reference game's caves are dotted with cabins and gold chests. Generator version 9. |
 | 2026-09-30 | Human clips are pose functions sampled every frame; characters with the same skeleton share an animation set (`assets/models/creatures/anim`), played through a code-built `AnimationTree` (locomotion + upper-body actions + held light + flinch) and an aim modifier | Layered, Terraria-like motion (swing while running, legs follow movement, torso to the aim) without re-exporting 98 character meshes; sets rebuild in seconds. |
+| 2026-09-30 | Player-feedback overhaul: fix the reported bugs first (targeting, swings, hooks, bows, exposure, torches, terrain), then lag spikes, a faithful Terraria UI, item and feel polish, bosses and a 1:1 Dungeon, complete town NPCs and a guide book, in waves W0–W11. The per-feature status with evidence and planned fixes is [`docs/AUDIT.md`](AUDIT.md), refreshed at every phase gate | The player reported jagged terrain, fast-forwarded swings, broken hooks, a flashbang desert, tiny torch light, wrong facing and lag spikes, and asked for a full audit. Old worlds are disposable; the body always faces the crosshair; the UI follows the Terraria look while the world stays realistic 3D |
 | 2026-09-30 | Bosses are rebuilt from metaball bodies with sculpted, painted detail and small rigs, translucent `:clear` parts, and renderer-drawn arms (`armModel`); centred models are raised onto their feet by their bounds | The primitive-built bosses did not read as the reference game's; eyes and brains were drawn half a hitbox low. |
+| 2026-10-01 | Exposure is a data-driven, deterministic model (`data/config/lighting.json`, Core `ExposureModel`): a cave and night boost and a per-biome `exposureBias`, eased asymmetrically (fast darken, slow brighten) on every preset; Godot's auto exposure only meters within a narrow window around it. Glow, fog, SSIL, volumetrics, torch lights and the block-light curve are data in the same file | The old auto-exposure window could only brighten (1.65–3.3×), so the desert and snow flashbanged and leaving a cave was a white frame; tuning needed numbers, not code edits |
+| 2026-10-01 | The body always faces the crosshair in third person: chest, arms and head follow the camera's yaw, the legs follow the movement (forward, strafe and backpedal clips, at most 70° of twist); the crosshair ray starts at the eye plane, so nothing behind the player is targeted | Aiming and talking turned the body the wrong way through the shoulder-camera offset; the player asked for the body to face where they look |
+| 2026-10-01 | `GenVersion` 10: smooth terrain. Relief is data (`relief` per biome) sampled with cubic B-splines and soft ridges; the surface is a heightfield with overhangs only in rare cliff zones; caves keep a roof under the true surface; ground vertices take their height from nearby column tops (no stair ripples) | The player found the terrain jagged and unpredictable (fins, floating blobs, pits, 4 m creases); old worlds are disposable and are marked "old terrain" in the world list |
+| 2026-10-01 | Lean mode for the overhaul: no software-rendered (lavapipe) tuning loops, at most one short rendered check per work package, smoke only what a change touches (the wave gate runs everything), no optional extras | The player's call: W1a took about 8.5 hours, 6+ of them rendered lighting tuning |
+| 2026-10-01 | The overhaul runs as parallel cloud sessions, each owning a disjoint slice and branch (integration, Bosses + Dungeon, Art, NPCs + Guide book, World & life), merged into `claude/clever-goodall-kgex45` with full CI; rules in [`docs/overhaul/PARALLEL.md`](overhaul/PARALLEL.md) | Cuts wall-clock time; slices avoid each other's hub files so merges stay mechanical |
+| 2026-10-02 | Boss parts are their own creatures (`BossPart`: Skeletron's hands, Prime's tools, Golem's head and fists, Moon Lord's hands and head) with group life for the boss bar; worms split into segments that each take their own life (the Destroyer shares one pool); Expert context and enrage are data | Terraria lets the player break parts one by one; one shared life pool made the fights read wrong (W7–W9) |
+| 2026-10-02 | The UI is laid out by a Core model (`UiLayout.Compute` on a logical viewport ≥ 1024×600) and screens register with `InputGate` as modal (world stops) or overlay (the player keeps walking and fighting) | No overlapping widgets at any resolution or UI scale; Terraria's inventory never pauses the world unless auto-pause is on |
+| 2026-10-02 | Controller and keyboard/mouse bindings are separate per action (rebound in their own column); aim assist acts only on the stick; quick heal/mana/buff, the Guide book, emotes and photo mode get no default pad button (bindings are single buttons and every standard button is taken) | Full controller play without a second input system; a hold-modifier layer is future work (FINAL.md) |
+| 2026-10-02 | `GenVersion` 11 (the 1:1 Dungeon), 12 (secret seeds: Drunk World, Not the Bees, No Traps…), 13 (Strange Plants), 14 (Don't Dig Up generates upside down); ordinary seeds keep their golden hashes from 12 on | Each generation change is versioned; old worlds are disposable and marked "old terrain", saves of characters stay loadable |
+| 2026-10-03 | The overhaul is complete (W0–W11 and X-01…X-17 across four parallel sessions, merged at `394f0e82`); remaining gaps are listed in [`overhaul/FINAL.md`](overhaul/FINAL.md) and as 🟡/⬜ rows in AUDIT | Full headless CI green on the final tree: every check, 24 smoke scripts, the menu tour |
 
 ## 3. System status
 Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
+
+This table is the summary. Feature-level status, known defects with `file:line` evidence and the planned fix for each
+are in [`AUDIT.md`](AUDIT.md).
 
 | Area | System | Status | Notes |
 |---|---|---|---|
 | Foundation | Solution, projects, CI | ✅ | Core tests (Linux; +Windows on PR/main), content/asset/reference checks, Godot headless smoke job |
 | Foundation | Determinism | ✅ | SplitMix/PCG32, name-derived seeds, no trig/pow in worldgen, golden hashes |
 | Content | Loader, registries, validator, manifest | ✅ | Strict JSON, typed specs, DAG checks, obtainability, conventional asset paths |
-| Content | Reference DBs + coverage | ✅ | 834 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 54.3 % (items 56 %, enemies 32 %, bosses 28 %, NPCs 21 %) |
+| Content | Reference DBs + coverage | ✅ | 1,025 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; 100 % covered, but the list is hand-picked (no Magic Missile, Golden Key, spikes, pylons…, see AUDIT §3) |
 | Voxels | Chunks, edits, raycast, tile objects | ✅ | COW chunks, EditBatch, multi-cell objects with containers |
 | Persistence | Regions, codec, id tables, migrations, players | ✅ | Atomic writes + .bak, v0→v1 migration, player saves, autosave |
-| WorldGen | 20 passes, plan + chunk tiers | ✅ | Structures: cabins, mineshafts, living trees, pyramid, crypt (zone + locked walls + gate landmark) |
+| WorldGen | 20 passes, plan + chunk tiers | ✅ | `GenVersion` 14 (10 smooth relief, 11 the 1:1 Dungeon, 12 secret seeds, 13 Strange Plants, 14 Don't Dig Up): smooth relief from data, heightfield surface with rare cliff zones, roofed caves, worm cave mouths. Structures: cabins, mineshafts, living trees, pyramid, crypt (zone + locked walls + gate landmark) |
 | WorldGen | Report tool | ✅ | Maps, sections, ore/depth charts |
-| Lighting | Sky + RGB block light | ✅ | Stateless per chunk; outdoor shade under floating roofs; liquid light (lava) from data; sampled by props/creatures via LightProbe; biome fog/sky/ambient looks from data |
-| Meshing | Surface nets + crisp shapes + liquids + collision + grass scatter | ✅ | Far terrain is the horizon heightfield (no coarse voxel chunks) |
-| Rendering | Physical sky + clouds, sky-lit PBR, graphics presets, terrain materials, water/lava, grass, leaf-card trees, character shader, horizon | ✅ | See `docs/architecture/rendering.md`. Cave culling, particles polish ⬜ |
+| Lighting | Sky + RGB block light, exposure | ✅ | Stateless per chunk; outdoor shade under floating roofs; liquid light (lava) from data; sampled by props/creatures via LightProbe; biome fog/sky/ambient looks from data; data-driven exposure model with per-biome bias (no desert flashbang); torches light 8–10 m of cave on every preset (`data/config/lighting.json`) |
+| Meshing | Surface nets + crisp shapes + liquids + collision + grass scatter | ✅ | Ground heights rebuilt from column tops (no stair ripples); far terrain is the horizon heightfield (no coarse voxel chunks) |
+| Rendering | Physical sky + clouds, sky-lit PBR, graphics presets, terrain materials, water/lava, grass, leaf-card trees, character shader, horizon | ✅ | See `docs/architecture/rendering.md`. Cave culling; pooled voxel-lit particles, flash lights, trails, crack decals, gore and ragdolls; weather particles. The horizon shows no caves or hardmode wedges 🟡 |
 | Streaming | Jobs, chunk streamer, colliders | ✅ | Adaptive completion budget; diagnostics (`stream`) |
-| Player | Controller, camera, avatar, carried light | ✅ | Step-up, variable jump, per-liquid swimming, breath/drowning, fall damage, knockback, blink |
-| Interaction | Targeting, mining, placing, objects | ✅ | Brushes, falling blocks, support loss, doors/chests/beds |
-| Items | Use table, tooltips, dropped items | ✅ | Inferred actions + explicit behaviours; prefixes/reforging ⬜ |
+| Player | Controller, camera, avatar, carried light | ✅ | Step-up, variable jump, per-liquid swimming, breath/drowning, fall damage, knockback, blink; the body always faces the crosshair, legs strafe and backpedal |
+| Interaction | Targeting, mining, placing, objects | ✅ | Brushes, falling blocks, support loss, doors/chests/beds; eye-plane crosshair ray with decor and canopy filters, the Reach stat, crosshair names for creatures, bosses, worm segments and residents |
+| Items | Use table, tooltips, dropped items | ✅ | Inferred actions + explicit behaviours; one use animation per swing (speed scales it), hooks thrown by click or key that hold on natural terrain, shots from the hand to the crosshair, bows drawn with a nocked arrow, swords that shoot also swing, failed uses say why; Terraria's 83 prefixes (data/prefixes.json; rolled on crafts, drops, chest loot and shop buys; tooltip modifier lines) and Goblin Tinkerer reforging in a reforge slot. Real yoyos, flails and whips, per-hook heads and chains, held-item sockets and grips, 3D dropped items, Hearts and Stars, quick heal/mana/buff keys, Piggy Bank and Safe. Dyes are not drawn on the avatar; some use styles' hand frames need tuning 🟡 (AUDIT §8) |
 | Crafting | Recipes, stations, environment | ✅ | Liquids/biome/time conditions |
-| UI | HUD, inventory, equipment, chests, crafting, console, perf overlay | ✅ | Settings/menus/world select ⬜ |
-| Combat | Damage model, melee arcs, projectiles (friendly + hostile), buffs, contact/death effects | ✅ | Whips/yoyos/summons ⬜ |
+| UI | HUD, inventory, equipment, chests, crafting, console, perf overlay, menus, settings, character/world select, map | ✅ | Terraria blue theme and bold UI font, rarity colours, prefix-aware tooltips, Terraria slot clicks, chest buttons, sorting and favourites, 7 accessory slots, coin and ammo slots (Core), combat text and enemy health bars (W3). W4: everything sits on the Core layout model with no overlaps from 1024×600 up — the hotbar top-left, hearts, mana stars and breath bubbles, buff bar with timers, chat log, pickup popups, boss and invasion bars, death screen and Smart Cursor; the inventory with Dye \| Vanity \| Equip, the chest panel, the crafting column, the NPC chat box, the grid shop with buyback and the reforge slot; themed menus (swaying logo, blue select rows with favourites, skinned settings, pause panel, the inventory's Settings button); the Housing tab, stacked boss bars, boss title cards, the Guide book (K), photo mode (P); controller support with aim assist and a screen cursor (X-04); colour-blind modes, subtitles and an autosave spinner (X-12). See `docs/architecture/ui.md` |
+| Combat | Damage model, melee arcs, projectiles (friendly + hostile), buffs, contact/death effects | ✅ | One swing curve for hitbox, trail and first-person arc; summons, whips (tag damage), yoyos and flails; creature hit materials, debuff visuals, hurt vignette and camera punches; Darkness, Silenced, Broken Armor and Venom are missing 🟡 |
 | AI | Slime, walker, flyer, swimmer, lunger, caster (blink), boss brains, worm, crypt warden (free hands); ranged attacks; voxel A* | ✅ | A* used by residents; enemy path following, utility AI ⬜ |
 | Spawning | Data-driven spawn rules (ground or liquid placement), biome + zone rosters, exclusive zones, per-rule caps, player-position rules, despawn conditions, town suppression | ✅ | Closed doors stop creatures |
-| Assets | Blender pipeline, icons, synthesised textures | ✅ | 35 object kinds, 245 item models/icons, 34 creatures; 11 procedural humans (player, 6 residents, shambler, skeleton, imp, hexcaster) with faces, hands, hair, clothing, 52-bone rig |
-| NPCs | Town residents, 3D housing, shops, services, happiness, landmark residents | ✅ | 6 residents (guide/merchant/nurse/dryad/old man/clothier roles); more residents, enemies attacking town ⬜ |
+| Assets | Blender pipeline, icons, synthesised textures | ✅ | 626 object models, 881 item models, 1,523 item icons, 243 creature models; 97 procedural humans with faces, hands, hair, clothing, 52-bone rig. A silhouette per weapon class and tier, outlined icons, worn armour, new creature bodies, rebuilt event bosses, boss/NPC/bestiary portraits (AUDIT §11) |
+| NPCs | Town residents, 3D housing, shops, services, happiness, landmark residents | ✅ | All 29 of the reference game's town NPCs with Terraria's move-in rules, rescues, the housing menu, happiness, services, shops with tabs and currencies, residents fighting back, sitting and sleeping, visitors, town pets, pylons, emotes (AUDIT §14). Pylon limits are not enforced 🟡 |
 | Liquids | Flow, mixing, contact effects, buckets | ✅ | Active-cell automaton per liquid; pressure/U-tubes, sponges, shimmer ⬜ |
-| Bosses | Framework + bosses | ✅ | King Slime, The Eye of Cthulhu, Eater of Worlds (tunnels), Skeletron (hands, spin, day rage), The Wall of Flesh (sweeping barrier, eye lasers, tethered hungry maws), Twins (paired eyes, phase-2 lasers and flamethrower), Destroyer (50-segment flying worm, part lasers, probes), Skeletron Prime (four tools, gun arms fire); arenas, boss bar; music state ⬜ |
+| Bosses | Framework + bosses | ✅ | 29 bosses (5 hand-written boss brains, the rest on the data-driven `pattern` brain): King Slime, The Eye of Cthulhu, Eater of Worlds (tunnels), Brain of Cthulhu, Queen Bee, Skeletron (hands, spin, day rage), Deerclops, The Wall of Flesh (sweeping barrier, eye lasers, tethered hungry maws), Queen Slime, Twins (paired eyes, phase-2 lasers and flamethrower), Destroyer (50-segment flying worm, part lasers, probes), Skeletron Prime (four tools, gun arms fire), Plantera, Golem, Duke Fishron, Empress of Light, Lunatic Cultist, pillars, Moon Lord and event bosses; arenas, boss bar, boss music. Skeletron's hands are their own creatures on bone arms (they fall first, the skull fights on); Expert context, enrage, treasure bags, trophies and masks (W7); killable parts for Prime, Golem and Moon Lord, segment-splitting worms, boss title cards and themes (W9, X-02); Mimics, the Nymph and the Wyvern (X-11). Moon Lord and event bosses run pattern loops 🟡 (AUDIT §12) |
 | Progression | Flags, auto-set cascade, announcements, incineration summons | ✅ | `ProgressionSystem.Raised` is the hook for hardmode mutations |
-| Events | Event director | ✅ | Blood moon, slime rain; invasions ⬜ |
-| Dungeon | Crypt zone, locked walls, guardian, roster, keeper + curse | ✅ | Crypt keys/locked chests, water bolt loot, spike traps ⬜ |
-| Hardmode | Trigger, lazy world mutations, spread, ore tiers, rosters, stations, mechanical bosses | ✅ | Wall of Flesh → `hardmode` → 3 ore tiers (2 alternates each), radiant + blighted wedges (zones), spreading biomes; evil/cinder/hardmode metal families (pick chain 65 → 100 → 110 → 150 → 190 → 200); 12 hardmode creatures; cinder forge, hardmode anvils and forges; Twins, Destroyer, Skeletron Prime → radiant gear; wings, hardmode variants of old creatures ⬜ |
-| Audio | Director + sounds | ⬜ | |
+| Events | Event director | ✅ | Blood Moon, Slime Rain, 7 invasions (Goblin Army, Pirates, Martian Madness, Old One's Army, Frost Legion, Pumpkin Moon, Frost Moon), Solar Eclipse, lunar events, rain, wind, sandstorm, party, lantern night; invasion progress bar |
+| Dungeon | 1:1 Dungeon (GenVersion 11): keep, winding halls, stairs and shafts, rooms by role, wall panels, zone, locks, guardian, roster, keeper + curse | ✅ | Flattest keep site plus a terraced clearing on the Phase 1 relief; blue/green/pink furniture sets, libraries with the Water Bolt, spikes and wired dart traps, locked Gold Chests and Golden/Shadow Keys, dungeon loot, the vault's six biome chests (Plantera lock) and the bound Mechanic (AUDIT §13) |
+| Hardmode | Trigger, lazy world mutations, spread, ore tiers, rosters, stations, mechanical bosses | ✅ | Wall of Flesh → `hardmode` → 3 ore tiers (2 alternates each), radiant + blighted wedges (zones), spreading biomes; evil/cinder/hardmode metal families (pick chain 65 → 100 → 110 → 150 → 190 → 200); 12 hardmode creatures; hellforge, hardmode anvils and forges; Twins, Destroyer, Skeletron Prime → radiant gear; 14 wings (13 hardmode); Plantera, chlorophyte, the Jungle Temple and Golem; hardmode variants of old creatures ⬜ |
+| Audio | Director + sounds | ✅ | Music director (boss > event > Blood Moon > biome > layer) with rain, town, night and biome variants, per-boss themes and a victory sting; 16 ambience beds with cave reverb; creature material sounds, object hits, per-item sound sets and a voice pool; 287 SFX, 55 music and 21 ambience files (AUDIT §10) |
+| Guide | Guide book, journal, bestiary, achievements, hints | ✅ | K opens Items (sources), Bestiary (drop rates, live 3D preview), Progress, NPCs, Tips and 49 achievements; onboarding hints and loading tips (AUDIT §16) |
+| World life | Weather, seasons, fishing, wiring, mounts, furniture, secret seeds | ✅ | Rain, storms, snow, wind, sandstorms; Halloween and Christmas; fishing power, crates, quest fish; four wire colours, actuators, timers, logic gates; five mounts; 14 furniture families, banners, signs; seven secret seeds (X-01…X-15) |
 
 ## 4. Technical debt
 * Creatures use AABB voxel collision while the terrain renders smooth: feet can float up to ~0.25 m on slopes (visual offset fix: ray down to the collider in the renderer).
 * `TileObjectRenderer` rebuilds a chunk's MultiMeshes when its light changes; fine now, could update custom data in place.
 * Screenshot runs on software Vulkan (llvmpipe) are slow (frame-rate-bound job completion); budget is adaptive now.
 * Streaming once failed to reach idle in a rendered run (not reproduced since); `ChunkStreamer.DebugState()` is logged by the screenshot tool to catch it.
-* Item held-in-hand orientation is generic (+90° about X); per-item grip data would improve swords/bows.
-* Prefix (reforge) data exists but no reforging service/UI yet.
+* Held items use per-use-style hand frames times the inverse of each model's `grip` socket (P3-05, P3-06); the swing,
+  gun, throw, holdUp, eat, yoyo, flail and whip frames still need a tuning pass.
+* Reforging uses Terraria's reforge slot (P2-28). Prefixes are Terraria's 1.4.4 table since P3-31; old invented ids
+  load through data/config/aliases.json.
+* Rendered menu tours (`--menu-tour` on xvfb + lavapipe) stall at the character creator: the process idles once the
+  turntable preview's SubViewport is on screen (the title shot is taken; headless runs pass; the commit before P2-30
+  stalls the same way, so it is not the menu reskin).
 * Generated liquid can still hang across a chunk's bottom face (pass 20 only sees inside the chunk); it stays static
   until disturbed.
-* Skeletron hands share the skull's life (the reference boss has separately killable hands).
 * The Wall of Flesh only sweeps along X and only its mouth and eyes take hits; its flesh tiles are separate pooled visuals
   (a MultiMesh would be cheaper for very tall cavities).
-* Zone membership scans a structure's blueprint ops per query (hundreds for the Dungeon); fine at spawn/lock rates,
-  would want a coarse occupancy grid if queried per frame.
+* Zone membership walks the blueprint ops indexed under the queried chunk (`Blueprint.Freeze`); fine at spawn/lock rates.
 * Outdoor shade considers only the first roof in a column (stacked islands shade as one).
 * Spreading only visits loaded chunks, and spread land outside a wedge does not count as that zone (zones are the
   wedges); trees, grass tufts and flowers on converted land keep their forest look.
 * Spread converts a few cells every half second, so converted borders keep remeshing (intended in play; tours and
   screenshots pause it with `mutations spread off`).
-* All bars smelt at the furnace and all metal gear uses the anvil (no hellforge / hardmode anvil and forge stations yet).
 * Texture layers are 256² (terrain at 2 m tiles, props at 1 m); 512² would sharpen close-ups at 4× the atlas size.
 * Humans are 50–67k triangles each with no authored LODs (Godot's automatic LOD only); crowds will cost. Hair is
   shell-based and reads as a solid mass up close (strand cards would look better).
@@ -119,8 +139,7 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
   with grass and leaf cards are not measured yet.
 * The horizon samples generator fields: it shows neither caves nor structures, edits or hardmode wedges, and its
   seam with the streamed chunks can show a small step on steep ground.
-* Bosses share one life pool per creature: the Destroyer's segments and Skeletron Prime's tools take hits for the
-  body (the reference game lets you break Prime's arms and destroys the Destroyer segment by segment).
+* Moon Lord and the event bosses run data-driven pattern loops (killable parts, but not Terraria's full AI).
 * Liquids have no pressure: water never rises in a U-tube (as in the reference game), and a flow step is one edit
   batch per liquid, so a large flood remeshes its chunks every few steps (rate-limited by the mesh queue).
 
@@ -138,7 +157,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (313, incl. graphics presets, grass scatter, horizon, hardmode life, mechanical bosses, nights, cabins, legacy saves) | `tests/Strata.Core.Tests` | ✅ CI |
+| Core unit/integration tests (574 at the W3 gate, 1,766 at the final integration, incl. graphics presets, grass scatter, horizon, hardmode life, mechanical bosses, nights, cabins, legacy saves, use timing, targeting, hooks, terrain shape, slots and coins) | `tests/Strata.Core.Tests` | ✅ CI |
 | Content validation (refs, specs, assets, graphics presets, grass kinds) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
@@ -150,11 +169,15 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 | Engine smoke: liquid flow, lava + water → obsidian, buckets, burning/dousing, submersion | `liquids.cmds` | ✅ CI |
 | Engine smoke: starter guide, built home, move-in, walking home through a door at night, talk/shop UI, buying | `town.cmds` | ✅ CI |
 | Engine smoke: every biome creature spawns, moves and renders; ranged attackers | `creatures.cmds` | ✅ CI |
-| Engine smoke: keeper at the Dungeon gate, guardian leaves outside, night summon, warden defeat frees the keeper | `dungeon.cmds` | ✅ CI |
+| Engine smoke: the Dungeon arc (keeper at night, Skeletron's hands then skull, guardian gone after the flag, shaft, library, spikes, vault and a locked chest opened with a key, props and errors clean) | `dungeon.cmds` | ✅ CI |
 | Engine smoke: effigy burned in underworld lava calls the Wall of Flesh (guide sacrificed), the fight runs, defeat raises hardmode | `mawwall.cmds` | ✅ CI |
 | Engine smoke: hardmode appends mutations, loaded chunks catch up, the Hallow wedge streams in converted and is a zone, spread runs; hardmode stations place and every hardmode creature spawns | `hardmode.cmds` | ✅ CI |
 | Engine smoke: clockwork eye brings both Twins (flag on the second death), Destroyer releases probes, Skeletron Prime, all-mechs flag | `mechs.cmds` | ✅ CI |
-| Screenshots | `--screenshot` + `--exec` (single shot); `screenshot <name>` in `game/Testing/Tours/tour.cmds` (biomes, caves, underworld, town, night, crypt gate, Skeletron, Wall of Flesh, Hallow wedge) | ✅ CI tour job on main/dispatch (Xvfb + lavapipe, artifacts) |
+| Engine smoke: grappling hooks on crisp, natural and platform anchors, rocket boots, wings, extra jumps, dashing | `movement.cmds` | ✅ CI |
+| Engine smoke: climbing rope, minecart track, wiring (lever, door, pressure plate, dart trap) | `builder.cmds` | ✅ CI |
+| Engine smoke: Terraria slot clicks, throwing, crates, chest operations; theme, font, UI scale, combat text, health bars; HUD widgets, inventory panels, shop, reforge, pause and Settings, layout overlaps; spike counters | `inventory.cmds`, `ui.cmds`, `perf.cmds` | ✅ CI |
+| Engine smoke (overhaul): weather and ambience, fishing, mounts, game feel (cracks, falling trees, gore), photo mode, rescues, the Guide book and achievements, Don't Dig Up generation | `weather.cmds`, `fishing.cmds`, `mounts.cmds`, `juice.cmds`, `photo.cmds`, `rescue.cmds`, `guide.cmds`, `dontdigup.cmds` (24 scripts in all) | ✅ CI |
+| Screenshots | `--screenshot` + `--exec` (single shot); `screenshot <name>` in `game/Testing/Tours/tour.cmds` (biomes, caves, underworld, town, night, crypt gate, Skeletron, Wall of Flesh, Hallow wedge); the UI tour `game/Testing/Tours/ui.cmds` (12 shots, `ui.overlaps == 0` at each) | ✅ CI tour job on main/dispatch (Xvfb + lavapipe, artifacts) |
 
 ## 7. Performance
 * Targets: 60 fps @1080p on GTX-1060-class; ~250 LOD0 chunks; mesh ≤2 ms/chunk; gen ≤10 ms/chunk.
@@ -170,6 +193,12 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
   by measured GPU time, GPU/CPU ms on F3. Not yet measured on the player's GPU.
 
 ## 8. Next development targets (rest of M4)
+> Superseded on 2026-09-30 by the player-feedback overhaul (waves W0–W11, tracked in [`AUDIT.md`](AUDIT.md)), which
+> finished on 2026-10-03. Of the list below everything is done except hardmode wedges on the horizon and hardmode
+> variants of cavern/underworld creatures (AUDIT §17). The next targets are the known gaps in
+> [`overhaul/FINAL.md`](overhaul/FINAL.md): drawing dyes on the avatar, default controller access to the quick keys,
+> hand-frame tuning, Moon Lord's full AI, the missing debuffs, pylon limits and a real-GPU performance pass.
+
 M4 graphics delivered the physical sky and clouds, sky-lit PBR shading with graphics presets, synthesised
 materials with height blending, refractive water and crusted lava, instanced grass and flowers, leaf-card trees, and
 detailed procedural people with a character shader.

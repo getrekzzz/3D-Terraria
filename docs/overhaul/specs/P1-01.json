@@ -1,0 +1,34 @@
+{
+ "id": "P1-01",
+ "title": "Prep: split near-limit files so the phase stays under 400 lines",
+ "player_outcome": "Nothing visible. Later P1 packages can add code to ItemUseSystem and GameWorld without hitting the CI file-length limit or merge-conflicting on one giant method.",
+ "design": [
+  "Move class PlayerEntity (src/Strata.Core/Session/GameWorld.cs lines 19-112) unchanged into a new src/Strata.Core/Session/PlayerEntity.cs in the same namespace. GameWorld.cs goes from 387 to about 280 lines.",
+  "Split src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs (375 lines). Move Shoot() and FindAmmo() into a new partial ItemUseSystem.Shooting.cs. Move Consume(), the Refused event, Summon(), StartEvent() and ConsumeHeld() into a new partial ItemUseSystem.Consumables.cs. Use(), UseTool(), Place(), PlacementCell(), ObjectAnchor() and DominantFace() stay in ItemUseSystem.cs (about 230 lines).",
+  "Change no behaviour: code moves only, same namespaces, same using lists.",
+  "Run the full local CI: check_file_length, build, Core tests, validate, smoke basic/combat."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Session/GameWorld.cs \u2014 remove PlayerEntity (moved)",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 remove the moved members"
+ ],
+ "files_add": [
+  "src/Strata.Core/Session/PlayerEntity.cs \u2014 PlayerEntity (moved verbatim)",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs \u2014 Shoot/FindAmmo partial",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consumables.cs \u2014 Consume/Summon/StartEvent/ConsumeHeld/Refused partial"
+ ],
+ "data_changes": [],
+ "tests": [
+  "No new tests; the whole existing suite must pass unchanged."
+ ],
+ "verification": [
+  "python3 tools/ci/check_file_length.py: all four touched files are under 300 lines",
+  "dotnet build Strata.sln && dotnet test tests/Strata.Core.Tests",
+  "Godot headless smoke basic.cmds and combat.cmds print SMOKE PASS"
+ ],
+ "depends_on": [],
+ "risks": [
+  "Every later Core package touches these files. Land and merge this first, before any other package branches."
+ ],
+ "effort": "S"
+}

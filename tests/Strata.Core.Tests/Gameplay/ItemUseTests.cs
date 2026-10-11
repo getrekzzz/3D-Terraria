@@ -1,4 +1,5 @@
 using System.Numerics;
+using Strata.Core.Commands;
 using Strata.Core.Common;
 using Strata.Core.Gameplay.Building;
 using Strata.Core.Gameplay.Interaction;
@@ -244,6 +245,98 @@ public class ItemUseTests
         Assert.Equal(4 + 5, shots[0].Damage);
         Assert.Equal(2, g.Player.State.Inventory.Backpack[20].Count);
         Assert.Equal(UseOutcome.Cooldown, g.World.ItemUse.Use(g.Player, null, true));
+    }
+
+    [Fact]
+    public void NoAmmoIsReportedOncePerPress()
+    {
+        using var g = TestGame.Create();
+        var ctx = new CommandContext(g.World, new HeadlessCommandHost());
+        var (failed, refused) = Feedback(g);
+        g.Hold("wooden_bow");
+        Assert.Equal(UseOutcome.NoAmmo, g.World.ItemUse.Use(g.Player, null, true));
+        Assert.Equal(new[] { UseOutcome.NoAmmo }, failed);
+        Assert.Equal(new[] { "Needs Wooden Arrow" }, refused);
+        Assert.Equal(1, ctx.ReadProbe("use.failures"));
+        // Holding the button reports nothing more, even for an auto-reuse gun that keeps trying.
+        for (int i = 0; i < 20; i++) g.World.ItemUse.Use(g.Player, null, false);
+        g.Hold("phoenix_blaster");
+        for (int i = 0; i < 20; i++) Assert.Equal(UseOutcome.NoAmmo, g.World.ItemUse.Use(g.Player, null, false));
+        Assert.Single(failed);
+        Assert.Equal(1, g.World.ItemUse.Failures);
+        // A new press names the cheapest ammo of the gun's class.
+        Assert.Equal(UseOutcome.NoAmmo, g.World.ItemUse.Use(g.Player, null, true));
+        Assert.Equal("Needs Musket Ball", refused[^1]);
+
+        // Clicking again at once clicks again, but the message stays up instead of stacking; later it repeats.
+        g.Ticks(10);
+        g.World.ItemUse.Use(g.Player, null, true);
+        Assert.Equal(3, failed.Count);
+        Assert.Equal(2, refused.Count);
+        g.Ticks(150);
+        g.World.ItemUse.Use(g.Player, null, true);
+        Assert.Equal(3, refused.Count);
+    }
+
+    [Fact]
+    public void NoManaIsReported()
+    {
+        using var g = TestGame.Create();
+        var (failed, refused) = Feedback(g);
+        g.Hold("amethyst_staff");
+        g.Player.State.Vitals.Mana = 0;
+        Assert.Equal(UseOutcome.NoMana, g.World.ItemUse.Use(g.Player, null, true));
+        Assert.Equal(new[] { UseOutcome.NoMana }, failed);
+        Assert.Equal(new[] { "Not enough mana" }, refused);
+    }
+
+    [Fact]
+    public void PotionSicknessExplains()
+    {
+        using var g = TestGame.Create();
+        var (failed, refused) = Feedback(g);
+        g.Hold("lesser_healing_potion", 2);
+        Assert.Equal(UseOutcome.Consumed, g.World.ItemUse.Use(g.Player, null, true));
+        g.Ticks(60);
+        Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, null, true));
+        Assert.Equal(new[] { UseOutcome.Blocked }, failed);
+        Assert.Equal(new[] { g.Content.Buffs.Get("potion_sickness").DisplayName }, refused);
+        Assert.Equal("Potion Sickness", refused[0]);
+
+        // A curse refuses every item, and says so.
+        g.Player.State.Buffs.Add(g.Content.Buffs.Get("cursed"), 600);
+        g.Player.State.Recompute();
+        g.Hold("wooden_bow");
+        Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, null, true));
+        Assert.Equal("You can't use items right now", refused[^1]);
+        Assert.Equal(2, failed.Count);
+    }
+
+    [Fact]
+    public void PlacementBlockedStaysSilent()
+    {
+        using var g = TestGame.Create();
+        var (failed, refused) = Feedback(g);
+        g.Hold("gray_brick", 5);
+        g.Player.Precision = true;
+        g.Player.Aim = Vector3.Normalize(new Vector3(0.01f, -1f, 0.01f)); // into our own body
+        Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, g.Target(), true));
+        // A crystal at the life cap is refused quietly too.
+        g.Player.State.BonusLife = 300;
+        g.Hold("life_crystal");
+        Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, null, true));
+        Assert.Empty(failed);
+        Assert.Empty(refused);
+        Assert.Equal(0, g.World.ItemUse.Failures);
+    }
+
+    private static (List<UseOutcome> Failed, List<string> Refused) Feedback(TestGame g)
+    {
+        var failed = new List<UseOutcome>();
+        var refused = new List<string>();
+        g.World.ItemUse.Failed += (_, _, outcome) => failed.Add(outcome);
+        g.World.ItemUse.Refused += (_, message) => refused.Add(message);
+        return (failed, refused);
     }
 
     [Fact]

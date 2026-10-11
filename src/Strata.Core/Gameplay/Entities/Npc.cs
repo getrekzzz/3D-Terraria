@@ -15,17 +15,25 @@ public sealed class Npc
         Position = feet;
         Anchor = feet;
         Life = MaxLife = def.Life;
-        HalfExtents = new Vector3(def.Width * 0.25f * def.Scale, def.Height * 0.25f * def.Scale, def.Width * 0.25f * def.Scale);
+        Disguised = def.Disguise != null;
+        BaseHalfExtents = HalfExtents = new Vector3(def.Width * 0.25f * def.Scale, def.Height * 0.25f * def.Scale, def.Width * 0.25f * def.Scale);
     }
 
     public long Id { get; }
     public EnemyDef Def { get; }
     public Vector3 Position { get; set; }
     public Vector3 Velocity;
-    public Vector3 HalfExtents { get; }
+    /// <summary>Half the collision box (m); a brain may shrink it from <see cref="BaseHalfExtents"/> (King Slime losing gel).</summary>
+    public Vector3 HalfExtents { get; set; }
+
+    /// <summary>Half the box the definition gives.</summary>
+    public Vector3 BaseHalfExtents { get; }
     public int Life { get; set; }
     public int MaxLife { get; set; }
     public bool OnGround { get; set; }
+
+    /// <summary>Downward speed (m/s) with which it came to rest on the ground on its last move; 0 when it did not land.</summary>
+    public float LandingSpeed { get; set; }
 
     /// <summary>Horizontal facing (radians, 0 = +Z).</summary>
     public float Yaw { get; set; }
@@ -38,6 +46,11 @@ public sealed class Npc
     /// <summary>Ticks left of the hurt flash (visual).</summary>
     public int HurtFlash { get; set; }
 
+    /// <summary>The player whose whip last struck this creature (their minions focus it) and the tick it did (P3-14).</summary>
+    public Session.PlayerEntity? TaggedBy { get; set; }
+
+    public long TagTick { get; set; }
+
     /// <summary>Ticks left reeling from a hit: the brain does not steer, so knockback carries it away.</summary>
     public int StunTicks { get; set; }
 
@@ -49,8 +62,17 @@ public sealed class Npc
     /// <summary>Effects of active buffs (damage over time, light), rebuilt when buffs change.</summary>
     public Stats.EffectState Effects { get; } = new();
 
-    /// <summary>Defense after buffs and debuffs (ichor, ironbark-like effects), never below zero.</summary>
-    public int Defense => Math.Max(0, (int)MathF.Round(Effects.Stats.Get(Stats.StatIds.Defense, Def.Defense)));
+    /// <summary>
+    /// Defense after buffs and debuffs (ichor, ironbark-like effects) and the brain's <see cref="DefenseDelta"/>, never
+    /// below zero; <see cref="DefenseOverride"/> (an enrage's lethal defense) replaces it outright.
+    /// </summary>
+    public int Defense => DefenseOverride ?? Math.Max(0, (int)MathF.Round(Effects.Stats.Get(Stats.StatIds.Defense, Def.Defense)) + DefenseDelta);
+
+    /// <summary>Defense the brain adds this tick (a guarding phase); zeroed before each think.</summary>
+    public int DefenseDelta { get; set; }
+
+    /// <summary>Fixed defense while set (a pattern phase's, or the enrage step's); cleared before each think.</summary>
+    public int? DefenseOverride { get; set; }
 
     public void RecomputeEffects()
     {
@@ -66,8 +88,32 @@ public sealed class Npc
     /// <summary>Set by the brain in a creature's second phase (or day rage); switches to <see cref="Content.Defs.RangedAttack.Enraged"/>.</summary>
     public bool Enraged { get; set; }
 
+    /// <summary>Multiplier on how far the creature moves each tick (enraged speed); 1 = normal.</summary>
+    public float SpeedScale { get; set; } = 1f;
+
+    /// <summary>Presentation only: scale of the model (a boss swelling in a phase).</summary>
+    public float VisualScale { get; set; } = 1f;
+
+    /// <summary>Presentation only: the model is mirrored (a left hand).</summary>
+    public bool Mirrored { get; set; }
+
+    /// <summary>Its <see cref="Content.Defs.BossInfo.Enrage"/> conditions hold (or held, when latched).</summary>
+    public bool Frenzied { get; set; }
+
+    /// <summary>Presentation: decoy copies shown around the creature.</summary>
+    public int Illusions { get; set; }
+
+    /// <summary>Presentation: the point illusions are mirrored around.</summary>
+    public Vector3 MirrorAround { get; set; }
+
     /// <summary>Ticks until the next ranged volley.</summary>
     public int AttackTimer;
+
+    /// <summary>Ticks until the creature reconsiders which town resident to go after (P5-09).</summary>
+    internal int RetargetTicks;
+
+    /// <summary>The town resident it is going after instead of a player, if any.</summary>
+    internal Town.TownNpc? ResidentTarget;
 
     /// <summary>Where the creature spawned (anchored creatures stay near it).</summary>
     public Vector3 Anchor;
@@ -79,6 +125,9 @@ public sealed class Npc
 
     public int VolleyTimer;
     public int SummonTimer;
+
+    /// <summary>Pattern bosses: ticks into the current phase.</summary>
+    public int PhaseTimer;
     public int Counter;
     public int Counter2;
     public int Phase;
@@ -96,17 +145,46 @@ public sealed class Npc
     /// <summary>Model shown instead of the definition's (boss phase changes).</summary>
     public string? ModelOverride { get; set; }
 
+    /// <summary>Still posing as its <see cref="EnemyDef.Disguise"/> (a chest, a lost girl): harmless and still until woken.</summary>
+    public bool Disguised { get; set; }
+
+    /// <summary>The model to draw: the disguise while disguised, else a phase's override, else the creature's own.</summary>
+    public string ShownModel => Disguised ? Def.Disguise!.Model : ModelOverride ?? Def.Model ?? Def.Id;
+
     /// <summary>Temporarily immune to damage (teleporting, burrowing phases).</summary>
     public bool Invulnerable { get; set; }
 
+    /// <summary>Released by a wired statue: drops no loot or coins and counts towards the statue caps.</summary>
+    public bool FromStatue { get; set; }
+
+    /// <summary>The player who last struck it (Hearts and Stars drop for them), and whether that hit was magic.</summary>
+    public Session.PlayerEntity? LastAttacker { get; set; }
+
+    public bool LastHitMagic { get; set; }
+
     /// <summary>The creature this one is tethered to (a boss's hungry mouths): its anchor follows the leader and it dies with it.</summary>
     public Npc? Leader { get; set; }
+
+    /// <summary>
+    /// A creature this one lives and dies with but does not follow (Golem's freed head): it is removed, without loot,
+    /// once that creature dies or goes.
+    /// </summary>
+    public Npc? BoundTo { get; set; }
 
     /// <summary>Anchor offset from the leader's centre.</summary>
     public Vector3 LeaderOffset { get; set; }
 
     /// <summary>The offset is in the leader's own frame and turns with its facing (a boss's hands).</summary>
     public bool TurnsWithLeader { get; set; }
+
+    /// <summary>The boss part this creature was spawned as (null for anything else).</summary>
+    public BossPart? Part { get; set; }
+
+    /// <summary>A fixed part of a boss body (Moon Lord's hands): it stays and goes with its leader.</summary>
+    public bool IsPart => Leader != null && TurnsWithLeader;
+
+    /// <summary>Its life counts on its leader's boss bar.</summary>
+    public bool InBossBar => Part?.InBossBar ?? false;
 
     /// <summary>Live creatures tethered to this one.</summary>
     public List<Npc> Followers { get; } = new();
@@ -126,15 +204,56 @@ public sealed class Npc
     /// <summary>Centres of trailing body segments (worms), head first; empty for single-body creatures.</summary>
     public List<Vector3> Segments { get; } = new();
 
+    /// <summary>Life left of each segment, parallel to <see cref="Segments"/> (worms whose segments die on their own); else empty.</summary>
+    public List<int> SegmentLife { get; } = new();
+
+    /// <summary>Per-segment state bits for brains (parallel to <see cref="Segments"/> when used).</summary>
+    public List<byte> SegmentFlags { get; } = new();
+
+    /// <summary>Life of the whole piece: the head plus every segment's.</summary>
+    public int TotalLife
+    {
+        get
+        {
+            int sum = Life;
+            foreach (int l in SegmentLife) sum += l;
+            return sum;
+        }
+    }
+
+    /// <summary>The whole worm's life when it arrived (every piece cut from it keeps it), for a boss bar.</summary>
+    public int WholeMaxLife { get; set; }
+
     public bool IsBoss => Def.Boss is { Minor: false };
 
-    /// <summary>Every volume that can hit or be hit: the body plus segments.</summary>
+    /// <summary>Every volume that can hit or be hit: the body plus segments (allocates an iterator; see <see cref="VolumeAt"/>).</summary>
     public IEnumerable<(Vector3 Min, Vector3 Max)> Volumes()
     {
-        yield return Box;
-        if (Segments.Count == 0) yield break;
+        for (int i = 0; i < VolumeCount; i++) yield return VolumeAt(i);
+    }
+
+    /// <summary>How many volumes <see cref="VolumeAt"/> serves: the body plus one per segment.</summary>
+    public int VolumeCount => 1 + Segments.Count;
+
+    /// <summary>Volume <paramref name="i"/> without allocating: 0 is the body's <see cref="Box"/>, then each segment's cube.</summary>
+    public (Vector3 Min, Vector3 Max) VolumeAt(int i)
+    {
+        if (i == 0) return Box;
         var half = new Vector3(Def.Boss?.SegmentRadius ?? 0.5f);
-        foreach (var s in Segments) yield return (s - half, s + half);
+        var s = Segments[i - 1];
+        return (s - half, s + half);
+    }
+
+    /// <summary>The first volume passing a test: −1 none, 0 the body (head), i + 1 segment i. Allocation-free walk.</summary>
+    public int FirstVolume(Func<Vector3, Vector3, bool> test)
+    {
+        var box = Box;
+        if (test(box.Min, box.Max)) return 0;
+        if (Segments.Count == 0) return -1;
+        var half = new Vector3(Def.Boss?.SegmentRadius ?? 0.5f);
+        for (int i = 0; i < Segments.Count; i++)
+            if (test(Segments[i] - half, Segments[i] + half)) return i + 1;
+        return -1;
     }
 
     public bool Alive => Life > 0;

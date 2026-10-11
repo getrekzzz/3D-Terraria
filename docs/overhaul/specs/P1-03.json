@@ -1,0 +1,54 @@
+{
+ "id": "P1-03",
+ "title": "Engine: exposure that can darken, glow retune, fog cap and a dimmer horizon (fix the desert/snow flashbang)",
+ "player_outcome": "On medium, high and ultra the desert and snow read like on low: bright but never a white wash. Leaving a cave adapts in under a second with no flashbang, and caves still brighten slowly as the eyes adjust. Every preset gets the same cave adaptation.",
+ "design": [
+  "GraphicsSettings.Load: load and validate LightingConfig (throw on problems like graphics.json) and expose GraphicsSettings.Lighting.",
+  "EnvironmentController.Initialize: take glow from config. Set GlowNormalized = true, GlowHdrThreshold = Threshold, GlowHdrScale = Softness, GlowIntensity, GlowHdrLuminanceCap and SetGlowLevel(i, Levels[i]), replacing lines 60-64 and 90. SsilIntensity and VolumetricFogAlbedo come from ScreenSpace.",
+  "EnvironmentController.ApplyPreset: when p.AutoExposure, set AutoExposureMinSensitivity/MaxSensitivity from ExposureModel.AutoWindow, AutoExposureScale = AutoKey and AutoExposureSpeed = AutoSpeed, replacing 85/170/0.35/0.3 at lines 94-97.",
+  "New partial game/Ambience/EnvironmentController.Exposure.cs. It holds ExposureModel _exposure and float _biomeExposure; BlendBiome eases _biomeExposure toward Biome?.ExposureBias ?? 1 with the existing k.",
+  "The new partial exposes public float Exposure => _exposure.Current and void UpdateExposure(float dt), called at the end of Apply. UpdateExposure computes Target(_outdoor, Daylight, _biomeExposure), steps the model, and writes _camera.ExposureMultiplier only when the value moved by more than 0.002 (no per-frame RenderingServer churn).",
+  "EnvironmentController.Frame.UpdateFog: FogDepthBegin = Lerp(Min(reach * 0.3, Fog.NearCap / Max(_biomeDensity, 0.5)), 2, deep). Today it is about 149-178 m on medium and higher, so distant sand is unfogged.",
+  "shaders/horizon.gdshader, land branch: clamp the albedo luminance so distant sand and snow cannot outshine the streamed terrain (float l = dot(base, vec3(0.2126, 0.7152, 0.0722)); base *= min(1.0, 0.42 / max(l, 1e-3))) and set AO = 0.8 instead of 1.0. Water is unchanged.",
+  "Add probe render.exposure (runtime.Environment.Exposure) in GodotCommandHost.CreateContext.",
+  "New tour game/Testing/Tours/lighting.cmds: time 12; for each preset in low/medium/high/ultra (graphics <preset>) take noon screenshots at spawn forest, biome desert and biome tundra, then a tp cave underground shot.",
+  "New tools/ci/shot_stats.py (Pillow + numpy, about 70 lines). For each PNG it prints mean Rec.709 luma, the percentage of pixels with luma > 0.98, and with --profile a 12-bin luma profile along the horizontal centre line.",
+  "docs/architecture/rendering.md: update the light-model table rows for exposure and glow, and the preset paragraph."
+ ],
+ "files_modify": [
+  "game/Rendering/GraphicsSettings.cs \u2014 load/validate LightingConfig, Lighting property",
+  "game/Ambience/EnvironmentController.cs \u2014 glow/SSIL/volumetric from config, AE window in ApplyPreset",
+  "game/Ambience/EnvironmentController.Frame.cs \u2014 call UpdateExposure, fog near cap, blend biome exposure",
+  "shaders/horizon.gdshader \u2014 albedo luminance clamp, AO 0.8",
+  "game/Debug/GodotCommandHost.cs \u2014 render.exposure probe",
+  "game/Testing/Scripts/basic.cmds \u2014 adaptation asserts",
+  "docs/architecture/rendering.md \u2014 exposure/glow description"
+ ],
+ "files_add": [
+  "game/Ambience/EnvironmentController.Exposure.cs \u2014 model-driven exposure per frame",
+  "game/Testing/Tours/lighting.cmds \u2014 per-preset biome/cave screenshots",
+  "tools/ci/shot_stats.py \u2014 screenshot luma/clipping/profile report"
+ ],
+ "data_changes": [
+  "Tune data/config/lighting.json exposure/glow values from the tour results (the code keeps no constants)"
+ ],
+ "tests": [
+  "basic.cmds, after the arena section: 'time noon' / 'fill -11 -3 -11 11 9 11 stone' / 'fill -10 0 -10 10 7 10 air' / 'wait 4' / 'assert render.exposure > 1.3' (sealed room adapts) / 'fill -10 8 -10 10 9 10 air' / 'wait 1.5' / 'assert render.exposure < 1.15' (open sky darkens quickly) / 'assert errors == 0'",
+  "Core ExposureModelTests from P1-02 cover the logic; there is no engine unit test"
+ ],
+ "verification": [
+  "Headless smoke basic.cmds prints SMOKE PASS (the exposure model runs without a renderer).",
+  "lavapipe: xvfb-run godot --rendering-driver vulkan -- --world=light --size=small --new --player=t --fresh-player --view=3 --shots=$PWD/shots --smoke=res://game/Testing/Tours/lighting.cmds",
+  "python3 tools/ci/shot_stats.py shots/*.png: desert and tundra clipped < 2% on medium/high/ultra, and their mean luma within \u00b115% of the low preset's; forest on medium within +25% of low; cave mean luma on low and medium >= the old baseline (compare with a pre-change run)",
+  "Manual: walk out of a cave into the desert at noon on ultra; the image settles in under 1 s and never goes white"
+ ],
+ "depends_on": [
+  "P1-02"
+ ],
+ "risks": [
+  "Godot applies CameraAttributes.ExposureMultiplier and auto-exposure before the glow threshold. Check that flames and lava still bloom after the threshold rise (flame albedo peaks around 2.8 HDR) and lower Glow.Threshold if not.",
+  "lavapipe is slow: run only lighting.cmds (about 20 shots), not the full tour.",
+  "Headless has no auto-exposure, so render.exposure checks only the CPU model part."
+ ],
+ "effort": "M"
+}

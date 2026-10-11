@@ -34,6 +34,22 @@ public sealed class TimeConditionParams : SpecParams, IValidatableSpec
     public string? Validate() => Is is null or "day" or "night" ? null : $"time.is must be day|night, got '{Is}'";
 }
 
+/// <summary>The local weather is one of <see cref="Any"/> (clear, rain, storm, snow, blizzard, sandstorm, or windy).</summary>
+public sealed class WeatherConditionParams : SpecParams, IValidatableSpec
+{
+    public string[] Any { get; init; } = Array.Empty<string>();
+
+    /// <summary>False inverts it: none of the kinds holds.</summary>
+    public bool Active { get; init; } = true;
+
+    public string? Validate()
+    {
+        foreach (var k in Any)
+            if (k != "windy" && !Enum.TryParse<Gameplay.Weather.LocalWeather>(k, ignoreCase: true, out _)) return $"unknown weather '{k}'";
+        return Any.Length == 0 ? "weather condition needs 'any'" : null;
+    }
+}
+
 public sealed class FlagConditionParams : SpecParams
 {
     public string Id { get; init; } = "";
@@ -47,6 +63,12 @@ public sealed class EventConditionParams : SpecParams
 
     /// <summary>Holds only once the running event has counted at least this many kills (its later waves).</summary>
     public int MinKills { get; init; }
+}
+
+/// <summary>The world is (or is not) an Expert-rules world: Expert or Master, never Classic or Journey.</summary>
+public sealed class ExpertConditionParams : SpecParams
+{
+    public bool Is { get; init; } = true;
 }
 
 public sealed class RangeConditionParams : SpecParams
@@ -77,31 +99,44 @@ public sealed class CompositeConditionParams : SpecParams
     public TypedSpec[] Of { get; init; } = Array.Empty<TypedSpec>();
 }
 
-/// <summary>Players carry at least <see cref="Min"/> copper worth of coins.</summary>
-public sealed class CoinsConditionParams : SpecParams
+/// <summary>A player wears an item (armor or accessory slot): the Clothier's Red Hat.</summary>
+public sealed class WearingConditionParams : SpecParams
 {
-    public long Min { get; init; }
-}
-
-/// <summary>A resident town NPC is (or is not) living in the world.</summary>
-public sealed class ResidentConditionParams : SpecParams
-{
-    public string Id { get; init; } = "";
-    public bool Present { get; init; } = true;
-}
-
-/// <summary>Players carry at least <see cref="Count"/> of an item, or of any item with <see cref="Tag"/>.</summary>
-public sealed class HasItemConditionParams : SpecParams, IValidatableSpec
-{
-    public string? Item { get; init; }
-    public string? Tag { get; init; }
-    public int Count { get; init; } = 1;
-
-    public string? Validate() => (Item == null) == (Tag == null) ? "hasItem needs exactly one of 'item' or 'tag'" : null;
+    public string Item { get; init; } = "";
 }
 
 /// <summary>The world's evil: "corruption" or "crimson".</summary>
 public sealed class EvilConditionParams : SpecParams
 {
     public string Is { get; init; } = "";
+}
+
+/// <summary>The catch comes from one of these liquids ("water", "honey", "lava").</summary>
+public sealed class FishingLiquidConditionParams : SpecParams
+{
+    public string[] Any { get; init; } = Array.Empty<string>();
+}
+
+/// <summary>A quest fish entry: holds only while the Angler wants <see cref="Fish"/> today.</summary>
+public sealed class AnglerQuestConditionParams : SpecParams
+{
+    public string Fish { get; init; } = "";
+}
+
+/// <summary>True in worlds created with this secret seed ("for_the_worthy", "drunk_world", "celebration", …).</summary>
+public sealed class SecretSeedConditionParams : SpecParams, Content.Specs.IValidatableSpec
+{
+    public string Is { get; init; } = "";
+
+    public string? Validate() => World.SecretSeeds.FromId(Is) == World.SecretSeed.None ? $"unknown secret seed '{Is}'" : null;
+}
+
+/// <summary>The seasonal event running is <see cref="Is"/> ("halloween", "christmas", or "none").</summary>
+public sealed class SeasonConditionParams : SpecParams, Content.Specs.IValidatableSpec
+{
+    public static readonly string[] Values = { "halloween", "christmas", "none" };
+
+    public string Is { get; init; } = "";
+
+    public string? Validate() => Array.IndexOf(Values, Is) < 0 ? $"season must be one of {string.Join(", ", Values)}" : null;
 }

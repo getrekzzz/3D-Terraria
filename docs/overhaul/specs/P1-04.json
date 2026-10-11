@@ -1,0 +1,58 @@
+{
+ "id": "P1-04",
+ "title": "Torches: flatter block-light curve, stronger longer dynamic lights, a small pool on low, brighter held torch",
+ "player_outcome": "A wall torch visibly lights about 8-10 m of cave in a warm, whiter light, even on the low preset. A held torch lights the way ahead instead of a 3 m bubble.",
+ "design": [
+  "shaders/include/voxel_light.gdshaderinc: add global uniform vec4 strata_block_curve (x = linear share, y = gain, z = daylit suppression).",
+  "In the same file, strata_block_curve(level) becomes level * mix(strata_block_curve.x, 1.0, level). This gives about 0.43 at 3.5 m instead of 0.39 at 3 m, and a long soft tail.",
+  "strata_block_light uses strata_block_curve.y instead of 1.6 and .z instead of 0.65.",
+  "project.godot [shader_globals]: add strata_block_curve as vec4 (0.62, 1.35, 0.65, 0). Without this, every shader that includes voxel_light fails to compile.",
+  "EnvironmentController.Initialize: RenderingServer.GlobalShaderParameterSet(\"strata_block_curve\", new Vector4(BlockLight.Linear, BlockLight.Gain, BlockLight.DaylitSuppression, 0)).",
+  "DynamicLights.Source: add a trailing optional float Attenuation = 1.1f so lava/creature glow providers keep their look.",
+  "DynamicLights.PlacedLights: use energy Torch.PlacedEnergy * peak, range PlacedRangeBase + peak * PlacedRangePerPeak (about 13.3 m for a torch) and Attenuation = PlacedAttenuation. Store the config in a static set by Initialize(GraphicsSettings).",
+  "DynamicLights.Assign: set light.OmniAttenuation = s.Attenuation. Replace the LINQ OrderBy/Take/ToList with a reused List<Source> and List.Sort on a precomputed score, so the 4 Hz refresh does not allocate.",
+  "PlayerLight.Initialize: read graphics.Lighting.Torch; OmniAttenuation = HeldAttenuation, OmniRange = HeldRangeBase + peak * HeldRangePerPeak, LightEnergy = HeldEnergy * peak * flicker.",
+  "graphics.json low preset: dynamicLights 0 -> 4 (shadowless omnis, negligible cost in Forward+).",
+  "furniture.json torch light [14,11,7] -> [15,12,8]: whiter (blue now reaches 4 m) with 0.5 m more baked reach; the held torch inherits it through DerivedContent.",
+  "lighting.cmds: add a torch-corridor section. 'tp cave underground', 'time midnight', 'fill -3 -2 -3 3 5 54 stone', 'fill -2 0 -2 2 4 52 air', 'place torch 0 0 51', aim 0 -0.05 1, then one screenshot per preset.",
+  "docs/architecture/rendering.md: block curve and dynamic light numbers, and the low pool."
+ ],
+ "files_modify": [
+  "shaders/include/voxel_light.gdshaderinc \u2014 parameterised flatter block curve",
+  "project.godot \u2014 strata_block_curve shader global",
+  "game/Ambience/EnvironmentController.cs \u2014 set the block-curve global from config",
+  "game/Rendering/DynamicLights.cs \u2014 config energies/ranges, per-source attenuation, allocation-free Assign",
+  "game/Player/PlayerLight.cs \u2014 config energy/range/attenuation",
+  "data/config/graphics.json \u2014 low dynamicLights 4",
+  "data/tileobjects/furniture.json \u2014 torch light [15,12,8]",
+  "game/Testing/Tours/lighting.cmds \u2014 torch corridor section",
+  "docs/architecture/rendering.md \u2014 torch lighting"
+ ],
+ "files_add": [],
+ "data_changes": [
+  "data/config/graphics.json: presets.low.dynamicLights 4",
+  "data/tileobjects/furniture.json: torch light [15,12,8]",
+  "data/config/lighting.json: torch and blockLight values tuned from the corridor shots"
+ ],
+ "tests": [
+  "GraphicsConfigTests.ShippedPresetsAreValid still passes; add Assert.True(low.DynamicLights >= 4)",
+  "LightingConfigTests: torch PlacedRangeBase + PlacedRangePerPeak >= 12 and HeldEnergy >= PlacedEnergy",
+  "MeshingTests.TorchLightFallsOffAndSkyStaysOutOfSealedCaves passes unchanged (explicit light values; propagation untouched)",
+  "basic.cmds: after 'place torch -2 0 -3' add 'wait 0.5' and 'assert objects.count > 0' (unchanged behaviour)"
+ ],
+ "verification": [
+  "lavapipe lighting.cmds corridor shots; python3 tools/ci/shot_stats.py --profile shots/corridor_*.png: on medium the wall luma at the 8 m bin is >= 20% of the 1 m bin and >= 10% at 10 m; low is within \u00b130% of medium",
+  "Manual on low/medium/high: place torches in a cave and walk 10 m away; the lit area reads clearly; toggle the PerfOverlay: no FPS change on low",
+  "Surface at noon: torch light remains suppressed by the daylit term (no glowing daytime walls)"
+ ],
+ "depends_on": [
+  "P1-02",
+  "P1-03"
+ ],
+ "risks": [
+  "A flatter curve also brightens lava, glowing ores and mushrooms. Check underworld and mushroom-biome screenshots and lower BlockLight.Gain if they wash out.",
+  "Wider held-torch range makes high/ultra torch shadow maps cover more geometry; watch gd.player_light and GPU time.",
+  "Tuning interacts with P1-03's cave exposure: calibrate both from the same corridor/cave shots."
+ ],
+ "effort": "M"
+}

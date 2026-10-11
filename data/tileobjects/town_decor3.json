@@ -1,0 +1,7 @@
+{
+  // P5-18: the Wizard's Crystal Ball (aura Clairvoyance) and Santa's Star Topper. One entry per line.
+  "tileObjects": [
+    {"id": "crystal_ball", "name": "Crystal Ball", "description": "Magic powers are increased when nearby.", "size": [1, 2, 1], "light": [8, 6, 14], "aura": {"buff": "clairvoyance", "radius": 12, "ticks": 36000}, "hitPoints": 2, "itemCategory": "furniture", "itemValue": 100000, "itemMaxStack": 9999, "covers": ["terraria:crystal_ball"]},
+    {"id": "star_topper", "name": "Star Topper", "description": "Festive.", "size": [1, 1, 1], "light": [12, 11, 4], "hitPoints": 1, "itemCategory": "furniture", "itemValue": 10000, "itemMaxStack": 9999, "tags": ["christmas", "decor"], "covers": ["terraria:star_topper"]}
+  ]
+}

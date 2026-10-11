@@ -1,0 +1,44 @@
+{
+ "id": "P4-34",
+ "title": "Biome chests and hardmode keys in the dungeon vault",
+ "player_outcome": "The dungeon's deepest vault holds six ornate locked chests: Jungle, Corruption, Crimson, Hallowed, Frozen and Desert. Each opens only after Plantera falls, with a key that drops (1 in 2500) from hardmode enemies in its biome.",
+ "design": [
+  "Objects: jungle_chest, corruption_chest, crimson_chest, hallowed_chest, frozen_chest, desert_chest. Each has lock {key <biome>_key, requiresFlag defeated_plantera, message 'It can only be opened once Plantera is defeated.'} and tags [world]. Models use the chest generator with themed params (vines, eyes, flesh, crystal, ice, sandstone).",
+  "Keys: jungle_key, corruption_key, crimson_key, hallowed_key, frozen_key, desert_key (key generator variants).",
+  "global_kill additions: each key chance 0.0004 with conditions [flag hardmode, biome any [<biome>]] (jungle includes underground_jungle; desert includes underground_desert).",
+  "Loot tables '<biome>_chest': the single P4-33 weapon.",
+  "DungeonDecorator vault: place all six chests Locked on the reserved spots.",
+  "Re-pin golden hashes."
+ ],
+ "files_modify": [
+  "src/Strata.Core/WorldGen/Structures/Dungeon/DungeonDecorator.Rooms.cs \u2014 vault chests",
+  "data/loot/global.json \u2014 key drops",
+  "data/loot/dungeon.json \u2014 biome chest tables",
+  "tools/blender/assets.json, tools/content/reference/items_extra.py \u2014 models and rows",
+  "tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs \u2014 re-pin"
+ ],
+ "files_add": [
+  "data/tileobjects/biome_chests.json \u2014 six chests",
+  "data/items/biome_keys.json \u2014 six keys"
+ ],
+ "data_changes": [
+  "6 chests, 6 keys, 6 tables, 6 global drops."
+ ],
+ "tests": [
+  "LockedChestTests.BiomeChestsWaitForPlantera: refused without the flag even with a key; opened with the flag and key.",
+  "DungeonLootTests.BiomeKeysDropOnlyInHardmodeInTheirBiome.",
+  "DungeonDecorTests.TheVaultHoldsAllSixChests.",
+  "Smoke dungeon.cmds: 'tp landmark dungeon_bottom', 'wait_until stream.idle == 1 600', 'interact nearest jungle_chest 12' (refused)."
+ ],
+ "verification": [
+  "dotnet test; validate; headless dungeon.cmds"
+ ],
+ "depends_on": [
+  "P4-21",
+  "P4-33"
+ ],
+ "risks": [
+  "Vault placement in Tiny worlds must fit six chests. The planner already sizes the vault room at \u2265 14\u00d714."
+ ],
+ "effort": "M"
+}

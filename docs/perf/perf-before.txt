@@ -1,0 +1,136 @@
+# Lag-spike baseline (W0, before any P1b lag fix)
+
+Measured with the P1b-05 instrumentation (spike log, timer scopes, game/Testing/Scripts/perf.cmds) on top of the W0
+prep commits (dfaad3b); no gameplay or rendering behaviour differs from that parent. P1b-06..16 compare against the
+numbers below by running the same commands on the same kind of machine.
+
+## Rendering run (the baseline)
+Command (Xvfb + lavapipe, 2026-10-01, 4-core Xeon @ 2.1 GHz, load average ~4 from another lane building in parallel):
+  xvfb-run -a -s "-screen 0 1600x900x24" env VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.json \
+    godot --path . --rendering-driver vulkan --audio-driver Dummy -- --world=perf --size=small --new --player=perf \
+    --fresh-player --view=6 --graphics=medium --smoke=res://game/Testing/Scripts/perf.cmds
+Result: SMOKE PASS, ~26 minutes wall time for 686 frames.
+
+How to read it:
+* lavapipe draws a frame in ~1.5 s, so physics runs its 8-step catch-up every frame (8 ticks per frame) and the
+  frame.delta line (Godot's clamped process delta) reads 133 ms. FrameProbe therefore measures the main thread's own
+  work (from the end of the last draw to the end of process): "frames (main thread, draw excluded)". These are CPU-side
+  hitches inflated by the software rasteriser sharing the 4 cores; compare only with other lavapipe runs.
+* The ring keeps the last 64 spikes; `perf spikes 10` lists the tail of the run (water, magic, creatures). The
+  per-timer max/avg/calls in `perf report` cover the whole run (travel, save, autosave, torches, water, magic,
+  creatures).
+* A first attempt that measured whole frames (draw included) had every one of its 699 frames over 100 ms
+  (p50 1.5 s, worst 18 s): useless for hitches, hence the main-thread basis on software renderers.
+
+--- perf report 40 / perf spikes 10 / probes (rendering run) ---
+[script] 71: perf report 40 -> 685 frames, avg frame 133.33 ms (worst 149.5), 5484 ticks
+spikes >=33 ms 179 (>=50 25, >=100 4) of 685 frames (main thread, draw excluded) · p50 29.5 p95 45.0 p99 69.5 max 228.2 ms · GC 52/52/31 pause 1005.1 ms
+  gd.world_runtime            15.688 ms/frame  avg  15.688  max  114.93  calls 685
+  gd.stream_and_jobs          11.181 ms/frame  avg  11.181  max   44.71  calls 685
+  gd.player_physics            3.004 ms/frame  avg   0.375  max   15.23  calls 5484
+  gd.objects                   1.688 ms/frame  avg   1.688  max   39.03  calls 685
+  gd.objects.rebuild           1.673 ms/frame  avg   0.227  max   37.89  calls 5052
+  gd.colliders                 1.595 ms/frame  avg   1.595  max   28.11  calls 685
+  gd.mesh_uploads              1.588 ms/frame  avg   1.588  max   43.52  calls 685
+  gd.colliders.build           1.303 ms/frame  avg   1.714  max   10.24  calls 521
+  tick.total                   0.117 ms/tick   avg   0.117  max   52.44  calls 5484
+  gd.grass                     0.606 ms/frame  avg   0.606  max   53.53  calls 685
+  gd.culling                   0.501 ms/frame  avg   0.501  max    6.46  calls 685
+  gd.grass.create              0.447 ms/frame  avg   3.188  max    4.74  calls 96
+  gd.dynamic_lights            0.363 ms/frame  avg   0.363  max    3.13  calls 685
+  tick.liquids                 0.041 ms/tick   avg   0.041  max   15.96  calls 5484
+  gd.interaction.physics       0.208 ms/frame  avg   0.026  max    1.70  calls 5484
+  tick.town                    0.024 ms/tick   avg   0.024  max    3.02  calls 5484
+  gd.drops                     0.135 ms/frame  avg   0.135  max   91.15  calls 685
+  tick.projectiles             0.010 ms/tick   avg   0.010  max   52.33  calls 5484
+  tick.autosave                0.008 ms/tick   avg  41.708  max   41.71  calls 1
+  gd.town                      0.056 ms/frame  avg   0.056  max    0.46  calls 685
+  gd.npcs                      0.056 ms/frame  avg   0.056  max   31.35  calls 685
+  gd.hud                       0.054 ms/frame  avg   0.054  max    0.60  calls 685
+  gd.projectiles               0.044 ms/frame  avg   0.044  max   24.96  calls 685
+  gd.npcs.create               0.042 ms/frame  avg   4.147  max   23.32  calls 7
+  tick.players                 0.005 ms/tick   avg   0.005  max    0.37  calls 5484
+  tick.npcs                    0.005 ms/tick   avg   0.005  max    2.06  calls 5484
+  tick.liquid_effects          0.005 ms/tick   avg   0.005  max    0.31  calls 5484
+  gd.music                     0.036 ms/frame  avg   0.036  max    5.68  calls 685
+  gd.projectiles.create        0.034 ms/frame  avg   1.169  max   22.10  calls 20
+  tick.world                   0.004 ms/tick   avg   0.004  max    0.47  calls 5484
+  gd.avatar                    0.030 ms/frame  avg   0.030  max    0.85  calls 685
+  gd.view_model                0.029 ms/frame  avg   0.029  max    3.68  calls 685
+  tick.drops                   0.002 ms/tick   avg   0.002  max    0.55  calls 5484
+  tick.map                     0.002 ms/tick   avg   0.002  max    1.92  calls 5484
+  gd.senses                    0.014 ms/frame  avg   0.014  max    0.21  calls 685
+  gd.slot_views                0.008 ms/frame  avg   0.000  max    0.04  calls 47265
+  gd.camera                    0.007 ms/frame  avg   0.007  max    0.07  calls 685
+  tick.events                  0.001 ms/tick   avg   0.001  max    0.02  calls 5484
+  gd.target_highlight          0.005 ms/frame  avg   0.005  max    0.04  calls 685
+  tick.spawner                 0.000 ms/tick   avg   0.000  max    0.06  calls 5484
+
+[script] 72: perf spikes 10 -> spikes >=33 ms 179 (>=50 25, >=100 4) of 686 frames (main thread, draw excluded) · p50 29.5 p95 45.0 p99 69.5 max 228.2 ms · GC 52/52/31 pause 1005.1 ms
+  #671     228.2 ms: gd.drops 91.2, tick.projectiles 52.8, gd.npcs 31.3, gd.npcs.create 29.0, gd.player_physics 3.0
+  #663     51.3 ms: gd.projectiles 25.0, gd.projectiles.create 23.4, gd.player_physics 2.6, tick.projectiles 1.0, tick.town 0.9
+  #662     33.1 ms: gd.grass.create 4.1, gd.player_physics 4.0, gd.view_model 3.7, gd.objects.rebuild 2.8, gd.colliders.build 2.7
+  #654     55.3 ms: gd.grass.create 13.8, gd.colliders.build 10.8, gd.objects.rebuild 8.4, tick.liquids 6.5, gd.player_physics 3.6
+  #652     51.0 ms: gd.grass.create 11.5, gd.colliders.build 10.2, gd.objects.rebuild 7.4, tick.liquids 5.2, gd.player_physics 4.1
+  #650     64.1 ms: tick.liquids 18.6, gd.grass.create 13.7, gd.colliders.build 10.4, gd.objects.rebuild 8.2, gd.mesh_uploads 2.4
+  #648     54.7 ms: tick.liquids 14.6, gd.grass.create 11.1, gd.colliders.build 9.7, gd.objects.rebuild 7.1, gd.player_physics 2.1
+  #646     69.4 ms: tick.liquids 16.0, gd.grass.create 11.2, gd.colliders.build 8.8, gd.objects.rebuild 8.6, gd.mesh_uploads 1.9 · GC gen0 gen1 pause 38.9 ms
+  #644     61.9 ms: gd.grass.create 15.5, gd.colliders.build 10.2, tick.liquids 10.0, gd.objects.rebuild 9.2, gd.player_physics 4.0
+  #643     50.4 ms: tick.liquids 27.9, gd.objects.rebuild 5.2, gd.player_physics 3.5, gd.stream_and_jobs 2.3, gd.colliders 0.4
+
+[script] 73: probe perf.frames -> perf.frames = 686
+[script] 74: probe perf.frames_over_33 -> perf.frames_over_33 = 179
+[script] 75: probe perf.frames_over_50 -> perf.frames_over_50 = 25
+[script] 76: probe perf.worst_ms -> perf.worst_ms = 228.234
+[script] 77: probe perf.p99_ms -> perf.p99_ms = 69.5
+[script] 78: probe perf.gc2 -> perf.gc2 = 31
+[script] 79: probe perf.gc_pause_ms -> perf.gc_pause_ms = 1005.0719999999999
+[script] 80: probe perf.calls.tick.autosave -> perf.calls.tick.autosave = 1
+[script] 81: assert errors == 0 -> ok: errors (0) == 0 (0)
+[script] 84: killall -> Removed 7 creatures.
+[script] 85: perf start -> Profiling.
+[script] 86: setblock 6 0 -4 stone -> (1030, 519, 1020) = stone
+[script] 88: probe perf.calls.gd.colliders.build -> perf.calls.gd.colliders.build = 8
+[script] 89: probe perf.calls.gd.objects.rebuild -> perf.calls.gd.objects.rebuild = 8
+[script] 90: probe perf.max_calls.gd.grass.create -> perf.max_calls.gd.grass.create = 4
+[script] 91: assert errors == 0 -> ok: errors (0) == 0 (0)
+SMOKE PASS res://game/Testing/Scripts/perf.cmds
+
+Key numbers (lavapipe, main thread):
+  spikes >=33 ms 179 / >=50 ms 25 / >=100 ms 4 of 686 frames; p50 29.5, p95 45.0, p99 69.5, max 228.2 ms
+  GC over the run: gen0/1/2 52/52/31, pause 1005 ms; gen2 collections during the three teleports: 31
+  worst single calls: tick.autosave 41.7 (1 autosave), gd.objects.rebuild 37.9, gd.colliders.build 10.2,
+  gd.grass.create 4.7, gd.npcs.create 23.3, gd.projectiles.create 22.1, gd.drops 91.2, tick.liquids 16.0,
+  gd.stream_and_jobs 44.7, gd.mesh_uploads 43.5
+  rebuild counts: 521 collider builds, 5052 tile-object rebuilds, 96 grass creations over the run;
+  one block edit: 8 collider builds, 8 tile-object rebuilds, at most 4 grass creations in one frame
+
+## Headless run (CI configuration; CPU only, no draw)
+  godot --headless --path . --audio-driver Dummy -- --world=smoke-perf --size=tiny --new --player=smoke \
+    --fresh-player --view=2 --smoke=res://game/Testing/Scripts/perf.cmds
+[script] 72: perf spikes 10 -> spikes >=33 ms 7 (>=50 4, >=100 0) of 1908 frames · p50 7.0 p95 14.5 p99 23.0 max 91.2 ms · GC 17/17/13 pause 117.2 ms
+  #1609    36.1 ms: gd.npcs 27.0, gd.npcs.create 21.3, gd.player_physics 0.3, gd.hud 0.2, gd.interaction.physics 0.0
+  #1259    41.5 ms: gd.grass.create 6.7, gd.colliders.build 5.9, tick.liquids 5.4, gd.objects.rebuild 4.8, gd.mesh_uploads 0.7
+  #724     91.2 ms: gd.colliders.build 24.1, gd.objects.rebuild 20.0, gd.player_physics 0.3, gd.interaction.physics 0.1, tick.town 0.1 · GC gen0 gen1 pause 18.1 ms
+  #723     52.0 ms: gd.colliders.build 6.8, gd.objects.rebuild 0.4, gd.player_physics 0.1, gd.grass 0.1, gd.town 0.0
+  #707     55.3 ms: gd.grass.create 19.8, gd.colliders.build 18.3, gd.objects.rebuild 6.7, gd.stream_and_jobs 0.4, gd.culling 0.3
+  #570     39.6 ms: gd.town 18.0, gd.grass.create 3.6, gd.colliders.build 3.3, gd.objects.rebuild 3.2, gd.mesh_uploads 0.6
+  #512     61.2 ms: gd.grass.create 21.6, gd.colliders.build 16.0, gd.objects.rebuild 8.8, gd.stream_and_jobs 5.6, gd.culling 0.5
+
+[script] 73: probe perf.frames -> perf.frames = 1910
+[script] 74: probe perf.frames_over_33 -> perf.frames_over_33 = 7
+[script] 75: probe perf.frames_over_50 -> perf.frames_over_50 = 4
+[script] 76: probe perf.worst_ms -> perf.worst_ms = 91.237
+[script] 77: probe perf.p99_ms -> perf.p99_ms = 23
+[script] 78: probe perf.gc2 -> perf.gc2 = 13
+[script] 79: probe perf.gc_pause_ms -> perf.gc_pause_ms = 117.242
+[script] 80: probe perf.calls.tick.autosave -> perf.calls.tick.autosave = 0
+[script] 81: assert errors == 0 -> ok: errors (0) == 0 (0)
+[script] 84: killall -> Removed 8 creatures.
+[script] 85: perf start -> Profiling.
+[script] 86: setblock 6 0 -4 stone -> (262, 349, 252) = stone
+[script] 88: probe perf.calls.gd.colliders.build -> perf.calls.gd.colliders.build = 8
+[script] 89: probe perf.calls.gd.objects.rebuild -> perf.calls.gd.objects.rebuild = 8
+[script] 90: probe perf.max_calls.gd.grass.create -> perf.max_calls.gd.grass.create = 2
+[script] 91: assert errors == 0 -> ok: errors (0) == 0 (0)
+SMOKE PASS res://game/Testing/Scripts/perf.cmds

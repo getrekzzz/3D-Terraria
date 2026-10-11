@@ -1,0 +1,66 @@
+{
+ "id": "P4-20",
+ "title": "Dungeon loot items and drops: Aqua Scepter, Magic Missile, Valor, Bone Welder, Golden and Shadow Keys, global kill drops, Angry Bones variants",
+ "player_outcome": "Dungeon chests hold Terraria's dungeon treasures: Muramasa, Cobalt Shield, Aqua Scepter, Handgun, Blue Moon, Magic Missile, Valor, and one Shadow Key per world, sometimes with a Bone Welder. Golden Keys drop from 1 in 65 dungeon kills, and Dungeon Slimes always carry one. Angry Bones come in Terraria's four looks.",
+ "design": [
+  "New data/items/dungeon_loot.json.",
+  "aqua_scepter: magic, damage 15, useTime/useAnimation 16, mana 7, knockback 5, rarity 2, value 20000, autoReuse. Projectile 'aqua_stream': a friendly blue orb, gravity 6, pierce 3, lifetime 60, trail #8ac8ff.",
+  "magic_missile: magic, damage 22, useTime 20, mana 10, knockback 3, rarity 2. Projectile 'magic_missile' has the new ProjectileDef.Guided.",
+  "valor: melee yoyo, damage 22, useTime 25, knockback 3.5, rarity 2. A returning projectile like wood_yoyo until the items phase adds real yoyo tethers.",
+  "golden_key: maxStack 9999, rarity 0. shadow_key: rarity 3.",
+  "bone_welder: tile object size [3,3,2], stations [bone_welder], item derived.",
+  "bone_block: new block in data/blocks/dungeon.json, crisp, texture 'bone_block' added to materials.json. Recipe: 1 bone \u2192 1 bone_block at bone_welder.",
+  "ProjectileDef.Guided. In ProjectileSystem.Special.Steer, a guided projectile turns toward the point on the owner's aim ray at its own distance from owner.Eye (Magic Missile follows the crosshair), while the owner holds the item that fired it.",
+  "Global kill drops. In NpcSystem.Loot.cs, after the creature's table, roll table 'global_kill' when it exists, for kills with Value > 0, not critters and not IsPart, using ContextAt(npc.Cell). Zones such as the dungeon are in the context.",
+  "Loot data (data/loot/dungeon.json): dungeon_chest = coins 1\u20133 gold; primary (weighted, one each): muramasa, cobalt_shield, aqua_scepter, handgun, blue_moon, magic_missile, valor. Secondary like gold_chest: potions, bars, bombs; bone_welder chance 0.14.",
+  "dungeon_chest_shadow_key = dungeon_chest + shadow_key.",
+  "global_kill: golden_key chance 1/65 with conditions [biome any [dungeon]].",
+  "dungeon_slime table: add golden_key (guaranteed).",
+  "Remove the dungeon-conditioned entries (muramasa, handgun, blue_moon, water_bolt, cobalt_shield) from cabin_chest_primary in data/loot/containers.json. Water Bolt now comes only from shelves.",
+  "Angry Bones variants in data/enemies/dungeon.json: angry_bones_big, angry_bones_big_muscle, angry_bones_big_helmet (Terraria's ids), same stats as angry_bones (80 life, 26 damage, 8 defense). Split spawn rule weights 5 \u2192 2/1/1/1. Loot: angry_bones table with bone 1\u20133.",
+  "Models: humanoid skeleton params variants in assets.json: a taller build, a heavy build, and a helmet. Add a 'helmet' hat style (iron kettle helm) to tools/blender/bgen/human/accessories.py and rebuild their anim sets with build_all.py --anims --only=angry_bones*.",
+  "Item models: aqua_scepter uses the staff generator with a water orb; magic_missile the wand generator with a blue gem; valor the yoyo generator in blue/steel; keys the key generator (gold; dark obsidian with a purple gem); bone_welder a new generator in dungeon_decor.py (bone-framed anvil with a skull vise); bone_block via textures.",
+  "Reference rows: aqua_scepter, handgun, magic_missile, valor, shadow_key, bone_welder, golden_key, bone_block, angry_bones variants."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/ProjectileDef.cs \u2014 Guided",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.Special.cs \u2014 guided steering",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Loot.cs \u2014 global_kill roll",
+  "data/enemies/dungeon.json \u2014 variants, spawn weights, dungeon_slime loot",
+  "data/loot/containers.json \u2014 dungeon entries removed from cabin loot",
+  "data/blocks/dungeon.json \u2014 bone_block",
+  "data/recipes/basic.json \u2014 bone_block recipe",
+  "tools/textures/materials.json \u2014 bone_block layer",
+  "tools/blender/assets.json, tools/blender/bgen/human/accessories.py, tools/blender/bgen/dungeon_decor.py \u2014 models",
+  "tools/content/reference/items_extra.py, world.py \u2014 rows"
+ ],
+ "files_add": [
+  "data/items/dungeon_loot.json \u2014 new items and projectiles",
+  "data/loot/global.json \u2014 global_kill table",
+  "tests/Strata.Core.Tests/Gameplay/DungeonLootTests.cs \u2014 loot tests"
+ ],
+ "data_changes": [
+  "New items and tables as listed; cabin loot no longer carries dungeon items."
+ ],
+ "tests": [
+  "DungeonLootTests.EveryDungeonChestRollsOnePrimaryTreasure.",
+  "DungeonLootTests.TheShadowKeyTableAlwaysHoldsTheKey.",
+  "DungeonLootTests.GoldenKeysDropAboutOneInSixtyFiveInsideTheDungeonOnly (fixed seeds; a context with and without the zone).",
+  "DungeonLootTests.DungeonSlimesAlwaysCarryAKey.",
+  "ArsenalTests.MagicMissileFollowsTheAim: rotate player.Aim 30\u00b0; the projectile velocity turns toward it.",
+  "InventoryCraftingTests.BoneWelderCraftsBoneBlocks.",
+  "Smoke combat.cmds: 'give magic_missile 1', 'wield magic_missile', 'use', 'assert projectiles.count >= 1'."
+ ],
+ "verification": [
+  "dotnet test; validate (obtainability); build_all.py --check; gen_reference --check"
+ ],
+ "depends_on": [
+  "P4-01",
+  "P4-18"
+ ],
+ "risks": [
+  "Valor and Blue Moon play as plain returning projectiles until the items phase implements yoyo and flail tethers.",
+  "Terraria 1.4 stats are quoted from memory. Double-check damage values against the reference and tune in data."
+ ],
+ "effort": "M"
+}

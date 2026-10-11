@@ -1,0 +1,17 @@
+{
+ "comment": "P3-18 pets and light pets: the summoning items (orb/heart reuse the evil orb shapes at item size; bell, lantern and bottle from bgen/pets.py; the fish and mushroom reuse their item generators) and the two new pet creatures.",
+ "items": {"explicit": {
+  "shadow_orb": {"generator": "evil_orb", "params": {"kind": "orb", "size": [0.55, 0.55, 0.55]}},
+  "crimson_heart": {"generator": "evil_orb", "params": {"kind": "heart", "size": [0.55, 0.55, 0.55]}},
+  "fairy_bell": {"generator": "pet_bell", "params": {}},
+  "magic_lantern": {"generator": "pet_lantern", "params": {}},
+  "wisp_in_a_bottle": {"generator": "pet_bottle", "params": {}},
+  "fish": {"generator": "fish", "params": {"color": "#4a6a9a", "fin": "#e8b040"}},
+  "zephyr_fish": {"generator": "fish", "params": {"color": "#d8f0ff", "fin": "#8ad8ff"}},
+  "strange_glowing_mushroom": {"generator": "small_mushroom", "params": {"capLayer": "glowcap", "glow": true, "tint": "#c08aff", "spots": 4}}
+ }},
+ "creatures": {
+  "baby_penguin": {"generator": "baby_penguin", "params": {}},
+  "baby_truffle": {"generator": "baby_truffle", "params": {}}
+ }
+}

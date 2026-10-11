@@ -1,0 +1,39 @@
+{
+ "id": "P2-19",
+ "title": "Floating combat text: Terraria colours, pop-in, constant screen size, green heal and blue mana numbers",
+ "player_outcome": "Hits pop in with a quick bounce: orange normal hits, bigger red-orange crits, pink-red when you get hurt. Drinking a potion floats a green '+50' over your head, and mana potions a blue one. Numbers stay the same size on screen at any distance, as in 2D Terraria.",
+ "design": [
+  "Core feedback event: new partial src/Strata.Core/Session/GameWorld.Feedback.cs with `event Action<PlayerEntity, int, bool>? PlayerHealed` (amount, mana) and `ReportHeal(p, amount, mana)`. Vitals.Heal and RestoreMana return the amount actually applied (int instead of void; existing callers ignore it).",
+  "Raise PlayerHealed from:\n- ItemUseSystem.Consume. Move Consume into a new partial ItemUseSystem.Consume.cs first, since ItemUseSystem.cs is at 375 lines.\n- Life steal in NpcSystem.Hit (NpcSystem.cs:291).\n- TownCommerce.Heal (the nurse).\n\nHeart and mana-star pickups (feel phase) call ReportHeal too.",
+  "Rewrite CombatEffects.Number:\n- Kinds: Hostile Color8(255,160,80); Crit Color8(255,100,30) at \u00d71.25 with \u00b10.05 m x-jitter; ToPlayer Color8(255,80,90); HealLife (100,255,100); HealMana (100,100,255).\n- Label3D FixedSize = true, PixelSize \u2248 0.0011 (tune on screenshots), font UiFonts.Bold, outline 12.\n- Pop: Scale 0.3 \u2192 1 over 0.08 s (TransitionType.Back).\n- Rise with decaying speed 0.9 m over 0.9 s; fade starts at 0.4 s.\n- Heal numbers appear at head + 0.4 m in third person, and at eye + Aim\u00b71.2 + 0.3 m up in first person.",
+  "Pool cap by graphics preset (low 24, medium 48, high/ultra 80); when exhausted, recycle the oldest label. No per-number allocation after warm-up."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Combat/Vitals.cs \u2014 Heal/RestoreMana return applied amounts",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 Consume moved out",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.cs \u2014 life steal reports heal (1 line)",
+  "src/Strata.Core/Gameplay/Town/TownCommerce.cs \u2014 nurse reports heal",
+  "game/Entities/CombatEffects.cs \u2014 colours, pop, fixed size, heal numbers, pool cap"
+ ],
+ "files_add": [
+  "src/Strata.Core/Session/GameWorld.Feedback.cs \u2014 PlayerHealed event",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consume.cs \u2014 moved Consume + heal reports"
+ ],
+ "data_changes": [],
+ "tests": [
+  "CombatPlayerTests: DrinkingAPotionReportsTheHealedAmount (60/100 life + lesser healing potion \u2192 event with 40); ManaPotionReportsMana; FullLifeReportsNothing",
+  "ui.cmds: `give lesser_healing_potion 1` / `wield lesser_healing_potion` / `use` / `wait 0.3` / `assert errors == 0`"
+ ],
+ "verification": [
+  "dotnet test; smoke combat.cmds and ui.cmds pass",
+  "Lavapipe exec: spawn a slime, swing, screenshot during the pop; compare sizes near and far"
+ ],
+ "depends_on": [
+  "P2-01"
+ ],
+ "risks": [
+  "The feel phase edits CombatEffects (death puffs, blood, hit dust); this WP changes only Number, NewLabel and the pool. Coordinate on the file.",
+  "P3 also edits ItemUseSystem; the partial split reduces the conflict surface."
+ ],
+ "effort": "S"
+}

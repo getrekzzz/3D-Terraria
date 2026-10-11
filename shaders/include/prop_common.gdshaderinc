@@ -11,6 +11,9 @@ uniform sampler2DArray albedo_array : source_color, filter_linear_mipmap_anisotr
 uniform sampler2DArray material_array : filter_linear_mipmap_anisotropic, repeat_enable;
 uniform float layer = 0.0;
 uniform float glow = 0.0;
+// Tinted metal slots (prop:<layer>:metal): the layer is read as neutral grey normalised to this gain (linear), so the
+// vertex colour is the metal's colour instead of multiplying onto the layer's own (muddy) grey. 0 = plain multiply.
+uniform float neutral_gain = 0.0;
 // Foliage sway (metres per metre of height above the origin).
 uniform float sway = 0.0;
 // Thin foliage (leaf layers): wrapped, light-transmitting diffuse instead of the opaque BRDF.
@@ -56,7 +59,11 @@ void fragment() {
 	vec4 m = w.x * texture(material_array, vec3(p.zy * vec2(1.0, -1.0), layer))
 		+ w.y * texture(material_array, vec3(p.xz, layer))
 		+ w.z * texture(material_array, vec3(p.xy * vec2(1.0, -1.0), layer));
-	vec3 albedo = a.rgb * COLOR.rgb * tint.rgb;
+	vec3 texel = a.rgb;
+	if (neutral_gain > 0.0) {
+		texel = vec3(min(dot(texel, vec3(0.2126, 0.7152, 0.0722)) * neutral_gain, 1.0));
+	}
+	vec3 albedo = texel * COLOR.rgb * tint.rgb;
 	ALBEDO = albedo;
 	ROUGHNESS = m.z;
 	METALLIC = m.w;

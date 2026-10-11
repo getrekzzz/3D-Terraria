@@ -1,0 +1,55 @@
+{
+ "id": "P4-25",
+ "title": "Hardmode treasure bags, trophies and missing Expert items (Demon Heart slot, Minecart Upgrade Kit pieces)",
+ "player_outcome": "Every hardmode boss drops its Treasure Bag in Expert, and every boss can drop a trophy. The Wall of Flesh's Demon Heart opens a sixth accessory slot in Expert worlds. The mechanical bosses' three Mechanical pieces combine into a Minecart Upgrade Kit.",
+ "design": [
+  "Treasure bags for queen_slime, the_twins (dropped by the last twin; the loot table 'the_twins' already shared), the_destroyer, skeletron_prime, plantera, golem, duke_fishron, empress_of_light and moon_lord. The Lunatic Cultist has no bag, as in Terraria.",
+  "Trophies for the same bosses; same patterns as P4-04.",
+  "Restructure the hardmode boss tables into data/loot/bosses.json.",
+  "Expert items in the bags: volatile_gelatin, spore_sac, shiny_stone, shrimpy_truffle (existing), plus the new demon_heart and mechanical pieces.",
+  "demon_heart: consume behavior. New ConsumeParams.ExtraAccessorySlot sets PlayerState.ExtraAccessorySlot = true (saved).",
+  "PlayerInventory.AccessorySlots becomes 6 with the 6th usable only when the flag is set and the world is Expert or Master (PlayerInventory.ActiveAccessorySlots(bool expertWorld)). The equip logic and EffectState only read active slots.",
+  "game/UI/InventoryScreen.cs draws the 6th slot when active.",
+  "mechanical_wheel_piece (Twins), mechanical_battery_piece (Destroyer), mechanical_cart_piece (Prime; Terraria's 'Mechanical Wagon Piece' if the reference names it so) combine by recipe into minecart_upgrade_kit (at a tinkerers_workshop).",
+  "minecart_upgrade_kit: consume sets PlayerState.MinecartUpgrade. Gameplay/Mounts/MinecartRide speed \u00d7 1.25 and contact damage 30 to creatures hit while riding fast.",
+  "Deferred and documented: gravity_globe and suspicious_looking_tentacle (need the gravity-flip and pet systems), Deerclops' Bone Helm.",
+  "Models: trophies and bags via trophies.py; pieces via gear or clockwork generators."
+ ],
+ "files_modify": [
+  "data/items/boss_bags.json \u2014 9 bags",
+  "data/loot/bosses.json \u2014 hardmode tables",
+  "data/tileobjects/trophies.json \u2014 9 trophies",
+  "data/items/equipment.json or new data/items/expert_items.json \u2014 demon_heart, pieces, kit",
+  "src/Strata.Core/Content/Specs/ItemBehaviorSpecs.cs \u2014 ConsumeParams.ExtraAccessorySlot, MinecartUpgrade",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Utility.cs \u2014 apply the permanent upgrades",
+  "src/Strata.Core/Gameplay/Items/PlayerInventory.cs \u2014 6th accessory slot",
+  "src/Strata.Core/Gameplay/Player (PlayerState and its persistence model) \u2014 flags saved",
+  "src/Strata.Core/Gameplay/Mounts/MinecartRide.cs \u2014 upgrade effects",
+  "game/UI/InventoryScreen.cs \u2014 6th slot",
+  "tools/blender/assets.json, tools/content/reference/items_extra.py \u2014 assets and rows"
+ ],
+ "files_add": [
+  "data/items/expert_items.json \u2014 Demon Heart, mechanical pieces, Minecart Upgrade Kit"
+ ],
+ "data_changes": [
+  "9 bags, 9 trophies, 5 new items, 1 recipe; hardmode boss tables restructured."
+ ],
+ "tests": [
+  "TreasureBagTests.EveryBossButTheCultistDropsABagInExpert: iterate non-minor boss defs.",
+  "GearTests.DemonHeartOpensASixthSlotOnlyInExpert.",
+  "CharacterTests.DemonHeartPersists.",
+  "MovementGearTests.MinecartUpgradeKitSpeedsTheCart.",
+  "Smoke hardmode.cmds: 'give demon_heart 1', 'wield demon_heart', 'use', 'assert errors == 0'."
+ ],
+ "verification": [
+  "dotnet test; validate; build_all.py --check; gen_reference --check"
+ ],
+ "depends_on": [
+  "P4-04"
+ ],
+ "risks": [
+  "The accessory-slot count overlaps the UI phase's equipment rework (hook/mount/pet/vanity/dye slots). Sequence after it or keep the change minimal.",
+  "Player save format changes need a PlayerState version bump or a tolerant default."
+ ],
+ "effort": "M"
+}

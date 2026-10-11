@@ -3,6 +3,10 @@
   // About one attempt every 10 s, day and night. The reference game spawns faster at night, but here night
   // creatures close in from every side at once, so nights keep the day's pace and a smaller allowance.
   "checkInterval": 60,
+  // Town defence (P5-09): hostile creatures go after residents within residentAggroRange when no player is
+  // playerPreference metres nearer.
+  "residentAggroRange": 14,
+  "playerPreference": 4,
   "chance": 0.10,
   "nightChance": 0.10,
   // Hostile creatures near a player (a group is cut short rather than go over); critters (fireflies, bunnies…)

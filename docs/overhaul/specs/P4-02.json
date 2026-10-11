@@ -1,0 +1,56 @@
+{
+ "id": "P4-02",
+ "title": "Pattern-brain upgrades: Expert overrides, flight phases, slam, leash, debuff pulses, illusions",
+ "player_outcome": "Data-driven bosses can play differently in Expert, take to the air, slam down with a screen-shaking impact, hang from anchors, confuse the player and cast illusions, all tuned in JSON. This covers the Brain, Queen Bee, Deerclops, Queen Slime, Plantera, Golem, Duke and Empress.",
+ "design": [
+  "Split src/Strata.Core/AI/PatternBrain.cs (257 lines) into PatternBrain.cs (Think, Enter, Summon, Fire) and PatternBrain.Moves.cs (the Move switch, Steer and the new moves).",
+  "New src/Strata.Core/Content/Specs/PatternExtras.cs with three classes. PatternExpert { Speed=1, Damage=1, VolleyInterval=1, VolleyCount=0, SummonMax=0, TelegraphScale=1 }. PatternAura { Buff, Ticks, Interval, Radius (m), ExpertOnly }. PatternLeash { Kind (a follower enemy id), Radius (m) }.",
+  "PatternPhase additions in PatternSpecs.cs: Expert, ExpertBelow (float?, the life threshold used in Expert), Fly (bool), Aura, Leash, Illusions (int) and Defense (int?, an override while in the phase).",
+  "PatternMove additions: ExpertOnly, plus a new kind 'slam'. The boss hovers Height above the target for Telegraph ticks, then falls at Speed until OnGround or Ticks runs out. On landing it calls ctx.Impact(center, 0.5) and fires its Volley once.",
+  "PatternSummon additions: Tether (bool; minions become followers that die with the boss, spread on a ring of Radius) and Offset. PatternVolley additions: ExpertCount and ExpertInterval.",
+  "PatternBrain.UsesGravityFor(npc) => _p.Ground && !(npc.Stage >= 0 && phase.Fly). Stage selection uses ExpertBelow when ctx.Expert.",
+  "Precompute per-phase move arrays: all moves and non-Expert moves. Counter indexes the list that matches ctx.Expert.",
+  "Multiply every move speed by npc.SpeedScale and, in Expert, by Expert.Speed. In Expert, DamageScale *= Expert.Damage, volleys use Expert interval and count, and summon Max += Expert.SummonMax. Tethered summons call NpcSystem.Tether after ctx.Spawn.",
+  "Leash: after Move, if phase.Leash is set, take the centroid of the living followers whose Def.Id == Kind. Beyond Radius, spring the velocity back and clamp the position.",
+  "Aura: every Interval ticks call ctx.Pulse(center, Radius, Buff, Ticks). Skip it when ExpertOnly && !ctx.Expert.",
+  "Illusions: npc.Illusions = phase.Illusions and npc.MirrorAround = target.Center every tick. A pure helper in new src/Strata.Core/AI/Illusions.cs, Position(npc, i), mirrors npc.Center about MirrorAround and turns it (i+1) quarter turns about +Y. Quarter turns are sign swaps, so no trig is needed.",
+  "Phase.Defense sets npc.DefenseOverride in Enter; the override is cleared when the phase has none.",
+  "ValidatePattern: the aura buff exists, the leash kind is a known enemy, 'slam' appears only in Ground or Fly phases, ExpertBelow is in (0,1], and tether needs Once or Max > 0."
+ ],
+ "files_modify": [
+  "src/Strata.Core/AI/PatternBrain.cs \u2014 split, Expert lists, gravity per phase, leash, aura, illusions",
+  "src/Strata.Core/Content/Specs/PatternSpecs.cs \u2014 new phase/move/summon/volley fields, 'slam' kind",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 ValidatePattern additions"
+ ],
+ "files_add": [
+  "src/Strata.Core/AI/PatternBrain.Moves.cs \u2014 Move switch, Steer, slam",
+  "src/Strata.Core/AI/Illusions.cs \u2014 pure illusion placement",
+  "src/Strata.Core/Content/Specs/PatternExtras.cs \u2014 PatternExpert, PatternAura, PatternLeash",
+  "tests/Strata.Core.Tests/Gameplay/PatternBrainTests.cs \u2014 pattern feature tests"
+ ],
+ "data_changes": [
+  "None (the feature is exercised by later WPs). Existing pattern bosses keep identical Classic behaviour."
+ ],
+ "tests": [
+  "PatternBrainTests.ExpertOnlyMovesAreSkippedInClassic. The EnemyDef is built in code with a brain TypedSpec parsed from a JSON literal.",
+  "PatternBrainTests.ExpertOverridesSpeedUpAndThickenVolleys: counts projectiles per volley in a Classic and an Expert TestGame.",
+  "PatternBrainTests.FlyPhaseSuspendsGravity: a ground boss in a Fly phase holds its height above the arena for 120 ticks.",
+  "PatternBrainTests.SlamLandsOnTheTargetAndRaisesAnImpact: subscribes NpcSystem.Impacted; the landing is within 2 m of the target.",
+  "PatternBrainTests.LeashHoldsTheBossNearItsAnchors.",
+  "PatternBrainTests.AuraPulsesItsBuffOnlyInRange.",
+  "PatternBrainTests.IllusionsMirrorAroundTheTarget: three positions equidistant from the target, 90\u00b0 apart.",
+  "Regression: existing BossTests, LunarTests, TempleTests, InvasionTests stay green. bosses.cmds and hardmode.cmds print SMOKE PASS."
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate; check_file_length.py",
+  "Headless smoke bosses.cmds, hardmode.cmds, events.cmds"
+ ],
+ "depends_on": [
+  "P4-01"
+ ],
+ "risks": [
+  "Move-list indexing must keep the RNG call order and loops identical for bosses without ExpertOnly moves, otherwise existing fights drift.",
+  "Leash spring forces can fight dash moves. Only clamp when the boss is beyond the radius."
+ ],
+ "effort": "M"
+}

@@ -120,4 +120,27 @@ public class BuilderTests
         Assert.Null(ride.Next);
         Assert.Equal(0f, ride.Speed);
     }
+
+    private static float SpeedAfterAThirdOfASecond(bool upgraded)
+    {
+        using var g = Arena();
+        for (int z = 0; z < 6; z++) Place(g, "minecart_track", g.Floor + new Int3(0, 1, -z));
+        g.Player.State.MinecartUpgrade = upgraded;
+        g.Player.Position = TestGame.CellFeet(g.Floor + Int3.Up);
+        g.Player.Aim = -Vector3.UnitZ;
+        g.Hold("minecart");
+        Assert.Equal(UseOutcome.Mounted, g.World.ItemUse.Use(g.Player, g.Target(), freshPress: true));
+        var ride = g.Player.Minecart!;
+        Assert.Equal(upgraded ? ItemUseSystem.MechanicalCartSpeed : 1f, ride.SpeedScale);
+        for (int i = 0; i < 20; i++) Minecarts.Step(g.World.Session.World, ride, 1f, 1f / 60f);
+        return ride.Speed; // still accelerating: the top speed scales the same way (Minecarts.Step)
+    }
+
+    [Fact]
+    public void MinecartUpgradeKitSpeedsTheCart()
+    {
+        float plain = SpeedAfterAThirdOfASecond(false), mechanical = SpeedAfterAThirdOfASecond(true);
+        Assert.True(plain > 1f);
+        Assert.Equal(plain * ItemUseSystem.MechanicalCartSpeed, mechanical, 1);
+    }
 }

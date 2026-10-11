@@ -43,7 +43,7 @@ def crop(g, head_obj):
             x = g.head.local(loop.vert.co)
             d = np.asarray(x) - g.crown
             loop[uv].uv = (float(np.linalg.norm(d)) * 10.0, math.atan2(d[0], -d[1]) * 0.3)
-            skin = loop[col]
+            skin = loop[col] if g.skin_edge else (*g.color, 1.0)     # (a hair model of its own: no skin to thin into)
             a, s = float(dens[loop.vert.index]), float(shade[loop.vert.index])
             loop[col] = (*(c * s * 0.85 * a + sk * (1 - a) for c, sk in zip(g.color, skin[:3])), 1.0)
     return mesh_from(bm, "hair_cap")

@@ -1,0 +1,39 @@
+{
+ "id": "P5-18",
+ "title": "Shops IV: hardmode NPCs (Wizard, Steampunker, Cyborg, Truffle, Pirate, Santa, Princess)",
+ "player_outcome": "Hardmode NPCs sell Terraria-style gear: the Wizard's Crystal Ball and hats, the Steampunker's wings and cogs, the Cyborg's rockets and Nanites, Truffle's mushroom gear, Pirate outfits, Santa's Christmas decorations (in season) and the Princess's royal outfits and dessert.",
+ "design": [
+  "Wizard: crystal_ball (tile object with Aura buff 'clairvoyance' magic +), greater_mana_potion, spell_tome, magic_hat (armor head with +mana/magic crit). Steampunker: steampunk_wings, cog (material), and the solutions/Clentaminator only if a conversion spray exists (deferred otherwise). Cyborg: rocket_i plus new rocket_ii/rocket_iii (ammo with explosion radius), nanites (potion with a buff). Truffle: autohammer, mushroom_spear, hammush, mushroom_cap (vanity).",
+  "Pirate: pirate_hat/shirt/pants (vanity). The cannon waits for an activatable launcher tile (deferred). Santa (season christmas): christmas_tree (decor tile object with light), star_topper, santa_hat/shirt/pants (vanity), snow_globe (existing). Princess: princess_hat, princess_dress (vanity), resplendent_dessert (food: well fed plus 'sugar rush' speed buff).",
+  "New buffs clairvoyance, sugar_rush, nanites. Assets and reference as before."
+ ],
+ "files_modify": [
+  "data/town/hardmode.json \u2014 shops",
+  "tools/blender/assets.json",
+  "tools/content/reference/items_town.py"
+ ],
+ "files_add": [
+  "data/items/town_shop_hardmode.json \u2014 about 20 items",
+  "data/tileobjects/town_decor3.json \u2014 crystal_ball, christmas_tree",
+  "generated assets"
+ ],
+ "data_changes": [
+  "about 20 new items/objects, 3 buffs"
+ ],
+ "tests": [
+  "ShopDataTests.SantaStockOnlyInChristmas (season forced)",
+  "ShopDataTests.EveryResidentExceptServiceOnlyHasAShop: every NPC except guide/nurse/old_man/tax_collector/pets has \u22651 shop entry",
+  "TileObjectTests.CrystalBallAura"
+ ],
+ "verification": [
+  "validate/manifest/reference/build_all checks, dotnet test",
+  "In game (flag hardmode + summons): each hardmode NPC's shop populated"
+ ],
+ "depends_on": [
+  "P5-15"
+ ],
+ "risks": [
+  "The deferred items (cannon, Clentaminator, sentry staffs) are listed in the PR so the player knows they are pending."
+ ],
+ "effort": "L"
+}

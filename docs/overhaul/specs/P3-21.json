@@ -1,0 +1,52 @@
+{
+ "id": "P3-21",
+ "title": "Object hits: events, per-object sounds, chips and leaves, crack progress on objects",
+ "player_outcome": "Chopping a tree thunks and sheds wood chips and leaves on every hit. Pots shatter with their own sound, glass tinkles, stone furniture cracks. The cursor shows cracks on objects as they take damage. Every tool swing whooshes once per swing.",
+ "design": [
+  "Verified: HitObject returns Damaged silently (WorldEditor.Objects.cs:64-65). ObjectBroken always plays break_wood (SoundEvents.cs:129). The object cursor draws a neutral box (TargetHighlight.cs:64-65).",
+  "WorldEditor.Objects: event ObjectHit(TileObjectInstance, ObjectHitResult), raised for Damaged, Broken and TooWeak.",
+  "TileObjectDef: Sound (default 'wood'), DustColor (hex, optional), Leaves (hex, optional; trees), Topple (bool; used by P3-22). Validate colours.",
+  "New game/Audio/SoundEvents.World.cs, ObjectHit: Damaged \u2192 dig_{Sound} (fallback dig_wood); Broken \u2192 break_{Sound} (pots use 'pot_shatter'); TooWeak \u2192 'tink'. This replaces the hard-coded break_wood.",
+  "Tool whoosh: play 'swing' at \u22126 dB when the local UseSerial changes and the item is a tool (fixes P3-01's per-hit Used).",
+  "BlockEffects (EffectKit): object chips from the object's bounds centre in DustColor (5 on hit, 20 on break). Trees also emit Leaves (8 on hit, 30 on break).",
+  "TargetHighlight: for objects in reach, draw faces with progress 1 \u2212 HitPoints/Def.HitPoints (the existing crack uniform)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Interaction/WorldEditor.Objects.cs \u2014 ObjectHit event",
+  "src/Strata.Core/Content/Defs/TileObjectDef.cs \u2014 Sound, DustColor, Leaves, Topple",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs (or .cs) \u2014 tile object colour validation",
+  "game/Audio/SoundEvents.cs \u2014 remove break_wood lambda; tool whoosh",
+  "game/Entities/BlockEffects.cs \u2014 object chips and leaves",
+  "game/Player/TargetHighlight.cs \u2014 object crack progress",
+  "data/tileobjects/nature.json, furniture.json, stations.json \u2014 sound/dust/leaves",
+  "data/enemies/evil.json \u2014 orb/heart object sounds",
+  "data/items/alchemy.json \u2014 herb plant sounds"
+ ],
+ "files_add": [
+  "game/Audio/SoundEvents.World.cs \u2014 object hit/break sounds"
+ ],
+ "data_changes": [
+  "Trees (oak/pine/palm/mahogany/ebonwood): sound wood, dustColor bark hex, leaves hex, topple true",
+  "Pots: sound pot, dustColor #b0603a; glass items: sound glass",
+  "Stone furniture/stations: sound stone; plants/decor: sound grass",
+  "Shadow Orb/Crimson Heart: sound 'orb' (fallback break_glass)"
+ ],
+ "tests": [
+  "ItemUseTests.AxeChopsTreesIntoWood (extended): ObjectHit Damaged raised HitPoints\u22121 times, then Broken",
+  "WorldInteractionTests: a hammer on an altar before hardmode raises ObjectHit TooWeak",
+  "Smoke basic.cmds: 'place oak_tree 3 0 0' / 'wield copper_axe' / 'aim 0.9 0.2 0' / 'hold use_primary 4' / 'wait 1' / 'assert inv.wood > 0'"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate",
+  "Lavapipe: chopping shows chips and leaves; the pot shatters with loot"
+ ],
+ "depends_on": [
+  "P3-01",
+  "P3-08"
+ ],
+ "risks": [
+  "'place' of natural objects must be allowed by the command (check EditCommands); otherwise use a world tree via 'tp surface'.",
+  "New sound ids fall back to existing ones until P3-27 lands."
+ ],
+ "effort": "M"
+}

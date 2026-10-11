@@ -1,0 +1,33 @@
+{
+ "id": "P2-22",
+ "title": "Merged pickup popups above the player",
+ "player_outcome": "Picked-up items float up from your head as 'Wood (37)' in rarity colour. Mining a vein bumps one growing popup with a little pop instead of flooding the screen. Coins merge into one line in coin colours ('1 gold 23 silver').",
+ "design": [
+  "New game/UI/Hud/PickupPopups.cs with 8 pooled Labels (18 px, outlined).\n- Anchor: in third person, `Camera3D.UnprojectPosition(player head + 0.9 m)`. In first person, or when the point is behind the camera, a fixed screen point (W/2, H\u00b70.38).\n- Active popups stack upward 22 px apart.",
+  "Merging: key = 'coins' for coin items, otherwise (item id, prefix id).\n- A repeat within 2 s adds to the count, resets the timer, and pops the scale 1.25 \u2192 1 over 0.12 s.\n- Text: '{prefix} {name} ({n})', or Coins.Format(total) coloured by Coins.TopTier.\n- Each popup rises 40 px over 1.5 s and fades over the last 0.5 s.",
+  "The GameWorld.ItemPickedUp handler moves from Hud toasts (Hud.cs:161-164) to PickupPopups.",
+  "UiProbes gains `ui.popups`."
+ ],
+ "files_modify": [
+  "game/UI/Hud.cs \u2014 create PickupPopups; drop the pickup toast",
+  "game/Debug/UiProbes.cs \u2014 ui.popups"
+ ],
+ "files_add": [
+  "game/UI/Hud/PickupPopups.cs"
+ ],
+ "data_changes": [],
+ "tests": [
+  "ui.cmds:\n- `drop dirt_block 5 0 0 1` / `wait 1.0` / `assert ui.popups == 1`.\n- `drop dirt_block 5 0 0 1` / `wait 1.0` / `assert ui.popups == 1` (merged)."
+ ],
+ "verification": [
+  "Lavapipe exec in third person (`camera third`) mining a vein: a single growing popup"
+ ],
+ "depends_on": [
+  "P2-01",
+  "P2-12"
+ ],
+ "risks": [
+  "UnprojectPosition near the screen edge; clamp to the viewport."
+ ],
+ "effort": "S"
+}

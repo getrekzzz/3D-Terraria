@@ -1,0 +1,27 @@
+{
+ "id": "X-08",
+ "title": "Ambient particles, cave audio, reverb and ambience loops (absorbs P3-49)",
+ "owner_session": "world",
+ "player_outcome": "Caves and biomes feel atmospheric: dust motes drifting in light shafts, glowing spores in mushroom caves, embers in the underworld, dripping water, falling leaves in forests, fireflies at night; caves get reverb and muffled sound by depth; every biome and layer has ambience loops (wind, birds, insects, water, lava rumble) and the music has rain/town/underground/night variants and a boss-defeat stinger; fishing bite sound.",
+ "design": [
+  "Engine: pooled GPU particle emitters near the camera chosen by biome/layer/time (budget per preset), audio reverb/low-pass bus by depth/enclosure (sky-map exposure), ambience loop director on the Ambient bus (AmbientVolume slider already exists), music variants in MusicDirector + tools/audio composer; data/config/ambience.json.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "game/Ambience/*",
+  "game/Audio/*",
+  "tools/audio/*",
+  "data/config/*"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "AmbienceRulesTests (selection by biome/layer/time)"
+ ],
+ "verification": [
+  "probe ambience.loop / audio.reverb in a cave via smoke"
+ ],
+ "depends_on": [],
+ "risks": [],
+ "effort": "M"
+}

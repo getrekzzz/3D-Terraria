@@ -1,0 +1,59 @@
+{
+ "id": "P1-08",
+ "title": "Core grappling hook: click-to-use, exact voxel anchors, platforms and tree canopies",
+ "player_outcome": "Clicking with a hook in the hotbar throws it, as in Terraria, and F still works. Hooks latch onto natural cave ceilings, slopes, platforms and trees and stay attached while reeling in. They let go only when the block is broken, you jump, or you press again.",
+ "design": [
+  "New src/Strata.Core/Gameplay/Player/GrappleHook.cs (about 170 lines). Move HookState { None, Flying, Attached, Retracting } here; the values stay 0-3 for the existing smoke asserts.",
+  "GrappleHook fields: State, Head, Target (hit point, metres), AnchorCell, AnchorNormal, Params (GrappleParams), Item.",
+  "static bool Latchable(VoxelWorld w, Int3 c): IsSolid; or a block cell whose ShapeCode shape is Platform (or another walkable-top shape); or a tile object at c with Def.Collision != None, which includes whole tree boxes (canopies). Liquids, cobweb-like non-solid blocks and decor never latch.",
+  "Fire(VoxelWorld w, GrappleParams gp, ItemDef item, Vector3 hand, Vector3 eye, Vector3 dir): Targeting.CastWhere(w, eye, dir, gp.Reach * CellSize, Latchable). On a hit, store AnchorCell/Normal and Target = hit point; on a miss, Target = hand + dir*reach. State = Flying and Head = hand.",
+  "Tick(VoxelWorld w, float dt, Vector3 hand): Flying moves Head toward Target at Speed, then becomes Attached (hit and still Latchable) or Retracting. Retracting returns at 1.5x Speed to None. Attached re-checks Latchable(AnchorCell) every tick against the exact DDA cell (no 5 cm nudge), so smoothed-mesh offsets can no longer drop the hook.",
+  "Vector3 PullVelocity(Vector3 bodyCenter): (Target - body)/dist * Pull when dist > 1.1 m, otherwise zero (hang). Release() switches to Retracting.",
+  "static GrappleParams? Best(PlayerState s, ItemUseTable uses, out ItemDef? item): moved from PlayerController.BestHook (accessories, then backpack, longest reach).",
+  "PlayerEntity: add GrappleHook Hook { get; } = new() and Vector3 Hand = Position + (0, 1.25, 0) + Right(Facing)*0.28 + Facing*0.1.",
+  "GameWorld.TickPlayer: p.Hook.Tick(Session.World, 1/60f, p.Hand); Release on death.",
+  "ItemUseSystem.Utility.cs: UseOutcome Grapple(PlayerEntity p, ItemUseInfo info) => p.Hook.Fire(world, info.Grapple!, info.Item, p.Hand, p.Eye, p.Aim) and returns the new UseOutcome.Grappled, appended at the end of the enum.",
+  "ItemUseSystem.Use: add a branch 'else if (info.Has(ItemAction.Grapple)) outcome = Grapple(p, info);' before the Shoot branch (hooks are not autoReuse, so fresh press only).",
+  "StandardProbes: player.hook = (int)p.Hook.State, moved from GodotCommandHost.",
+  "data/items/mobility.json: grappling_hook description becomes 'Get over here!'; the keybind text moves to the tooltip or input-hint work in the UI phase."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Session/PlayerEntity.cs \u2014 Hook, Hand",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 tick/release hook in TickPlayer",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 UseOutcome.Grappled, Grapple branch",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Utility.cs \u2014 Grapple()",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 player.hook",
+  "game/Debug/GodotCommandHost.cs \u2014 drop the old player.hook probe",
+  "data/items/mobility.json \u2014 description text"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Player/GrappleHook.cs \u2014 hook state machine, latch rules, best hook",
+  "tests/Strata.Core.Tests/Gameplay/GrappleTests.cs \u2014 hook behaviour"
+ ],
+ "data_changes": [
+  "data/items/mobility.json: grappling_hook description 'Get over here!'"
+ ],
+ "tests": [
+  "GrappleTests.LatchesOntoNaturalCeilingAndHolds: natural stone slab (CellFlags.None) 8 m up; Fire straight up; within 60 ticks State == Attached; PullVelocity(center).Y > 0; after 120 more ticks with the body stationary it is still Attached",
+  "GrappleTests.ReleasesWhenTheBlockBreaks: Editor.SetBlock(AnchorCell, air) gives Retracting on the next tick",
+  "GrappleTests.PlatformsHold: a wood cell with Platform shape overhead -> Attached",
+  "GrappleTests.TreeCanopyHolds: place oak_tree 3 m away and aim at canopy height off the trunk column -> Attached",
+  "GrappleTests.MissRetracts: an empty sky gives Flying, then Retracting, then None within reach/speed*2 s",
+  "GrappleTests.ClickToUse: g.Hold(\"grappling_hook\"); ItemUse.Use(p, null, true) == Grappled and Hook.State == Flying",
+  "GrappleTests.BestHookPrefersReach: dual_hook beats grappling_hook"
+ ],
+ "verification": [
+  "dotnet test",
+  "Strata.Tools validate",
+  "movement.cmds keeps passing before P1-09 lands (probe numbering unchanged)"
+ ],
+ "depends_on": [
+  "P1-05"
+ ],
+ "risks": [
+  "Both this package and P1-10/P1-15/P1-16 edit ItemUseSystem.Use. This one adds only a three-line branch; rebase after whichever lands first.",
+  "The Core hand position is an approximation of the engine's; P1-09 draws from the engine hand, so small visual differences only.",
+  "Latching the whole tree box means hooks can grab 'air' inside a sparse canopy. That is acceptable (Terraria lets hooks grab trees) but tune if it feels sticky."
+ ],
+ "effort": "M"
+}

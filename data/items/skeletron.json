@@ -1,0 +1,11 @@
+{
+  "projectiles": [
+    { "id": "bone_glove_bone", "name": "Crossbone", "visual": "item", "model": "bone", "gravity": 10, "lifetime": 150, "radius": 0.35, "pierce": 1 }
+  ],
+  "items": [
+    { "id": "skeletron_mask", "name": "Skeletron Mask", "category": "armor", "rarity": 1, "value": 7500, "equipSlot": "head", "defense": 0, "tags": ["vanity"], "covers": ["terraria:skeletron_mask"] },
+    { "id": "skeletron_hand", "name": "Skeletron Hand", "description": "Grapples with the grip of the dead.", "category": "hook", "equipSlot": "hook", "rarity": 2, "value": 20000, "behaviors": [{ "type": "grapple", "reach": 24, "speed": 25, "pull": 13, "color": "#e8e0c8" }], "covers": ["terraria:skeletron_hand"] },
+    { "id": "bone_glove", "name": "Bone Glove", "description": "Throws a crossbone with your attacks.", "category": "accessory", "rarity": -12, "value": 20000, "equipSlot": "accessory", "tags": ["expert"], "equipEffects": [{ "type": "attackProjectile", "projectile": "bone_glove_bone", "damage": 25, "knockback": 3, "cooldown": 60, "speed": 15 }], "covers": ["terraria:bone_glove"] },
+    { "id": "clothier_voodoo_doll", "name": "Clothier Voodoo Doll", "description": "You are a terrible person.", "category": "bossSummon", "rarity": 1, "maxStack": 9999, "value": 13000, "useStyle": "holdUp", "useTime": 45, "useAnimation": 45, "consumable": true, "behaviors": [{ "type": "summonBoss", "enemy": "skeletron", "conditions": [{ "type": "time", "is": "night" }], "failMessage": "The doll does nothing while the sun is up.", "curse": "clothier", "height": 7, "curseFailMessage": "The doll is only cloth without the Clothier." }], "covers": ["terraria:clothier_voodoo_doll"] }
+  ]
+}

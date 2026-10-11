@@ -1,0 +1,90 @@
+{
+ "comment": "P5-17: the Golfer's clubs, balls, cup, tee and outfit, the Zoologist's Fairy Glowstick and Critter Shampoo (bgen/town_shop.py).",
+ "objects": {
+  "golf_cup": {
+   "generator": "golf_cup",
+   "params": {}
+  },
+  "golf_tee": {
+   "generator": "golf_tee",
+   "params": {}
+  }
+ },
+ "items": {
+  "explicit": {
+   "golf_club_iron": {
+    "generator": "golf_club",
+    "params": {
+     "head": "iron"
+    }
+   },
+   "golf_club_driver": {
+    "generator": "golf_club",
+    "params": {
+     "head": "driver"
+    }
+   },
+   "golf_club_wedge": {
+    "generator": "golf_club",
+    "params": {
+     "head": "wedge"
+    }
+   },
+   "golf_club_putter": {
+    "generator": "golf_club",
+    "params": {
+     "head": "putter"
+    }
+   },
+   "golf_ball": {
+    "generator": "golf_ball",
+    "params": {}
+   },
+   "fairy_glowstick": {
+    "generator": "bullet",
+    "params": {
+     "color": "#ff90f0",
+     "glow": true
+    }
+   },
+   "critter_shampoo": {
+    "generator": "potion",
+    "params": {
+     "color": "#ffd0f0"
+    }
+   },
+   "golf_visor": {
+    "generator": "helmet",
+    "params": {
+     "metal": "#f0f0f0",
+     "metalLayer": "cloth"
+    }
+   },
+   "golf_shirt": {
+    "generator": "chest_armor",
+    "params": {
+     "metal": "#e8f0ff",
+     "metalLayer": "cloth"
+    }
+   },
+   "golf_pants": {
+    "generator": "greaves",
+    "params": {
+     "metal": "#e8e0c8",
+     "metalLayer": "cloth"
+    }
+   }
+  }
+ },
+ "armor": {
+  "golf_outfit": {
+   "preset": "hood",
+   "layer": "cloth",
+   "metal": "#e8f0ff",
+   "trim": "#3a8a3a",
+   "styles": {
+    "head": "dome"
+   }
+  }
+ }
+}

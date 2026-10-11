@@ -1,0 +1,10 @@
+{
+  // Bestiary unlocks (P5-25), per character. Kills unlock an entry's stats, then its drops; sighting a creature within
+  // seenRadius (m) gives half an entry. Kills credit every player within creditRadius (m); bosses credit everyone.
+  "killsForStats": 1,
+  "killsForDrops": 25,
+  "bossKillsForDrops": 1,
+  "rareKillsForDrops": 1,
+  "seenRadius": 20,
+  "creditRadius": 60
+}

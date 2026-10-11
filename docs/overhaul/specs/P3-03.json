@@ -1,0 +1,49 @@
+{
+ "id": "P3-03",
+ "title": "New and re-authored human action clips (throw, hold-up, eat, rapier, gun, staff, tome, whip, flail, yoyo, place, sleep) and anim-set rebuild",
+ "player_outcome": "The character's body sells every item: an overhand throw for boomerangs and bombs, holding a crystal overhead, eating, a quick rapier jab, guns and bows held out at the target (the bow releases instantly like Terraria), a staff pointed with its gem forward, a whip crack, a flail spun overhead, a yoyo worked with the wrist, and lying down to sleep.",
+ "design": [
+  "Verified: actions.py (134 lines) has swing, mine, thrust, shoot, bow, cast, drink, use and hold. The bow releases at t 0.6\u20130.66 while arrows spawn at tick 0. HumanoidAnimator.Actions (HumanoidAnimator.cs:25) lists 8 clips.",
+  "Split tools/blender/bgen/human/actions.py into actions.py (swing, mine, rapier, spear, place, whip, flail, hold, sleep) and a new actions_items.py (gun, bow, staff, tome, throw, hold_up, drink, eat, yoyo). clips() merges both; keep each under 300 lines.",
+  "swing(): read data/config/use_styles.json swing.bladeCurve so the blade angle (arm pitch + wrist) follows the gameplay curve used by P3-04. It is the single source of truth.",
+  "Re-key bow(): string released at t 0.06 and redrawn over 0.3\u20130.9, matching the instant arrow. gun(): two-handed hold-out along the aim with a 0\u20130.12 kick; one clip serves pistols and rifles.",
+  "New clips: rapier (0.25 s jab, peak extension 0.15\u20130.35); spear (the old thrust re-keyed, peak extension 0.3\u20130.6); throw (overhand, release at 0.1 so the instant projectile matches); hold_up (raised overhead by 0.25, held to 0.8); eat (two bites); staff (arm out, 30\u00b0 tilt, small lift at 0.1); tome (book in the left hand, right palm push at 0.1); whip (wind back 0\u20130.35, crack at 0.55); place (0.25 s forward tap); flail (looping overhead circle); yoyo (looping wrist flick); sleep (whole-body lying on the back, a locomotion state).",
+  "Rebuild all 29 animation sets: python3.13 tools/blender/build_all.py --anims --shard=I/4, four in parallel. Check that assets/models/creatures/anim/index.json is unchanged and commit the GLBs (plus the .import files from godot --headless --import).",
+  "game/Rendering/HumanoidAnimator.cs: Actions gains rapier, spear, gun, staff, tome, throw, hold_up, eat, whip, place; States gains sleep. Generalise Hold(bool) to Hold(string? clip): an AnimationNodeTransition under the existing 'hold' Blend2 picks hold/flail/yoyo. Looping includes flail, yoyo and sleep.",
+  "Update docs/architecture/content-and-assets.md (action list) and the use_styles.json clip names."
+ ],
+ "files_modify": [
+  "tools/blender/bgen/human/actions.py \u2014 melee/tool clips; swing reads bladeCurve",
+  "tools/blender/bgen/human/motion.py \u2014 register the sleep clip; pass the repo path for the config read",
+  "game/Rendering/HumanoidAnimator.cs \u2014 new action/state names; Hold(string?) looping layer",
+  "game/Player/PlayerAvatar.Motion.cs \u2014 Hold(clip) call sites",
+  "data/config/use_styles.json \u2014 clip names",
+  "assets/models/creatures/anim/*.glb \u2014 rebuilt sets",
+  "docs/architecture/content-and-assets.md \u2014 clip list"
+ ],
+ "files_add": [
+  "tools/blender/bgen/human/actions_items.py \u2014 ranged, consumable and tether clips"
+ ],
+ "data_changes": [
+  "use_styles.json: clip per style (rapier\u2192rapier, spear\u2192spear, gun\u2192gun, bow\u2192bow, staff\u2192staff, tome\u2192tome, throw\u2192throw, holdUp\u2192hold_up, drink\u2192drink, eat\u2192eat, whip\u2192whip, flail\u2192flail, yoyo\u2192yoyo, place\u2192place, swing\u2192swing, tools\u2192mine via Swing+IsTool)"
+ ],
+ "tests": [
+  "python3 tools/blender/build_all.py --check",
+  "Extend game/Testing/Tours/animation.cmds with a timescale-0.01 screenshot per new style: shuriken (throw), cooked_fish (eat), wooden_crate (hold_up), flintlock_pistol + musket_ball (gun), wooden_bow + wooden_arrow (bow), amethyst_staff (staff), water_bolt (tome), leather_whip (whip), copper_shortsword (rapier)",
+  "Smoke: all .cmds PASS (no missing-clip warnings; assert warnings == 0 in basic.cmds if stable)"
+ ],
+ "verification": [
+  "tools/blender/preview.py contact sheets of each new clip on m_* and f_* sets",
+  "Lavapipe animation tour screenshots reviewed side by side with Terraria use-style references",
+  "Godot import succeeds; HumanAnimations loads every set without warnings"
+ ],
+ "depends_on": [
+  "P3-02"
+ ],
+ "risks": [
+  "Anim-set size grows (22 MB \u2192 ~35 MB).",
+  "Blade/grip alignment depends on P3-06 grip sockets; tune both together.",
+  "The whole rebuild takes minutes per set; use shards."
+ ],
+ "effort": "M"
+}

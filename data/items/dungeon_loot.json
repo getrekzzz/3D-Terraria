@@ -1,0 +1,27 @@
+{
+  // The Dungeon's locked-chest treasures and keys (Terraria 1.4 stats; shot speeds in m/s): the Aqua Scepter's water
+  // stream, the Magic Missile that follows the crosshair, the Valor yoyo, Golden and Shadow Keys, the Bone Welder and
+  // the Clothier's Red Hat (worn when he dies, he drops his Voodoo Doll).
+  "projectiles": [
+    { "id": "aqua_stream", "name": "Aqua Scepter", "visual": "orb", "color": "#3a8aff", "gravity": 6, "lifetime": 60, "radius": 0.4, "pierce": 3, "light": [2, 6, 12], "trail": "#8ac8ff" },
+    { "id": "magic_missile", "name": "Magic Missile", "visual": "bolt", "color": "#6a8aff", "lifetime": 600, "radius": 0.45, "guided": 8, "light": [4, 6, 14], "trail": "#b0c8ff", "covers": ["terraria:magic_missile"] },
+    { "id": "valor", "name": "Valor", "visual": "item", "model": "valor", "lifetime": 150, "radius": 0.5, "returns": 50, "pierce": -1, "light": [2, 4, 10] }
+  ],
+  "items": [
+    { "id": "aqua_scepter", "name": "Aqua Scepter", "description": "Sprays out a shower of water.", "category": "weapon", "rarity": 2, "value": 20000, "useStyle": "staff",
+      "useTime": 16, "useAnimation": 16, "autoReuse": true, "damage": 15, "damageType": "magic", "knockback": 5, "manaCost": 7, "projectile": "aqua_stream", "shootSpeed": 20,
+      "covers": ["terraria:aqua_scepter"] },
+    { "id": "magic_missile", "name": "Magic Missile", "description": "Casts a controllable missile.", "category": "weapon", "rarity": 2, "value": 10000, "useStyle": "staff",
+      "useTime": 20, "useAnimation": 20, "damage": 22, "damageType": "magic", "knockback": 3, "manaCost": 10, "projectile": "magic_missile", "shootSpeed": 12,
+      "behaviors": [{ "type": "shootProjectile", "maxActive": 1 }], "covers": ["terraria:magic_missile"] },
+    { "id": "valor", "name": "Valor", "category": "weapon", "rarity": 2, "value": 50000, "useStyle": "yoyo", "useTime": 25, "useAnimation": 25, "damage": 22, "damageType": "melee",
+      "knockback": 3.5, "projectile": "valor", "shootSpeed": 14, "covers": ["terraria:valor"] },
+    { "id": "golden_key", "name": "Golden Key", "description": "Opens one locked Gold Chest or Lock Box.", "category": "key", "rarity": 0, "maxStack": 9999, "covers": ["terraria:golden_key"] },
+    { "id": "shadow_key", "name": "Shadow Key", "description": "Opens all Shadow Chests and Obsidian Lock Boxes.", "category": "key", "rarity": 3, "covers": ["terraria:shadow_key"] },
+    { "id": "red_hat", "name": "Red Hat", "description": "It smells funny...", "category": "vanity", "equipSlot": "head", "rarity": 0, "value": 1000, "covers": ["terraria:red_hat"] }
+  ],
+  "recipes": [
+    { "id": "bone_block", "output": "bone_block", "inputs": [{ "item": "bone", "count": 1 }], "stations": ["bone_welder"] },
+    { "id": "red_hat", "output": "red_hat", "inputs": [{ "item": "silk", "count": 3 }], "stations": ["loom"] }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+ "id": "P4-08",
+ "title": "Brain of Cthulhu: Terraria life split, illusions, confusion that reverses controls",
+ "player_outcome": "The Brain hides behind 20 Creepers. Once they fall it teleports around you with three ghostly illusions mirrored around you. Its touch, and in Expert its periodic pulse, leaves you Confused, which reverses your movement keys.",
+ "design": [
+  "New EffectSpec 'invertControls' (EffectSpecs.cs) and EffectState.InvertControls.",
+  "The 'confused' buff (data/enemies/lunar.json) gets effects [{type: invertControls}] and loses the moveSpeed penalty.",
+  "game/Player/PlayerController.cs: negate the local move input (forward and strafe) while State.Effects.InvertControls. The camera is unaffected.",
+  "Brain data (data/enemies/evil.json): life 1000, defense 14 (Terraria Classic); creeper life 100 with 20 summoned once.",
+  "Phase 2 ('exposed') gets illusions 3, moves [teleport distance 9 telegraph 25, chase 6 m/s 120 ticks, dash \u00d72], expert {speed 1.25}, aura {buff confused, ticks 120, interval 360, radius 22, expertOnly true}.",
+  "Brain onContact: applyBuff confused 90 ticks, chance 0.33.",
+  "New game/Entities/NpcRenderer.Illusions.cs (partial). For npcs with Illusions > 0, acquire pooled CreatureVisual copies of the current model and place them at Illusions.Position(npc, i).",
+  "Illusion copies share the boss's yaw mirrored and a dimmer tint (0.55 alpha if CreatureVisual supports it, otherwise darkened). They have no collision or damage, as in Terraria, and are released when Illusions drops to 0."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Specs/EffectSpecs.cs \u2014 invertControls",
+  "src/Strata.Core/Gameplay/Stats/EffectState.cs \u2014 InvertControls",
+  "game/Player/PlayerController.cs \u2014 reversed input when confused",
+  "game/Entities/NpcRenderer.cs \u2014 call UpdateIllusions, release on removal",
+  "data/enemies/evil.json \u2014 brain and creeper values, phase 2",
+  "data/enemies/lunar.json \u2014 confused buff effect"
+ ],
+ "files_add": [
+  "game/Entities/NpcRenderer.Illusions.cs \u2014 pooled illusion visuals",
+  "tests/Strata.Core.Tests/Gameplay/BrainOfCthulhuTests.cs \u2014 phase and illusion tests"
+ ],
+ "data_changes": [
+  "brain_of_cthulhu life 1000 with 20 creepers of 100 life; phase 2 illusions and Expert aura; onContact confused."
+ ],
+ "tests": [
+  "BrainOfCthulhuTests.ShieldedUntilCreepersFallThenCastsThreeIllusions.",
+  "BrainOfCthulhuTests.ConfusionReversesControls: buff applied \u2192 EffectState.InvertControls.",
+  "BrainOfCthulhuTests.ExpertBrainPulsesConfusionInRange.",
+  "Smoke bosses.cmds, after 'boss brain_of_cthulhu 10': 'slay creeper', 'wait 1', 'assert boss.brain_of_cthulhu.illusions == 3'."
+ ],
+ "verification": [
+  "dotnet test; smoke bosses.cmds",
+  "Manual: fight the Brain; confirm the illusions render in the headless-safe pool (no errors) and that the controls reverse while Confused, with the buff icon/text shown."
+ ],
+ "depends_on": [
+  "P4-02"
+ ],
+ "risks": [
+  "Reversed controls in 3D can be disorienting. Terraria only reverses left/right, so consider reversing strafe only if playtesters dislike it (make it a data flag on the effect).",
+  "The feel/UI phases may rework PlayerController input. Keep the change a single guarded multiply."
+ ],
+ "effort": "M"
+}

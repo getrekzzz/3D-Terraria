@@ -1,4 +1,5 @@
 using Strata.Core.Content.Defs;
+using Strata.Core.Presentation;
 
 namespace Strata.Core.Gameplay.Buffs;
 
@@ -12,11 +13,17 @@ public sealed class ActiveBuff
 
     public BuffDef Def { get; }
     public int TicksLeft { get; set; }
+
+    /// <summary>Lasts while its source does (a mount being ridden): the buff bar shows no timer for it.</summary>
+    public bool Unlimited => TicksLeft >= BuffSet.Unlimited;
 }
 
 /// <summary>Timed buffs/debuffs on an entity. Re-applying refreshes the duration to the longer value.</summary>
 public sealed class BuffSet
 {
+    /// <summary>Duration for buffs that last as long as their source (removed explicitly, e.g. on dismounting).</summary>
+    public const int Unlimited = int.MaxValue / 4;
+
     private readonly List<ActiveBuff> _buffs = new();
 
     public IReadOnlyList<ActiveBuff> Active => _buffs;
@@ -37,6 +44,20 @@ public sealed class BuffSet
     public void Remove(string id)
     {
         if (_buffs.RemoveAll(b => b.Def.Id == id) > 0) Changed?.Invoke();
+    }
+
+    /// <summary>
+    /// The player right-clicked the buff's icon: removes it and raises <see cref="Changed"/>, unless it is a debuff or a
+    /// buff the player cannot shed (<see cref="BuffDisplay.CanCancel"/>) or is not active. The caller recomputes the
+    /// stats (<c>PlayerState.Recompute</c>) when this returns true.
+    /// </summary>
+    public bool TryCancel(string id)
+    {
+        int index = _buffs.FindIndex(b => b.Def.Id == id);
+        if (index < 0 || !BuffDisplay.CanCancel(_buffs[index].Def)) return false;
+        _buffs.RemoveAt(index);
+        Changed?.Invoke();
+        return true;
     }
 
     /// <summary>Counts down one tick; returns true if any buff expired.</summary>

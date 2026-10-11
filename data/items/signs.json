@@ -1,0 +1,9 @@
+{
+  // Signs (X-03): read with the interact key to see or edit what they say (saved in the chunk's object meta).
+  "tileObjects": [
+    {"id": "sign", "name": "Sign", "description": "Interact to edit what it says.", "size": [2, 2, 1], "interaction": "read", "hitPoints": 2, "itemCategory": "furniture", "itemValue": 50}
+  ],
+  "recipes": [
+    {"id": "sign", "output": "sign", "inputs": [{"item": "wood", "count": 6}], "stations": ["work_bench"]}
+  ]
+}

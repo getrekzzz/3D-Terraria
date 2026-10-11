@@ -1,111 +1,272 @@
 using System;
+using System.Collections.Generic;
 using Godot;
+using Strata.Core.Common;
 using Strata.Core.Gameplay.Items;
-using Strata.Game.Items;
 
 namespace Strata.Game.UI;
 
+/// <summary>The tooltip lines of a stack as a screen shows it (<see cref="UiContext.Tooltip(ItemStack)"/>, or a shop's buy price).</summary>
+public delegate List<(string Text, TooltipKind Kind)> TooltipSource(ItemStack stack);
+
 /// <summary>
-/// One inventory slot: background, item icon, stack count, selection/hover state and a rich tooltip.
-/// Reads its stack through a delegate so it always shows the live inventory.
+/// One item slot, drawn the reference game's way (ItemSlotView.Draw.cs): tinted by <see cref="SlotKind"/>, gold when
+/// it is the selected hotbar slot or favourited, the icon centred with a bold outlined stack count, the rounds left
+/// on bows and guns, a faint silhouette when empty. Reads its stack through a delegate so it always shows the live
+/// inventory; hovering shows the instant <see cref="TooltipFollower"/> and a held right button repeats the click at
+/// <see cref="HoldRepeat"/>'s quickening pace. Hidden slots stop processing.
 /// </summary>
 public sealed partial class ItemSlotView : Control
 {
-    private readonly Func<ItemStack> _read;
-    private readonly Func<ItemStack, System.Collections.Generic.List<(string Text, TooltipKind Kind)>>? _tooltip;
-    private bool _hovered;
-    private ItemStack _shown;
+    private static ulong _countedFrame;
+    private static int _counting;
 
-    public ItemSlotView(Func<ItemStack> read, float size, Func<ItemStack, System.Collections.Generic.List<(string, TooltipKind)>>? tooltip = null)
+    private readonly Func<ItemStack> _read;
+    private readonly TooltipSource? _tooltip;
+    private SlotKind _kind;
+    private bool _selected;
+    private bool _locked;
+    private bool _dimmed;
+    private bool _short;
+    private bool _hovered;
+    private bool _padFocused;
+    private ItemStack _shown;
+    private bool _favoriteShown;
+    private int _ammoShown = -1;
+    private bool _repeating;
+    private int _repeats;
+    private double _repeatWait;
+
+    public ItemSlotView(Func<ItemStack> read, float size, SlotKind kind, TooltipSource? tooltip = null)
     {
         _read = read;
+        _kind = kind;
         _tooltip = tooltip;
         CustomMinimumSize = new Vector2(size, size);
         MouseFilter = MouseFilterEnum.Stop;
-        MouseEntered += () => { _hovered = true; QueueRedraw(); };
-        MouseExited += () => { _hovered = false; QueueRedraw(); };
+        // Icons are drawn at about a third of their size; mipmaps (where imported) keep them from aliasing.
+        TextureFilter = TextureFilterEnum.LinearWithMipmaps;
+        MouseEntered += () =>
+        {
+            _hovered = true;
+            ShowTooltip();
+            QueueRedraw();
+        };
+        MouseExited += () =>
+        {
+            _hovered = false;
+            StopRepeat();
+            TooltipFollower.Current?.Hide(this);
+            QueueRedraw();
+        };
+        VisibilityChanged += OnVisibilityChanged;
     }
 
-    public bool Selected { get; set; }
+    /// <summary>Slot views that processed in the last full frame (the <c>ui.slot_views</c> probe): hidden ones do not.</summary>
+    public static int ActiveViews { get; private set; }
 
-    /// <summary>Short label drawn in the corner (hotbar numbers).</summary>
+    /// <summary>The slot's tint (inventory blue, chest teal, equipment violet…).</summary>
+    public SlotKind Kind
+    {
+        get => _kind;
+        set => Redraw(ref _kind, value);
+    }
+
+    /// <summary>The selected hotbar slot: drawn gold.</summary>
+    public bool Selected
+    {
+        get => _selected;
+        set => Redraw(ref _selected, value);
+    }
+
+    /// <summary>A slot the world has not unlocked (Expert accessory slots): drawn dark, its item still shown.</summary>
+    public bool Locked
+    {
+        get => _locked;
+        set => Redraw(ref _locked, value);
+    }
+
+    /// <summary>The icon drawn greyed, the slot as usual (a recipe the player cannot craft yet).</summary>
+    public bool Dimmed
+    {
+        get => _dimmed;
+        set => Redraw(ref _dimmed, value);
+    }
+
+    /// <summary>A recipe material the player has too few of: its count is drawn red, even a count of one.</summary>
+    public bool Short
+    {
+        get => _short;
+        set => Redraw(ref _short, value);
+    }
+
+    /// <summary>Short label drawn in the top-left corner (hotbar numbers).</summary>
     public string? Badge { get; set; }
 
-    /// <summary>Icon shown dimmed when empty (armor slot silhouettes).</summary>
+    /// <summary>Silhouette shown faintly while the slot is empty (armor, accessory and misc slots, trash).</summary>
     public Texture2D? EmptyHint { get; set; }
 
-    /// <summary>(button, shift) on click.</summary>
-    public event Action<MouseButton, bool>? Clicked;
+    /// <summary>The slot's name, shown as its tooltip while it is empty ('Helmet', 'Social Shirt', 'Dye'); null shows none.</summary>
+    public string? EmptyText { get; set; }
+
+    /// <summary>Why the slot is <see cref="Locked"/> ('Requires Master Mode'), the last line of its tooltip while it is.</summary>
+    public string? LockedText { get; set; }
+
+    /// <summary>Whether the slot is favourited (Alt+click): drawn gold; null for slots that cannot be.</summary>
+    public Func<bool>? Favorite { get; set; }
+
+    /// <summary>Rounds of an ammo class carried (<see cref="PlayerInventory.CountAmmo"/>), shown on bows and guns; null to hide.</summary>
+    public Func<string, int>? AmmoCount { get; set; }
+
+    /// <summary>A held right button repeats the click (inventory and chest slots, not the hotbar).</summary>
+    public bool RepeatRight { get; set; }
+
+    /// <summary>True while <see cref="Clicked"/> runs for a hold-repeat rather than a press.</summary>
+    public bool Repeating { get; private set; }
+
+    /// <summary>(button, modifier keys) on click, and again for each hold-repeat of the right button.</summary>
+    public event Action<MouseButton, ClickMods>? Clicked;
+
+    /// <summary>Clicks do something here (a recipe's material slots only show): the controller cursor stops on it.</summary>
+    public bool Interactive => Clicked != null;
+
+    /// <summary>Whether the mouse is over the slot.</summary>
+    public bool Hovered => _hovered;
+
+    /// <summary>
+    /// The controller's screen cursor is on the slot (<see cref="PadCursor"/>): drawn as hovered, and a held take-one
+    /// button repeats as a held right button does.
+    /// </summary>
+    public bool PadFocused
+    {
+        get => _padFocused;
+        set
+        {
+            if (!value) StopRepeat();
+            Redraw(ref _padFocused, value);
+        }
+    }
+
+    /// <summary>
+    /// Sizes the slot to <paramref name="side"/> pixels square, smaller than it was made too: the minimum size first, as
+    /// a control never shrinks below its minimum (setting the size first would leave a shrinking slot at its old size).
+    /// </summary>
+    public void Resize(float side)
+    {
+        var size = new Vector2(side, side);
+        CustomMinimumSize = size;
+        Size = size;
+    }
+
+    /// <summary>Shows this slot's tooltip beside the pointer (on hover, and from the <c>ui hover</c> command).</summary>
+    public void ShowTooltip()
+    {
+        if (_tooltip != null) TooltipFollower.Current?.Show(this, _read, _tooltip, EmptyText, _locked ? LockedText : null);
+    }
+
+    /// <summary>Ends a hold-repeat (the owner calls it when a repeated click stops moving items).</summary>
+    public void StopRepeat() => _repeating = false;
 
     public override void _Process(double delta)
     {
+        if (!IsVisibleInTree())
+        {
+            SetProcess(false); // until it is shown again
+            return;
+        }
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.slot_views");
+        Count();
         var s = _read();
-        if (!s.Equals(_shown))
+        bool favorite = Favorite != null && !s.IsEmpty && Favorite();
+        int ammo = AmmoCount != null && s.Item?.UseAmmo is { } ammoClass ? AmmoCount(ammoClass) : -1;
+        if (!s.Equals(_shown) || favorite != _favoriteShown || ammo != _ammoShown)
         {
             _shown = s;
-            TooltipText = s.IsEmpty ? "" : s.Item!.DisplayName;
+            _favoriteShown = favorite;
+            _ammoShown = ammo;
             QueueRedraw();
         }
+        if (_repeating) Repeat(delta);
     }
 
     public override void _GuiInput(InputEvent e)
     {
-        if (e is InputEventMouseButton { Pressed: true } mb && (mb.ButtonIndex == MouseButton.Left || mb.ButtonIndex == MouseButton.Right))
-        {
-            Clicked?.Invoke(mb.ButtonIndex, mb.ShiftPressed);
-            AcceptEvent();
-        }
+        if (e is not InputEventMouseButton { Pressed: true } mb || (mb.ButtonIndex != MouseButton.Left && mb.ButtonIndex != MouseButton.Right)) return;
+        var mods = (mb.ShiftPressed ? ClickMods.Shift : 0) | (mb.CtrlPressed || mb.MetaPressed ? ClickMods.Ctrl : 0) | (mb.AltPressed ? ClickMods.Alt : 0);
+        AcceptEvent();
+        Press(mb.ButtonIndex, mods);
     }
 
-    public override void _Draw()
+    /// <summary>
+    /// A click on the slot as a press of <paramref name="button"/> with <paramref name="mods"/> makes it (the mouse, and
+    /// the controller cursor's buttons); a plain right press starts the hold-repeat.
+    /// </summary>
+    public void Press(MouseButton button, ClickMods mods)
     {
-        var rect = new Rect2(Vector2.Zero, Size);
-        DrawStyleBox(UiTheme.Slot(Selected, _hovered), rect);
-        var s = _shown;
-        var inner = rect.Grow(-Size.X * 0.14f);
-        if (!s.IsEmpty)
+        _repeating = RepeatRight && button == MouseButton.Right && mods == ClickMods.None;
+        _repeats = 0;
+        _repeatWait = HoldRepeat.IntervalTicks(0) / (double)Units.TicksPerSecond;
+        Clicked?.Invoke(button, mods);
+    }
+
+    /// <summary>
+    /// Shown: process again. Hidden (the inventory closing under the pointer sends no exit event): drop the hover
+    /// state, the hold-repeat and the tooltip.
+    /// </summary>
+    private void OnVisibilityChanged()
+    {
+        bool visible = IsVisibleInTree();
+        SetProcess(visible);
+        if (visible) return;
+        _hovered = false;
+        StopRepeat();
+        TooltipFollower.Current?.Hide(this);
+    }
+
+    /// <summary>
+    /// Holding the right button (or the controller's take-one button on the cursor's slot) keeps clicking, faster and
+    /// faster, until it is released or the pointer leaves.
+    /// </summary>
+    private void Repeat(double delta)
+    {
+        bool held = _padFocused ? PadCursor.SplitHeld : _hovered && Input.IsMouseButtonPressed(MouseButton.Right);
+        if (!held)
         {
-            DrawTextureRect(ItemIcons.Get(s.Item!), inner, false);
-            if (s.Count > 1)
+            _repeating = false;
+            return;
+        }
+        _repeatWait -= delta;
+        while (_repeatWait <= 0 && _repeating)
+        {
+            _repeatWait += HoldRepeat.IntervalTicks(++_repeats) / (double)Units.TicksPerSecond;
+            Repeating = true;
+            try
             {
-                var font = GetThemeDefaultFont();
-                int fs = Mathf.RoundToInt(Size.X * 0.27f);
-                var text = s.Count.ToString();
-                var pos = new Vector2(Size.X * 0.14f, Size.Y - Size.Y * 0.1f);
-                DrawStringOutline(font, pos, text, HorizontalAlignment.Left, -1, fs, 4, new Color(0, 0, 0, 0.9f));
-                DrawString(font, pos, text, HorizontalAlignment.Left, -1, fs, UiTheme.Text);
+                Clicked?.Invoke(MouseButton.Right, ClickMods.None);
+            }
+            finally
+            {
+                Repeating = false;
             }
         }
-        else if (EmptyHint != null)
-        {
-            DrawTextureRect(EmptyHint, inner, false, new Color(1, 1, 1, 0.2f));
-        }
-        if (Badge != null)
-        {
-            var font = GetThemeDefaultFont();
-            DrawString(font, new Vector2(4, 13), Badge, HorizontalAlignment.Left, -1, 11, UiTheme.Muted);
-        }
     }
 
-    public override Control? _MakeCustomTooltip(string forText)
+    private static void Count()
     {
-        var s = _read();
-        if (s.IsEmpty || _tooltip == null) return null;
-        var box = new VBoxContainer();
-        foreach (var (text, kind) in _tooltip(s))
+        ulong frame = Engine.GetProcessFrames();
+        if (frame != _countedFrame)
         {
-            var label = new Label { Text = text };
-            label.AddThemeColorOverride("font_color", kind switch
-            {
-                TooltipKind.Name => UiTheme.Rarity(s.Item!.Rarity),
-                TooltipKind.Flavor => new Color(0.75f, 0.8f, 0.95f),
-                TooltipKind.Price => new Color(0.95f, 0.85f, 0.5f),
-                TooltipKind.Info => UiTheme.Muted,
-                _ => UiTheme.Text,
-            });
-            box.AddChild(label);
+            ActiveViews = _counting;
+            _counting = 0;
+            _countedFrame = frame;
         }
-        return box;
+        _counting++;
+    }
+
+    private void Redraw<T>(ref T field, T value)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return;
+        field = value;
+        QueueRedraw();
     }
 }

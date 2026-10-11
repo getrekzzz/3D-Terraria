@@ -1,0 +1,38 @@
+{
+ "id": "P3-44",
+ "title": "Wrong-archetype creatures (2/2): flying snake, bone serpent, eater of souls, crimera, elementals, antlion",
+ "player_outcome": "The Flying Snake is a winged serpent, the Bone Serpent a skull with vertebrae, the Eater of Souls a worm-bodied flying mouth, the Crimera a floating crimson face, the Granite and Ice Elementals floating rock or ice clusters, and the Antlion a head poking out of the sand.",
+ "design": [
+  "Verified: vulture 'bird' serves flying_snake; eater_of_worlds_head (tinted) serves bone_serpent/giant_worm/devourer/digger/tomb_crawler; the hornet 'insect' serves eater_of_souls/crimera; jelly serves the elementals; crab serves antlion.",
+  "New bgen/fauna3.py: flying_serpent (bosses_pre2 eater segment logic + wings; head/body/tail models for the segmented brain), bone_serpent head (small skeletron_skull) + vertebra segment + tail, eater_of_souls (worm-bodied mouth flyer, detail.organic), crimera (floating crimson face, detail.organic), elemental cluster (rock or ice shards orbiting a glow core; params), antlion (head-in-sand with mandibles, attack clip).",
+  "Optionally give giant_worm, devourer and digger distinct heads (colour/teeth params).",
+  "assets.json entries; data/enemies models and boss segment models re-pointed (bone_serpent segmentModel/tailModel).",
+  "Target 1\u20133k tris."
+ ],
+ "files_modify": [
+  "tools/blender/build_all.py \u2014 register fauna3",
+  "tools/blender/assets.json \u2014 creature entries",
+  "data/enemies/*.json \u2014 model/segment refs",
+  "game/Testing/Scripts/creatures.cmds \u2014 spawn each"
+ ],
+ "files_add": [
+  "tools/blender/bgen/fauna3.py \u2014 serpents, flyers, elementals, antlion"
+ ],
+ "data_changes": [
+  "Model/segment fields for flying_snake, bone_serpent, eater_of_souls, crimera, granite_elemental, ice_elemental, antlion (+ worms if done)"
+ ],
+ "tests": [
+  "build_all --check; Strata.Tools validate",
+  "Smoke creatures.cmds spawns: props.problems == 0, errors == 0"
+ ],
+ "verification": [
+  "preview.py contact sheets; in-game screenshots of the serpent segments following"
+ ],
+ "depends_on": [
+  "P3-43"
+ ],
+ "risks": [
+  "Segmented creatures need matching SegmentSpacing in data after the new model lengths."
+ ],
+ "effort": "M"
+}

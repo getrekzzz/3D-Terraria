@@ -13,15 +13,23 @@ public static partial class ContentValidator
             if (i.MaxStack < 1) ctx.Error(i, "maxStack must be >= 1.");
             if (i.Value < 0) ctx.Error(i, "value must be >= 0.");
             if (i.UseTime < 1 || i.UseAnimation < 1) ctx.Error(i, "useTime/useAnimation must be >= 1 tick.");
+            if (i.ReuseDelay < 0) ctx.Error(i, "reuseDelay must be >= 0 ticks.");
+            if (i.AmmoPerBurst && (i.UseAmmo == null || i.UseTime >= i.UseAnimation))
+                ctx.Error(i, "ammoPerBurst needs useAmmo and a burst (useTime < useAnimation).");
             if (i.Damage > 0 && i.DamageType == DamageClass.None) ctx.Error(i, "damage > 0 requires damageType.");
             if (i.Crit is < 0 or > 100) ctx.Error(i, "crit must be 0–100.");
+            if (i.AmmoSaveChance is < 0f or > 1f || (i.AmmoSaveChance > 0f && i.UseAmmo == null)) ctx.Error(i, "ammoSaveChance must be within 0–1 and needs useAmmo.");
             if (i.MineBrush is < 1 or > 8) ctx.Error(i, "mineBrush must be 1–8.");
+            if (i.Rarity is < -13 or > 13) ctx.Error(i, "rarity must be -13–13 (Terraria's rarity tiers).");
+            if (i.Buff != null && ctx.Db.Buffs.TryGet(i.Buff.Id, out var granted) && !Describable(granted, ctx.Db))
+                ctx.Warn(i, $"buff '{granted.Id}' has no description and no effects a tooltip can describe.");
             ctx.Ref(i, ctx.Db.Blocks, i.PlaceBlock, "placeBlock");
             ctx.Ref(i, ctx.Db.TileObjects, i.PlaceObject, "placeObject");
             ctx.Ref(i, ctx.Db.Projectiles, i.Projectile, "projectile");
             ctx.Ref(i, ctx.Db.Buffs, i.Buff?.Id, "buff");
             ctx.Light(i, i.HeldLight, "heldLight");
             ctx.Asset(i, AssetPaths.ItemModel(i, ctx.Db), "model");
+            ctx.Sound(i, i.SoundSet, "soundSet");
             foreach (var b in i.Behaviors.Where(b => b.Type == Specs.ItemBehaviorSpecs.SummonBoss))
             {
                 if (b.Raw.TryGetProperty("enemy", out var enemy)) ctx.Ref(i, ctx.Db.Enemies, enemy.GetString(), "summonBoss.enemy");
@@ -45,15 +53,33 @@ public static partial class ContentValidator
             {
                 if (b.Type == Specs.ItemBehaviorSpecs.Wiring && ctx.TryParse<Specs.WiringParams>(SpecKind.ItemBehavior, b) is { } wiring)
                     ctx.Ref(i, ctx.Db.Items, wiring.Wire, "wiring.wire");
+                if (b.Type == Specs.ItemBehaviorSpecs.Whip && ctx.TryParse<Specs.WhipParams>(SpecKind.ItemBehavior, b) is { } whip)
+                {
+                    ctx.Ref(i, ctx.Db.Buffs, whip.TagBuff, "whip.tagBuff");
+                    ctx.Ref(i, ctx.Db.Buffs, whip.Inflict, "whip.inflict");
+                }
+                if (b.Type == Specs.ItemBehaviorSpecs.PlantGrass && ctx.TryParse<Specs.PlantGrassParams>(SpecKind.ItemBehavior, b) is { } garden)
+                    foreach (var block in garden.On.Append(garden.Grass)) ctx.Ref(i, ctx.Db.Blocks, block, "plantGrass");
                 if (b.Type == Specs.ItemBehaviorSpecs.ReleaseCritter && ctx.TryParse<Specs.ReleaseCritterParams>(SpecKind.ItemBehavior, b) is { } release)
                     ctx.Ref(i, ctx.Db.Enemies, release.Enemy, "releaseCritter.enemy");
+                if (b.Type == Specs.ItemBehaviorSpecs.Consume && ctx.TryParse<Specs.ConsumeParams>(SpecKind.ItemBehavior, b) is { } consume)
+                    ctx.Ref(i, ctx.Db.Flags, consume.RequiresFlag, "consume.requiresFlag");
+                if (i.NoMelee && b.Type is Specs.ItemBehaviorSpecs.MeleeSwing or Specs.ItemBehaviorSpecs.Thrust)
+                    ctx.Error(i, $"noMelee items cannot have a {b.Type} behaviour (their swing is animation only).");
+                if (b.Type == Specs.ItemBehaviorSpecs.ShootProjectile && ctx.TryParse<Specs.ShootProjectileParams>(SpecKind.ItemBehavior, b) is { } shoot
+                    && i.Projectile != null && ctx.Db.Projectiles.TryGet(i.Projectile, out var shot) && shoot.Limit(shot.OneAtATime ? 1 : 0) is > 0 and var limit && shoot.Count > limit)
+                    ctx.Error(i, $"shootProjectile fires {shoot.Count} '{shot.Id}' per use but only {limit} may be out at once (set maxActive).");
             }
             ctx.Asset(i, AssetPaths.ItemIcon(i), "icon");
             if (i.UseAmmo != null && !ammoClasses.Contains(i.UseAmmo)) ctx.Error(i, $"useAmmo '{i.UseAmmo}' has no ammo items.");
-            if (i.UseStyle == UseStyle.Shoot && i.Projectile == null && i.UseAmmo == null)
-                ctx.Error(i, "shoot items need a projectile or useAmmo.");
+            UseStyleChecks(ctx, i);
+            if (i.MaxStack > 1 && i.MaxStack != ItemDef.CommonMaxStack && i.Category != ItemCategory.Coin)
+                ctx.Error(i, $"stackable items stack to {ItemDef.CommonMaxStack} (Terraria 1.4.4); only coins stop sooner.");
             if (i.EquipSlot == EquipSlot.None && (i.Category is ItemCategory.Armor or ItemCategory.Accessory))
                 ctx.Error(i, "armor/accessory needs equipSlot.");
+            if (MiscEquipSlot(i.Category) is { } misc && i.EquipSlot != misc && !(misc == EquipSlot.Pet && i.EquipSlot == EquipSlot.LightPet))
+                ctx.Error(i, $"{i.Category} items need equipSlot '{System.Text.Json.JsonNamingPolicy.CamelCase.ConvertName(misc.ToString())}'"
+                    + (misc == EquipSlot.Pet ? " or 'lightPet'." : "."));
             if (i.Consumable && i.MaxStack == 1 && i.PlaceBlock == null && i.PlaceObject == null)
                 ctx.Warn(i, "consumable item with maxStack 1.");
             if (i.PlaceBlock != null && i.PlaceObject != null) ctx.Error(i, "item cannot place both a block and an object.");
@@ -61,6 +87,45 @@ public static partial class ContentValidator
             ctx.Specs(i, SpecKind.Effect, i.EquipEffects, "equipEffects");
             ctx.Specs(i, SpecKind.Effect, i.SetEffects, "setEffects");
             if ((i.SetEffects.Length > 0 || i.SetBonus != null) && i.ArmorSet == null) ctx.Error(i, "setBonus/setEffects need an armorSet.");
+        }
+    }
+
+    /// <summary>
+    /// Use styles: a style that releases something (gun, bow, staff, boomerang, yoyo, flail…) needs a projectile or
+    /// ammo; yoyos, flails and whips need damage; a weapon, tool or consumable should not end up without a style.
+    /// </summary>
+    private static void UseStyleChecks(Ctx ctx, ItemDef i)
+    {
+        string style = System.Text.Json.JsonNamingPolicy.CamelCase.ConvertName(i.UseStyle.ToString());
+        if (Gameplay.Items.UseStyleRules.Shoots(i.UseStyle) && i.Projectile == null && i.UseAmmo == null)
+            ctx.Error(i, $"{style} items need a projectile or useAmmo.");
+        if (i.UseStyle is (UseStyle.Yoyo or UseStyle.Flail or UseStyle.Whip) && i.Damage <= 0)
+            ctx.Error(i, $"{style} items need damage.");
+        bool usable = (i.IsWeapon && i.AmmoClass == null) || i.IsTool || i.Category is ItemCategory.Consumable or ItemCategory.Potion;
+        if (usable && Gameplay.Items.UseStyleRules.Resolve(i) == UseStyle.None)
+            ctx.Warn(i, "no useStyle, and none can be inferred from its stats (it plays no use action).");
+    }
+
+    /// <summary>The misc slot items of a category must be worn in (hooks, mounts, minecarts, pets); null for other categories.</summary>
+    private static EquipSlot? MiscEquipSlot(ItemCategory category) => category switch
+    {
+        ItemCategory.Hook => EquipSlot.Hook,
+        ItemCategory.Mount => EquipSlot.Mount,
+        ItemCategory.Minecart => EquipSlot.Minecart,
+        ItemCategory.Pet => EquipSlot.Pet,
+        _ => null,
+    };
+
+    /// <summary>Whether a tooltip can say what the buff does (malformed effects are reported by the buff checks).</summary>
+    private static bool Describable(BuffDef buff, ContentDatabase db)
+    {
+        try
+        {
+            return Gameplay.Buffs.BuffText.Describe(buff, db) != null;
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return true;
         }
     }
 

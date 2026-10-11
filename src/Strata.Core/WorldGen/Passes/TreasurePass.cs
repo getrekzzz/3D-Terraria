@@ -23,7 +23,11 @@ public sealed class TreasurePass : GenPass
         var chest = tiles.Get("wooden_chest");
         var goldChest = tiles.Get("gold_chest");
         var crystal = tiles.Get("life_crystal_node");
-        var altar = tiles.Get(ctx.Gen.Plan.Settings.Evil == World.EvilKind.Crimson ? "crimson_altar" : "demon_altar");
+        // A Drunk World has both kinds of altar (chunk by chunk).
+        bool crimson = ctx.Gen.Plan.Settings.Has(World.SecretSeed.Drunk)
+            ? ((ctx.ChunkOrigin.X + ctx.ChunkOrigin.Z) / Common.ChunkMath.Size & 1) == 1
+            : ctx.Gen.Plan.Settings.Evil == World.EvilKind.Crimson;
+        var altar = tiles.Get(crimson ? "crimson_altar" : "demon_altar");
         var bulb = tiles.Get("plantera_bulb");
         byte jungle = (byte)ctx.Gen.Content.Biomes.Get("jungle").RuntimeId;
         float depth = ctx.Depth(ctx.ChunkOrigin.Y + 16);
@@ -33,7 +37,7 @@ public sealed class TreasurePass : GenPass
         {
             int x = ctx.ChunkOrigin.X + rng.NextInt(ChunkMath.Size - 2);
             int z = ctx.ChunkOrigin.Z + rng.NextInt(ChunkMath.Size - 2);
-            if (!TryFindFloor(ctx, x, z, 3, out int floorY)) continue;
+            if (!TryFindFloor(ctx, x, z, 3, out int floorY) || ctx.IsStructure(x, floorY - 1, z)) continue; // not on structure floors
             float roll = rng.NextFloat();
             if (roll < 0.018f + 0.02f * depth) Place(ctx, crystal, x, floorY, z, 0, null);
             else if (roll < 0.05f)
@@ -47,11 +51,11 @@ public sealed class TreasurePass : GenPass
                     int px = Math.Clamp(x + rng.Range(-4, 5), ctx.ChunkOrigin.X, ctx.ChunkOrigin.X + ChunkMath.Size - 3);
                     int pz = Math.Clamp(z + rng.Range(-4, 5), ctx.ChunkOrigin.Z, ctx.ChunkOrigin.Z + ChunkMath.Size - 3);
                     if (Math.Abs(px - x) < 3 && Math.Abs(pz - z) < 3) continue;
-                    if (TryFindFloor(ctx, px, pz, 3, out int py) && Math.Abs(py - floorY) <= 2) Place(ctx, pot, px, py, pz, rng.NextInt(4), null, rng.NextInt(3));
+                    if (TryFindFloor(ctx, px, pz, 3, out int py) && Math.Abs(py - floorY) <= 2 && !ctx.IsStructure(px, py - 1, pz)) Place(ctx, pot, px, py, pz, rng.NextInt(4), null, rng.NextInt(3));
                 }
             }
             else if (roll < 0.17f) Place(ctx, pot, x, floorY, z, rng.NextInt(4), null, rng.NextInt(3));
-            else if (roll < 0.1745f && depth > 0.06f && TryFindFloor(ctx, x + 2, z, 3, out int other) && other == floorY)
+            else if (roll < 0.1745f && depth > 0.06f && TryFindFloor(ctx, x + 2, z, 3, out int other) && other == floorY && !ctx.IsStructure(x + 2, other - 1, z))
                 Place(ctx, altar, x, floorY, z, rng.NextInt(4), null); // demon altars dot the underground
             else if (roll < 0.182f && depth > 0.3f && ctx.Biome[ctx.WorldIndex(x, floorY, z)] == jungle)
                 Place(ctx, bulb, x, floorY, z, 0, null); // Plantera's Bulbs, sealed until the mechanical bosses fall

@@ -1,0 +1,53 @@
+{
+ "id": "P2-25",
+ "title": "Death screen: dim, 'You were slain...', and the cause of death",
+ "player_outcome": "When you die the screen darkens and a large red 'You were slain...' appears, with the cause underneath ('Wanderer was slain by a Zombie.', 'Wanderer fell to their death.', 'Wanderer tried to swim in lava.') and the respawn countdown. The same line goes to the chat log.",
+ "design": [
+  "Move PlayerEntity out of GameWorld.cs (lines 20-~100) into src/Strata.Core/Session/PlayerEntity.cs. This is a pure move that frees space in GameWorld.cs.",
+  "New src/Strata.Core/Gameplay/Combat/Harm.cs: `enum HarmKind { Enemy, Projectile, Fall, Lava, Drowning, Debuff, Other }` and `readonly record struct Harm(HarmKind Kind, string? Source)`. Add `PlayerEntity.LastHarm`.",
+  "NpcSystem.ReportPlayerDamage(player, damage, knock, Harm harm) sets LastHarm. Callers:\n- NpcSystem.ContactDamage: Enemy, npc.Def.DisplayName.\n- NpcSystem.Parts BarrierEffects: Enemy.\n- ProjectileSystem.HurtPlayer: Projectile, the owner NPC's name when known, else the projectile's DisplayName.\n- LiquidEffects: Drowning (:113) and Lava (:143).\n- PlayerController fall (game/Player/PlayerController.cs:265-269): set Entity.LastHarm = Fall before DamageDirect.\n- GameWorld.TickPlayer damage-over-time: Debuff, with EffectState recording the DisplayName of the buff whose damageOverTime applied (new EffectState.DotSource).",
+  "New data/config/deaths.json with message variants per kind, using {player} and {source}. Examples:\n- enemy: '{player} was slain by {source}.'\n- fall: '{player} fell to their death.'\n- lava: '{player} tried to swim in lava.'\n- drowning: '{player} forgot to breathe.'\n- debuff: '{player} was consumed by {source}.'\n- other: '{player} was slain.'\n\nNew src/Strata.Core/Presentation/DeathMessages.cs: Load(IDataSource), and Format(name, harm, deaths), which picks the variant deterministically by death count. Validate that every HarmKind has at least one line.",
+  "Raise GameWorld `event Action<PlayerEntity, string>? PlayerSlain` next to PlayerDied (TickPlayer). WorldLauncher loads DeathMessages, like TownConfig.",
+  "New game/UI/Hud/DeathScreen.cs: a FullRect ColorRect whose alpha tweens 0 \u2192 0.55 over 1 s.\n- Title 'You were slain...' at 48 px in Color8(225,25,25). Hardcore reads '{Name} has perished...' with 'Hardcore characters do not return.'\n- Cause line at 20 px, then 'Respawning in N' at 20 px.\n- Tweens out on respawn.\n- Also posts the cause to ChatLog in the Death colour.\n- Replaces the _death Label (Hud.cs:114-118,213-217).",
+  "UiProbes gains `ui.death_dim` (1 while shown)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Session/GameWorld.cs \u2014 PlayerEntity moved out; TickPlayer DoT harm; PlayerSlain event",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.cs \u2014 ReportPlayerDamage(harm), contact harm",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Parts.cs \u2014 barrier harm",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs \u2014 projectile harm",
+  "src/Strata.Core/Gameplay/Liquids/LiquidEffects.cs \u2014 drowning and lava harm",
+  "src/Strata.Core/Gameplay/Stats/EffectState.cs \u2014 DotSource",
+  "game/Player/PlayerController.cs \u2014 fall harm",
+  "game/Bootstrap/WorldLauncher.cs \u2014 load DeathMessages",
+  "game/UI/Hud.cs \u2014 DeathScreen",
+  "game/Debug/UiProbes.cs \u2014 ui.death_dim"
+ ],
+ "files_add": [
+  "src/Strata.Core/Session/PlayerEntity.cs \u2014 moved class + LastHarm",
+  "src/Strata.Core/Gameplay/Combat/Harm.cs",
+  "src/Strata.Core/Presentation/DeathMessages.cs",
+  "data/config/deaths.json \u2014 Terraria-style death lines",
+  "game/UI/Hud/DeathScreen.cs",
+  "tests/Strata.Core.Tests/Gameplay/DeathMessageTests.cs"
+ ],
+ "data_changes": [
+  "New data/config/deaths.json (message templates by harm kind)"
+ ],
+ "tests": [
+  "DeathMessageTests: ContactDeathNamesTheEnemy (TestGame zombie contact until dead); FallAndLavaMessages; EveryHarmKindHasAMessage; VariantIsDeterministic",
+  "ui.cmds: `kill` / `wait 0.5` / `assert ui.death_dim == 1` / `assert ui.chat_lines >= 1` / `wait 6` / `assert player.alive == 1` / `assert ui.death_dim == 0`"
+ ],
+ "verification": [
+  "dotnet test; headless ui.cmds and basic.cmds pass; lavapipe death screenshot"
+ ],
+ "depends_on": [
+  "P2-12",
+  "P2-21"
+ ],
+ "risks": [
+  "The feel phase (fall/debuff damage sounds and FP hurt cue) touches the same damage call sites. Land the harm plumbing first and they add sounds on top.",
+  "Moving PlayerEntity conflicts with any open branch editing it. Announce the move and land it early in the phase."
+ ],
+ "effort": "M"
+}

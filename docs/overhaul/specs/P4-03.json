@@ -1,0 +1,60 @@
+{
+ "id": "P4-03",
+ "title": "Boss presentation: Terraria messages, boss bar with head icon, camera punch, music fade, boss icons",
+ "player_outcome": "'Eye of Cthulhu has awoken!' appears in Terraria purple. The boss bar sits at the bottom centre with the boss's head icon and life numbers. The screen jolts when a boss arrives, slams or dies. The music drops out briefly after a win before the biome theme returns.",
+ "design": [
+  "Core: add AssetPaths.BossIcon(EnemyDef) = 'assets/icons/bosses/{Boss.Icon ?? Id}.png'. ContentValidator requires the icon for every non-minor boss (ctx.Asset).",
+  "Blender icons. Add a 'portrait' view to tools/blender/bgen/export.render_icon: front-on, 15\u00b0 above, tight orthographic fit, 96 px, transparent. New tools/blender/bgen/boss_icons.py builds each non-minor boss's creature model in memory, using the same generator lookup as build_all.build.",
+  "build_all.py gains --boss-icons: render assets/icons/bosses/<enemyId>.png without exporting GLBs and record 'bossIcons' in assets/manifest.json. Run it once for all non-minor bosses (about 30).",
+  "New game/UI/BossBar.cs (Control). Anchor it bottom-centre above the hotbar, matching Terraria 1.4.",
+  "BossBar contents: a 40 px icon TextureRect (textures cached per icon id) and a _Draw bar 456\u00d722. The bar has a 2 px dark frame, background Color8(30,10,20,200), fill Color8(200,30,50) with a 3 px lighter top highlight, a trailing damage chunk Color8(255,200,200,180) that eases down after 0.4 s, and a centred outlined 'life/max' label.",
+  "BossBar group life: the strongest living boss, plus living bosses with its flag, plus its followers whose BossPart.Bar is set. QueueRedraw only when the numbers change; no per-frame allocation.",
+  "game/UI/Hud.cs: remove _bossPanel/_bossName/_bossBar/UpdateBossBar and add a BossBar child. Show '{Title} has awoken!' and '{Title} has been defeated!' in Color8(175,75,255), through the chat log if the UI phase added one, otherwise Hud.Announce.",
+  "New game/Entities/BossEffects.cs (Node3D, created in game/Bootstrap/WorldLauncher.cs next to CombatEffects). BossSpawned \u2192 CameraShake.Kick(0.45). BossDefeated \u2192 CameraShake.Kick(0.7) and MusicDirector.Instance.Silence(3.0).",
+  "BossEffects also handles NpcSystem.Impacted(at, s): CameraShake.Kick(s \u00d7 clamp(1 - distance/40 m)), a dust ring from 8 pre-built pooled CpuParticles3D tinted by the block under the impact, and Sfx.PlayAt('boss_slam'). NpcSystem.Cued(npc, id) \u2192 Sfx.PlayAt(id, npc.Center); cue ids are SFX ids.",
+  "game/Audio/MusicDirector.cs: Silence(seconds) fades the current track out over 1 s and suppresses re-evaluation until the time is up; then the normal Choose() resumes with its 2 s crossfade.",
+  "tools/audio/sfx_recipes.py: add 'boss_slam' (a sub thud plus rubble noise) and rebuild assets/audio/sfx with tools/audio/build_audio.py.",
+  "Engine probes in game/Debug/GodotCommandHost.cs: camera.trauma, hud.bossbar (1 when shown), hud.bossbar.icon (1 when the texture loaded), music.silent."
+ ],
+ "files_modify": [
+  "game/UI/Hud.cs \u2014 boss panel removed, BossBar added, Terraria purple boss messages",
+  "game/Audio/MusicDirector.cs \u2014 Silence(seconds)",
+  "game/Player/CameraShake.cs \u2014 expose Trauma for the probe",
+  "game/Bootstrap/WorldLauncher.cs \u2014 create BossEffects",
+  "game/Debug/GodotCommandHost.cs \u2014 camera/hud/music probes",
+  "src/Strata.Core/Content/AssetPaths.cs \u2014 BossIcon",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 boss icon asset check",
+  "tools/blender/build_all.py \u2014 --boss-icons option",
+  "tools/blender/bgen/export.py \u2014 'portrait' icon view",
+  "tools/audio/sfx_recipes.py \u2014 boss_slam"
+ ],
+ "files_add": [
+  "game/UI/BossBar.cs \u2014 Terraria-style boss bar with icon, numbers and damage chunk",
+  "game/Entities/BossEffects.cs \u2014 shake, dust ring, cue sounds, music silence",
+  "tools/blender/bgen/boss_icons.py \u2014 in-memory boss model build and portrait icons",
+  "assets/icons/bosses/*.png \u2014 boss head icons",
+  "assets/audio/sfx/boss_slam.wav \u2014 impact sound"
+ ],
+ "data_changes": [
+  "Optional boss.icon overrides where the head is a separate model, e.g. eater_of_worlds uses its head model by default."
+ ],
+ "tests": [
+  "AssetCoverageTests.EveryBossHasABarIcon.",
+  "ContentValidatorTests.MissingBossIconIsAnError.",
+  "Smoke bosses.cmds, after 'boss king_slime 12': 'wait 0.5', 'assert hud.bossbar == 1', 'assert hud.bossbar.icon == 1', 'assert camera.trauma > 0'.",
+  "Smoke bosses.cmds, after 'slay brain_of_cthulhu': 'assert music.silent == 1'."
+ ],
+ "verification": [
+  "Headless smoke prints SMOKE PASS.",
+  "lavapipe screenshot: godot --path . --rendering-driver vulkan -- --world=bar --size=tiny --new --player=bar --fresh-player --exec='time 22;boss eye_of_cthulhu 20;wait 2;screenshot boss_bar'. Compare the bar placement and look with Terraria 1.4.",
+  "Turn camera shake off in settings and confirm no jolt."
+ ],
+ "depends_on": [
+  "P4-01"
+ ],
+ "risks": [
+  "The UI phase also rewrites Hud.cs and UiTheme (font, hotbar placement, chat log). Keep BossBar self-contained, and re-anchor it if the UI phase moved the hotbar.",
+  "Boss icon rendering adds Blender time. Use --samples=16 and keep it deterministic."
+ ],
+ "effort": "M"
+}

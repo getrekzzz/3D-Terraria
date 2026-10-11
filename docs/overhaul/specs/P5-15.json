@@ -1,0 +1,52 @@
+{
+ "id": "P5-15",
+ "title": "Shops I: Merchant, Dryad, Arms Dealer, Demolitionist, Clothier, Goblin Tinkerer, Mechanic, Witch Doctor (+ new functional items)",
+ "player_outcome": "The early-game NPCs sell their Terraria stock, with day, night, hardmode and biome conditions. Among it: grass seeds that plant grass, Sunflowers that make you Happy, Purification Powder, Mining gear and Glowsticks.",
+ "design": [
+  "Rule: only sell items that work now; defer the rest to a list in the PR. Author from terraria.wiki.gg shop tables (1.4.4) and map conditions onto existing types (time, flag, moon, event, biome at home, hasItem, resident, evil).",
+  "Merchant: mining_helmet, piggy_bank (only if the equipment/storage phase shipped it), iron_anvil, copper_pickaxe, copper_axe, torch, lesser_healing_potion, lesser_mana_potion, wooden_arrow, shuriken, rope, glowstick (new), bug_net, bottle, empty_bucket, mining_shirt and mining_pants (new). Nurse: remove the shop (Terraria's Nurse has none).",
+  "Dryad: purification_powder, vile/vicious powder by world evil, grass_seeds, jungle_grass_seeds, mushroom_grass_seeds (new), corrupt/crimson/hallowed seeds in hardmode or by evil (new), sunflower (new tile object with Aura buff 'happy'), acorn, herb_bag (new; consume with loot table herb_bag).",
+  "Arms Dealer: musket_ball, silver_bullet, flintlock_pistol, minishark, shotgun (hardmode), empty_bullet (new, hardmode material), illegal_gun_parts (new, night material). Demolitionist: grenade, bomb, dynamite. Clothier: top_hat, tuxedo_shirt, tuxedo_pants (new vanity: 0-defense armor). Goblin: rocket_boots, tinkerers_workshop, grappling_hook, spiky_ball. Mechanic: keep the wiring stock and add anything the WireSystem supports (verify). Witch Doctor: pygmy_necklace, hercules_beetle, leaf_wings (night, hardmode), pygmy_staff (after defeated_plantera), bewitching_table (new tile object with Aura buff 'bewitched' +1 minion).",
+  "New behavior 'plantGrass' {grass, on:[blocks]} in ItemBehaviorSpecs plus a handler in a new ItemUseSystem.Garden.cs: the targeted top block in 'on' becomes the grass block and the item is consumed. New buffs happy and bewitched in data.",
+  "Assets: add every new item and object to tools/blender/assets.json, reusing generators (seed/bottled/potion/helmet/chest_armor/greaves/furniture); run python3.13 tools/blender/build_all.py --only=<ids>. Reference concepts go in a new tools/content/reference/items_town.py, then python3 tools/content/gen_reference.py.",
+  "Items live in data/items/town_shop_early.json and objects in data/tileobjects/town_decor.json; regenerate the manifest."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Specs/ItemBehaviorSpecs.cs \u2014 plantGrass",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 dispatch plantGrass (1 line; file at 375, handler in the partial)",
+  "data/town/pre_hardmode.json \u2014 shops",
+  "tools/blender/assets.json \u2014 new items and objects",
+  "tools/content/gen_reference.py inputs \u2014 include items_town.py",
+  "data/manifest.json \u2014 regenerated"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Garden.cs \u2014 plantGrass handler",
+  "data/items/town_shop_early.json \u2014 about 20 new items",
+  "data/tileobjects/town_decor.json \u2014 sunflower, bewitching_table",
+  "tools/content/reference/items_town.py \u2014 reference concepts for new town items",
+  "assets/icons/items/*.png, assets/models/items/*.glb, assets/models/objects/*_v0.glb \u2014 generated"
+ ],
+ "data_changes": [
+  "new items: glowstick, mining_shirt, mining_pants, grass_seeds, jungle_grass_seeds, mushroom_grass_seeds, corrupt_seeds, crimson_seeds, hallowed_seeds, herb_bag, empty_bullet, illegal_gun_parts, top_hat, tuxedo_shirt, tuxedo_pants, sunflower, bewitching_table; loot table herb_bag; buffs happy, bewitched; a glowstick projectile with light"
+ ],
+ "tests": [
+  "ShopDataTests.EveryShopItemResolves and prices \u2265 1",
+  "ShopDataTests.MerchantNightStock: glowstick at night per its condition",
+  "ItemUseTests.GrassSeedsTurnDirtToGrass",
+  "TileObjectTests.SunflowerAuraGivesHappy",
+  "Smoke town.cmds: 'town summon dryad 0 0 -3' / 'give gold_coin 2' / 'town buy dryad grass_seeds' / 'assert inv.grass_seeds == 1'"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate + manifest --check + coverage; gen_reference --check; build_all.py --check",
+  "In game: each NPC's shop lists its stock with icons; no missing-icon checkerboards (grep 'Missing icon' in the smoke log)"
+ ],
+ "depends_on": [
+  "P5-13",
+  "P5-06"
+ ],
+ "risks": [
+  "tools/blender/assets.json conflicts with the art phase; add entries in a clearly separated block.",
+  "Terraria stock lists change between versions; state the version in the PR."
+ ],
+ "effort": "L"
+}

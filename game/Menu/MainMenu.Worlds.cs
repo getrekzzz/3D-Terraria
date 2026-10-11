@@ -20,6 +20,9 @@ public sealed partial class MainMenu
         "Master: the ultimate challenge.",
     };
 
+    private const string OldGeneratorWarning =
+        "Made with an older world generator - new terrain will not match.\nPlaces you have not explored yet will not line up with the saved ones. Play anyway?";
+
     private void ShowWorlds()
     {
         if (_character == null)
@@ -30,14 +33,14 @@ public sealed partial class MainMenu
         var (panel, box) = MenuKit.Panel(new Vector2(760, 520));
         box.AddChild(MenuKit.Title("Select World", 40));
         box.AddChild(MenuKit.Text($"Playing as {_character.Name}", 16, new Color(0.8f, 0.85f, 0.95f)));
-        var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(0, 340), SizeFlagsVertical = Control.SizeFlags.ExpandFill };
+        var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(0, 340), SizeFlagsVertical = Control.SizeFlags.ExpandFill, FollowFocus = true };
         var list = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
         list.AddThemeConstantOverride("separation", 8);
         scroll.AddChild(list);
         box.AddChild(scroll);
         var worlds = SaveCatalog.Worlds(WorldsDirectory, (dir, ex) => _services.Log.Error("menu", $"Unreadable world {dir}", ex));
         if (worlds.Count == 0) list.AddChild(MenuKit.Text("No worlds yet — create one!", 18, MenuKit.Idle));
-        foreach (var w in worlds) list.AddChild(WorldRow(w));
+        foreach (var w in SaveFavorites.StarredFirst(worlds, w => Favorites.IsWorld(w.Directory))) list.AddChild(WorldRow(w));
         var buttons = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
         buttons.AddThemeConstantOverride("separation", 24);
         buttons.AddChild(MenuKit.Big("Back", ShowCharacters, 26));
@@ -46,25 +49,35 @@ public sealed partial class MainMenu
         Show(MenuKit.Centered(panel));
     }
 
+    /// <summary>A world's blue row: name, size, difficulty, evil, play time and seed, then favourite, play and delete.</summary>
     private Control WorldRow(WorldEntry w)
     {
-        var (panel, box) = MenuKit.Panel(new Vector2(0, 0), 2);
-        var row = new HBoxContainer();
-        row.AddThemeConstantOverride("separation", 14);
-        box.AddChild(row);
-        var info = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
+        var (panel, row) = MenuKit.RowPanel();
+        var info = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, Alignment = BoxContainer.AlignmentMode.Center };
         info.AddChild(MenuKit.Text(w.Name, 24, MenuKit.Idle));
         string evil = w.Evil == EvilKind.Corruption ? "Corruption" : "Crimson";
         string difficulty = w.Difficulty switch { Difficulty.Expert => "Expert", Difficulty.Master => "Master", _ => "Classic" };
-        var detail = $"{w.Size} · {difficulty} · {evil}{(w.Hardmode ? " · Hardmode" : "")} · {SaveCatalog.PlayTime(w.PlayTicks)} played · seed {w.Seed}";
+        var detail = $"{w.Size} · {difficulty} · {evil}{(w.Hardmode ? " · Hardmode" : "")} · {SaveCatalog.PlayTime(w.PlayTicks)} played · seed {w.Seed}{(w.OldGenerator ? " · old terrain" : "")}";
         info.AddChild(MenuKit.Text(detail, 15, w.Difficulty == Difficulty.Master ? new Color(1f, 0.45f, 0.4f) : w.Difficulty == Difficulty.Expert ? new Color(1f, 0.75f, 0.3f) : new Color(0.8f, 0.85f, 0.9f)));
         row.AddChild(info);
-        row.AddChild(MenuKit.Small("Play", () => PlayRequested?.Invoke(new LaunchRequest(w.Directory, _character!.Name)), 100));
-        row.AddChild(MenuKit.Small("Delete", () => Confirm($"Delete the world {w.Name}? This cannot be undone.", () =>
+        void Play() => PlayRequested?.Invoke(new LaunchRequest(w.Directory, _character!.Name));
+        bool starred = Favorites.IsWorld(w.Directory);
+        row.AddChild(MenuKit.Icon(starred ? "menu_favourite" : "menu_favourite_off", starred ? "Unfavorite" : "Favorite", () =>
+        {
+            Favorites.ToggleWorld(w.Directory);
+            ShowWorlds();
+        }));
+        row.AddChild(MenuKit.Icon("menu_play", "Play", () =>
+        {
+            if (w.OldGenerator) Confirm(OldGeneratorWarning, Play);
+            else Play();
+        }));
+        row.AddChild(MenuKit.Icon("menu_delete", "Delete", () => Confirm($"Delete the world {w.Name}? This cannot be undone.", () =>
         {
             SaveCatalog.DeleteWorld(w.Directory);
+            Favorites.ForgetWorld(w.Directory);
             ShowWorlds();
-        }), 100));
+        })));
         return panel;
     }
 
@@ -76,7 +89,9 @@ public sealed partial class MainMenu
         var (panel, box) = MenuKit.Panel(new Vector2(720, 0), 10);
         box.AddChild(MenuKit.Title("Create World", 40));
         box.AddChild(MenuKit.Row("World Name", MenuKit.Field("", "Enter a world name", t => name = t.Trim())));
-        box.AddChild(MenuKit.Row("Seed", MenuKit.Field("", "Random", t => seedText = t.Trim(), 32), "Leave empty for a random world. Numbers or any text."));
+        var found = Settings.UserSettings.Current.DiscoveredSeeds;
+        box.AddChild(MenuKit.Row("Seed", MenuKit.Field("", "Random", t => seedText = t.Trim(), 32), "Leave empty for a random world. Numbers or any text."
+            + (found.Length > 0 ? $"\nSecret seeds found: {found.Replace("|", ", ")}." : "")));
         box.AddChild(MenuKit.Row("Size", MenuKit.Choice(Sizes, 0, i => size = i),
             "Small is about 1 km across, Medium 2 km, Large 3 km (streamed as you explore)."));
         var note = MenuKit.Text(DifficultyInfo[0], 15, new Color(0.8f, 0.85f, 0.95f));
@@ -96,16 +111,17 @@ public sealed partial class MainMenu
                 1 => EvilKind.Corruption,
                 2 => EvilKind.Crimson,
                 _ => GD.Randi() % 2 == 0 ? EvilKind.Corruption : EvilKind.Crimson,
-            }), 26));
+            }, SecretSeeds.Parse(seedText)), 26));
         box.AddChild(buttons);
         Show(MenuKit.Centered(panel));
     }
 
     /// <summary>Generates the world plan and saves the new world (off the main thread), then returns to the list.</summary>
-    private void CreateWorld(string name, long seed, WorldSizePreset size, Difficulty difficulty, EvilKind evil)
+    private void CreateWorld(string name, long seed, WorldSizePreset size, Difficulty difficulty, EvilKind evil, SecretSeed secret = SecretSeed.None)
     {
         var done = Busy("Generating world...");
-        var settings = new WorldSettings { Name = name, Seed = seed, Size = size, Difficulty = difficulty, Evil = evil };
+        var settings = new WorldSettings { Name = name, Seed = seed, Size = size, Difficulty = difficulty, Evil = evil, Secret = secret };
+        RememberSecret(secret);
         var dir = SaveCatalog.NewWorldDirectory(WorldsDirectory, name);
         var services = _services;
         Task.Run(() => WorldSession.Create(services.Content, settings, dir, services.Render, services.Log)).ContinueWith(t =>
@@ -123,12 +139,27 @@ public sealed partial class MainMenu
         });
     }
 
-    /// <summary>A number seed as typed, or a stable hash of any other text; random when empty.</summary>
+    /// <summary>
+    /// A number seed as typed, or a stable hash of any other text; random when empty or a secret seed name (secret
+    /// worlds differ every time, as in Terraria).
+    /// </summary>
     private static long ParseSeed(string text)
     {
-        if (text.Length == 0) return (long)(GD.Randi() & 0x7fffffff);
+        if (text.Length == 0 || SecretSeeds.Parse(text) != SecretSeed.None) return (long)(GD.Randi() & 0x7fffffff);
         if (long.TryParse(text, out long n)) return n;
         return (long)(Strata.Core.Determinism.Hash.String(text) & 0x7fffffff);
+    }
+
+    /// <summary>Secret seeds stay secret until found: once used, they are listed under the seed field.</summary>
+    private static void RememberSecret(SecretSeed secret)
+    {
+        if (secret == SecretSeed.None) return;
+        var s = Settings.UserSettings.Current;
+        var found = new System.Collections.Generic.List<string>(s.DiscoveredSeeds.Split('|', StringSplitOptions.RemoveEmptyEntries));
+        foreach (var title in SecretSeeds.Titles(secret))
+            if (!found.Contains(title)) found.Add(title);
+        s.DiscoveredSeeds = string.Join("|", found);
+        s.Save();
     }
 
     private static string RandomWorldName()

@@ -12,14 +12,56 @@ public enum DamageClass
     None, Melee, Ranged, Magic, Summon, Generic,
 }
 
+/// <summary>
+/// How an item is used on screen, Terraria's use styles (JSON camelCase, e.g. "holdUp"). The style also implies some
+/// actions (<see cref="Gameplay.Items.UseStyleRules"/>): a melee swing, a thrust, a shot, drinking a potion.
+/// <see cref="None"/> in data is resolved from the item's stats (tools swing, placers place, potions are drunk).
+/// Each style's body clip, arm aim and grip live in data/config/use_styles.json.
+/// </summary>
 public enum UseStyle
 {
-    None, Swing, Thrust, Shoot, Hold, Consume, Place,
+    None,
+    /// <summary>Overhead swing: swords, tools, summon staves, fishing rods, nets, buckets, wiring and paint tools.</summary>
+    Swing,
+    /// <summary>A quick jab: shortswords.</summary>
+    Rapier,
+    /// <summary>A two-handed thrust along the aim: spears and tridents.</summary>
+    Spear,
+    /// <summary>Held out along the aim (grappling hooks and anything without a better style).</summary>
+    Shoot,
+    /// <summary>Held like a gun, including magic guns.</summary>
+    Gun,
+    Bow,
+    /// <summary>Staffs and wands point at the target.</summary>
+    Staff,
+    /// <summary>Spell tomes are read from the off hand.</summary>
+    Tome,
+    /// <summary>Boomerangs, shuriken, throwing knives, bombs and grenades.</summary>
+    Throw,
+    Yoyo,
+    Flail,
+    Whip,
+    /// <summary>Raised overhead: boss and event summons, life and mana crystals, mirrors, crates.</summary>
+    HoldUp,
+    Drink,
+    Eat,
+    Place,
 }
 
+/// <summary>
+/// Where an item is worn. Pet through Hook are the misc equipment row, in the order of
+/// <see cref="Gameplay.Items.MiscSlot"/> (JSON: "pet", "lightPet", "minecart", "mount", "hook").
+/// </summary>
 public enum EquipSlot
 {
-    None, Head, Body, Legs, Accessory,
+    None, Head, Body, Legs, Accessory, Pet, LightPet, Minecart, Mount, Hook,
+}
+
+/// <summary>What touching a pickup item restores (Terraria's Heart: 20 life; Star: 100 mana).</summary>
+public sealed class PickupEffect
+{
+    public int HealLife { get; init; }
+    public int HealMana { get; init; }
 }
 
 public sealed class BuffApplication
@@ -34,6 +76,12 @@ public sealed class BuffApplication
 /// </summary>
 public sealed class ItemDef : ContentDef
 {
+    /// <summary>
+    /// What every stackable item stacks to (Terraria 1.4.4: potions, ammo, blocks, materials, summons, furniture);
+    /// only the copper, silver and gold coins stop at 100. Checked by the content validator.
+    /// </summary>
+    public const int CommonMaxStack = 9999;
+
     public ItemCategory Category { get; init; } = ItemCategory.Material;
     public int Rarity { get; init; }
     public int MaxStack { get; init; } = 1;
@@ -43,10 +91,31 @@ public sealed class ItemDef : ContentDef
 
     // --- Use ---
     public UseStyle UseStyle { get; init; } = UseStyle.None;
+
+    /// <summary>Chance (0–1) a shot keeps its ammo (Megashark 0.5), on top of ammo-saving gear.</summary>
+    public float AmmoSaveChance { get; init; }
     public int UseTime { get; init; } = 20;
     public int UseAnimation { get; init; } = 20;
     public bool AutoReuse { get; init; }
+
+    /// <summary>
+    /// Ticks after a use animation ends before the next may start (Terraria's reuseDelay): the pause between the
+    /// Clockwork Assault Rifle's bursts. Speed prefixes do not shorten it.
+    /// </summary>
+    public int ReuseDelay { get; init; }
+
+    /// <summary>
+    /// A burst (several shots inside one animation, use time shorter than use animation) uses ammo for its first shot
+    /// only, as the Clockwork Assault Rifle does in Terraria; other bursts use ammo per shot.
+    /// </summary>
+    public bool AmmoPerBurst { get; init; }
     public bool Consumable { get; init; }
+
+    /// <summary>
+    /// The swing or thrust is animation only and the blade never hits (Terraria's noMelee: Zenith fights with its
+    /// projectiles alone). Stops <see cref="UseStyle"/> from implying a melee attack.
+    /// </summary>
+    public bool NoMelee { get; init; }
 
     /// <summary>Interaction reach in cells (tools, placement).</summary>
     public int Reach { get; init; } = 10;
@@ -103,6 +172,15 @@ public sealed class ItemDef : ContentDef
     // --- Consumption ---
     public int HealLife { get; init; }
     public int HealMana { get; init; }
+
+    /// <summary>A pickup (Heart, Star): applied when touched and never stored, so it needs no free slot.</summary>
+    public PickupEffect? Pickup { get; init; }
+
+    /// <summary>Lies where it is dropped, drifting and bobbing (souls).</summary>
+    public bool NoGravity { get; init; }
+
+    /// <summary>Drawn glowing and pulsing on the ground (Heart, Star, Fallen Star).</summary>
+    public bool Glows { get; init; }
     public BuffApplication? Buff { get; init; }
 
     // --- Placement ---
@@ -111,6 +189,9 @@ public sealed class ItemDef : ContentDef
 
     /// <summary>Light emitted while held, [r, g, b] 0–15.</summary>
     public int[]? HeldLight { get; init; }
+
+    /// <summary>Left on the ground, it vanishes when day breaks (Fallen Stars, P3-30).</summary>
+    public bool FadesAtDawn { get; init; }
 
     // --- Presentation ---
     public string? Model { get; init; }

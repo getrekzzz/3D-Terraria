@@ -16,6 +16,12 @@ public sealed class SpawnConfig
 {
     public int CheckInterval { get; init; } = 60;
 
+    /// <summary>Hostile creatures go after town residents within this distance (m) when no player is closer.</summary>
+    public float ResidentAggroRange { get; init; } = 14f;
+
+    /// <summary>A resident is chosen only when nearer than the player by this much (m).</summary>
+    public float PlayerPreference { get; init; } = 4f;
+
     /// <summary>Chance per check that a spawn is attempted by day.</summary>
     public float Chance { get; init; } = 0.10f;
 
@@ -180,9 +186,11 @@ public sealed class SpawnDirector
             ctx.Light = EffectiveLight(cell.Value);
             ctx.Random = _rng;
             ctx.PlayerMaxLife = player.State.Vitals.MaxLife;
+            ctx.PlayerDefense = player.State.Defense;
             var atPlayer = session.ContextAt(origin);
             atPlayer.Light = EffectiveLight(origin);
             atPlayer.PlayerMaxLife = player.State.Vitals.MaxLife;
+            atPlayer.PlayerDefense = player.State.Defense;
             var exclusive = ctx.Biomes.Where(_exclusive.Contains).ToList();
             bool hostileHere = hostiles > 0 && !IsSafe(cell.Value, ctx.Layer);
             var eligible = _rules.Where(r => (r.Enemy.HasTag("critter") ? critters > 0 : hostileHere)
@@ -204,6 +212,37 @@ public sealed class SpawnDirector
             return spawned;
         }
         return spawned;
+    }
+
+    /// <summary>
+    /// Enemies likely to appear near a player soon (for preloading their models): those whose spawn rules pass where
+    /// the player stands at the current time, and those of rules naming a biome the player is in.
+    /// </summary>
+    public List<EnemyDef> LikelyEnemies(PlayerEntity p)
+    {
+        var ctx = _world.Session.ContextAt(p.FeetCell);
+        ctx.PlayerMaxLife = p.State.Vitals.MaxLife;
+        return LikelyEnemies(ctx);
+    }
+
+    /// <summary>
+    /// <see cref="LikelyEnemies(PlayerEntity)"/> for a given context. Light is ignored (taken as dark, where most rules
+    /// pass) and chance rolls use a private generator, so asking never changes what actually spawns.
+    /// </summary>
+    public List<EnemyDef> LikelyEnemies(ConditionContext ctx)
+    {
+        ctx.Light = 0;
+        ctx.Random = new Pcg32(0x4C494B45UL);
+        var likely = new List<EnemyDef>();
+        foreach (var (rule, enemy, condition) in _rules)
+        {
+            if (likely.Contains(enemy)) continue;
+            bool named = false;
+            foreach (var biome in ctx.Biomes)
+                if (_namedBiomes[rule].Contains(biome)) { named = true; break; }
+            if (named || condition.Evaluate(ctx)) likely.Add(enemy);
+        }
+        return likely;
     }
 
     /// <summary>Biomes a rule asks for by name (top-level <c>biome any</c> conditions), for exclusive zones.</summary>

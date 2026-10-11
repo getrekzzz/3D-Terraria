@@ -77,8 +77,14 @@ public sealed class GraphicsPreset
     /// <summary>Carried torches cast shadows.</summary>
     public bool TorchShadows { get; set; }
 
-    /// <summary>Real lights for the nearest placed torches, lava and glowing creatures (0 = baked light only).</summary>
+    /// <summary>
+    /// Real (shadowless) lights for the nearest placed torches, lava and glowing creatures (0 = baked light only, which
+    /// stops 7.5 m from a torch).
+    /// </summary>
     public int DynamicLights { get; set; } = 8;
+
+    /// <summary>How many light pets (Shadow Orb, Fairy Bell…) may claim a light from the dynamic pool (0 = baked glow only).</summary>
+    public int PetLights { get; set; } = 2;
 
     public bool Ssao { get; set; } = true;
 
@@ -116,7 +122,10 @@ public sealed class GraphicsPreset
     /// <summary>Cloud light-marching steps (0 draws flat clouds).</summary>
     public int CloudSteps { get; set; } = 3;
 
-    /// <summary>Eye adaptation between bright surface and dark caves.</summary>
+    /// <summary>
+    /// Godot's metering on top of the eye adaptation every preset gets (<see cref="ExposureModel"/>): it fine-tunes
+    /// brightness to the frame within lighting.json's autoMin–autoMax window.
+    /// </summary>
     public bool AutoExposure { get; set; }
 
     /// <summary>Grass blade density (0 disables grass) and draw distance in metres.</summary>
@@ -124,11 +133,44 @@ public sealed class GraphicsPreset
 
     public float GrassDistance { get; set; } = 30f;
 
+    /// <summary>Floating combat numbers on screen at once (8–256); past it the oldest number is reused.</summary>
+    public int CombatNumbers { get; set; } = 48;
+
+    /// <summary>Chunk grass buffers built or rebuilt per frame at most (nearest first; spreads walking-in pops).</summary>
+    public int GrassBuildsPerFrame { get; set; } = 2;
+
     /// <summary>Mesh LOD switch threshold in pixels (lower keeps detail further away).</summary>
     public float LodThreshold { get; set; } = 1f;
 
     /// <summary>How far the horizon (the world's surface beyond the streamed chunks) reaches, in metres; 0 = none.</summary>
     public float HorizonDistance { get; set; }
+
+    /// <summary>Multiplies the particle counts of hit, mining and death effects (EffectKit).</summary>
+    public float EffectsScale { get; set; } = 0.7f;
+
+    /// <summary>Short-lived flash lights (explosions, sparks) alive at once; 0 disables them.</summary>
+    public int FlashLights { get; set; } = 2;
+
+    /// <summary>Human creatures that can lie as physics ragdolls at once (X-16); past it they play their death clip.</summary>
+    public int Ragdolls { get; set; } = 3;
+
+    /// <summary>Pooled lights handed each frame to the glowing projectiles nearest the camera (P1b-15); the rest only glow.</summary>
+    public int ProjectileLights { get; set; } = 4;
+
+    /// <summary>Looping buff and debuff emitters (StatusVisuals) alive at once; handed out first come, first served (past it a status shows only its tint).</summary>
+    public int StatusEmitters { get; set; } = 16;
+
+    /// <summary>How many glowing statuses (On Fire!, Shadowflame…) may claim a light from the dynamic pool.</summary>
+    public int StatusLights { get; set; } = 1;
+
+    /// <summary>How many glowing or light-giving dropped items (Fallen Stars, torches, Hearts) may claim a light from the dynamic pool.</summary>
+    public int DropLights { get; set; } = 2;
+
+    /// <summary>How far ore veins twinkle with light-catching glints, in metres (they fade over the last 30 %).</summary>
+    public float OreGlintDistance { get; set; } = 24f;
+
+    /// <summary>Hair and loose clothing (robes, coat tails) sway on characters within this distance, in metres; 0 = off.</summary>
+    public float SwayDistance { get; set; } = 20f;
 
     /// <summary>A copy to edit into a custom preset.</summary>
     public GraphicsPreset Clone() => (GraphicsPreset)MemberwiseClone();
@@ -152,9 +194,21 @@ public sealed class GraphicsPreset
         if (CloudSteps is < 0 or > 12) yield return "cloudSteps must be within 0–12";
         if (GrassDensity is < 0f or > 1f) yield return "grassDensity must be within 0–1";
         if (GrassDistance is < 0f or > 200f) yield return "grassDistance must be within 0–200 m";
+        if (GrassBuildsPerFrame is < 0 or > 16) yield return "grassBuildsPerFrame must be within 0–16";
         if (LodThreshold is < 0f or > 16f) yield return "lodThreshold must be within 0–16";
         if (DynamicLights is < 0 or > 64) yield return "dynamicLights must be within 0–64";
+        if (EffectsScale is < 0f or > 2f) yield return "effectsScale must be within 0–2";
+        if (FlashLights is < 0 or > 16) yield return "flashLights must be within 0–16";
+        if (Ragdolls is < 0 or > 32) yield return "ragdolls must be within 0–32";
+        if (ProjectileLights is < 0 or > 32) yield return "projectileLights must be within 0–32";
+        if (PetLights is < 0 or > 8) yield return "petLights must be within 0–8";
+        if (StatusEmitters is < 0 or > 64) yield return "statusEmitters must be within 0–64";
+        if (StatusLights is < 0 or > 8) yield return "statusLights must be within 0–8";
+        if (DropLights is < 0 or > 8) yield return "dropLights must be within 0–8";
+        if (CombatNumbers is < 8 or > 256) yield return "combatNumbers must be within 8–256";
         if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";
+        if (OreGlintDistance is < 1f or > 60f) yield return "oreGlintDistance must be within 1–60 m";
+        if (SwayDistance is < 0f or > 120f) yield return "swayDistance must be within 0–120 m";
     }
 
     private static bool PowerOfTwo(int v, int min, int max) => v >= min && v <= max && (v & (v - 1)) == 0;

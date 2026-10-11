@@ -1,56 +1,78 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using Strata.Core.Content.Specs;
-using Strata.Core.Gameplay.Items;
 using Strata.Core.Gameplay.Town;
-using Strata.Game.Items;
+using Strata.Core.Presentation;
 
 namespace Strata.Game.UI;
 
 /// <summary>
-/// Talking to a resident: their line, then Shop (buy with Buy buttons, sell the held stack), their service
-/// (Heal for a price, crafting Help for the held item) and Close. Closes when the player walks away.
+/// Talking to a resident, as Terraria's chat box: a dark-blue box at the top centre (the layout's
+/// <see cref="UiRegion.NpcChat"/> rectangle, clear of the hotbar, buffs and hearts) with the resident's name, their
+/// line wrapped to the box, and under it plain text buttons that turn gold and grow under the mouse: Shop, their
+/// service (TownDialog.Services.cs: Heal with its price, Help, Reforge, Taxes, Quest, a summon) and Close. The box
+/// grows down from the top to fit its text and never spills off its region. It is an overlay: the player keeps moving,
+/// the resident waits facing them while it is open, and walking away (or Esc) closes it. Shop hides the box and asks
+/// for the shop in the inventory (<see cref="ShopRequested"/>), and Reforge for the reforge slot there
+/// (<see cref="ServiceRequested"/>); the conversation goes on there.
 /// </summary>
 public sealed partial class TownDialog : CanvasLayer
 {
     private const string Gate = "town";
+    private const float HoverScale = 1.1f;
+    private const double HoverSeconds = 0.08;
+    private const double LabelRefreshSeconds = 0.25;
+    private const int NameSize = 14;
+    private const int Separation = 4;
+
+    private static readonly Color Rim = Color.Color8(120, 140, 220);
+
+    private readonly List<Button> _buttonList = new();
     private UiContext _ui = null!;
+    private VBoxContainer _host = null!;
     private PanelContainer _root = null!;
     private Label _title = null!;
     private Label _text = null!;
-    private Label _coins = null!;
-    private VBoxContainer _shop = null!;
-    private ScrollContainer _shopScroll = null!;
-    private HBoxContainer _buttons = null!;
+    private HFlowContainer _buttons = null!;
     private TownNpc? _npc;
+    private UiRect? _region;
+    private double _labelWait;
 
     public bool IsOpen => _root.Visible;
     public TownNpc? Resident => _npc;
+
+    /// <summary>The line shown in the box (services answer in it).</summary>
+    public string Text => _text.Text;
+
+    /// <summary>The box opened or closed: the HUD lays the screen out at once, so no frame shows it unplaced.</summary>
+    public event Action? LayoutChanged;
+
+    /// <summary>Shop was pressed: the inventory opens with this resident's shop in its panel host.</summary>
+    public event Action<TownNpc>? ShopRequested;
 
     public void Initialize(UiContext ui)
     {
         _ui = ui;
         Name = "TownDialog";
         Layer = 22;
-        _root = new PanelContainer { Visible = false, Theme = UiTheme.Theme, CustomMinimumSize = new Vector2(560, 0) };
-        _root.SetAnchorsPreset(Control.LayoutPreset.CenterBottom);
-        _root.Position = new Vector2(-280, -330);
-        AddChild(_root);
+        // The host spans the region and passes clicks through; the box in it takes the width and its content's height.
+        _host = new VBoxContainer { Name = "NpcChatRegion", MouseFilter = Control.MouseFilterEnum.Ignore };
+        AddChild(_host);
+        _root = LayoutWidgets.Register(new PanelContainer { Name = "NpcChat", Visible = false, MouseFilter = Control.MouseFilterEnum.Stop });
+        _root.AddThemeStyleboxOverride("panel", ChatStyle());
+        _host.AddChild(_root);
         var box = new VBoxContainer();
+        box.AddThemeConstantOverride("separation", Separation);
         _title = new Label();
-        _title.AddThemeFontSizeOverride("font_size", 20);
+        _title.AddThemeFontSizeOverride("font_size", NameSize);
+        _title.AddThemeColorOverride("font_color", UiTheme.Muted);
         box.AddChild(_title);
-        _text = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(540, 48) };
+        _text = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart };
+        _text.AddThemeFontSizeOverride("font_size", UiFonts.Body);
         box.AddChild(_text);
-        _shopScroll = new ScrollContainer { CustomMinimumSize = new Vector2(540, 190), Visible = false, HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
-        _shop = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        _shopScroll.AddChild(_shop);
-        box.AddChild(_shopScroll);
-        _coins = new Label();
-        _coins.AddThemeColorOverride("font_color", UiTheme.Muted);
-        box.AddChild(_coins);
-        _buttons = new HBoxContainer();
+        _buttons = new HFlowContainer();
+        _buttons.AddThemeConstantOverride("h_separation", 22);
         box.AddChild(_buttons);
         _root.AddChild(box);
         ui.Interaction.TalkRequested += Open;
@@ -58,22 +80,49 @@ public sealed partial class TownDialog : CanvasLayer
 
     public void Open(TownNpc npc)
     {
+        // The interact key works with the chat open: talking to someone else lets the first resident go.
+        if (_npc != null && _npc != npc) _ui.Game.Town.EndTalk(_npc);
+        if (npc.TalkingTo != _ui.Entity) _ui.Game.Town.BeginTalk(npc, _ui.Entity);
         _npc = npc;
+        bool opening = !IsOpen;
         _root.Visible = true;
-        InputGate.SetOpen(Gate, true);
+        InputGate.SetOpen(Gate, true, GateKind.Overlay); // the player can still walk off and fight
         _title.Text = npc.Title;
         _text.Text = _ui.Game.Commerce.Greet(npc, _ui.Entity);
-        ShowShop(false);
         RebuildButtons();
+        if (opening) LayoutChanged?.Invoke();
     }
 
+    /// <summary>Closes the box and lets the resident go.</summary>
     public void Close()
     {
         if (!IsOpen) return;
-        _root.Visible = false;
-        InputGate.SetOpen(Gate, false);
-        if (_npc != null) _ui.Game.Town.EndTalk(_npc);
-        _npc = null;
+        var npc = _npc;
+        HideBox();
+        if (npc != null && npc.TalkingTo == _ui.Entity) _ui.Game.Town.EndTalk(npc);
+    }
+
+    /// <summary>Shop: the box hides and the inventory shows the resident's wares (commands and tests press it too).</summary>
+    public void OpenShop()
+    {
+        if (_npc is not { } npc || !HasShop(npc)) return;
+        HideBox();
+        ShopRequested?.Invoke(npc);
+    }
+
+    /// <summary>Puts the box on the layout's NPC chat region: its width, growing down from the top to fit its text.</summary>
+    public void Place(UiLayoutResult layout)
+    {
+        _region = layout.TryGet(UiRegion.NpcChat, out var r) ? r : null;
+        Arrange();
+    }
+
+    /// <summary>True while the box is open in the top third of the screen, overlapping no other HUD widget.</summary>
+    public bool AtTopClear()
+    {
+        if (!IsOpen || !_root.IsVisibleInTree()) return false;
+        float height = LayoutWidgets.LogicalSize(_root.GetViewport()).Y;
+        return _root.GetGlobalRect().Position.Y < height / 3f && LayoutWidgets.CountOverlapsWith(_root.GetTree(), _root) == 0;
     }
 
     public override void _UnhandledInput(InputEvent e)
@@ -88,168 +137,114 @@ public sealed partial class TownDialog : CanvasLayer
     public override void _Process(double delta)
     {
         if (!IsOpen || _npc == null) return;
-        _coins.Text = $"Coins: {Coins.Format(Coins.Total(_ui.Inventory.Backpack))}";
-        var far = System.Numerics.Vector3.Distance(_npc.Center, _ui.Entity.Center) > _ui.Game.Town.Config.TalkRange + 1f;
-        if (far || !_npc.Alive || !_ui.Entity.Alive || !_ui.Game.Town.Residents.Contains(_npc)) Close();
+        var town = _ui.Game.Town;
+        var far = System.Numerics.Vector3.Distance(_npc.Center, _ui.Entity.Center) > town.Config.TalkRange + 1f;
+        if (far || !_npc.Alive || !_ui.Entity.Alive || !town.Residents.Contains(_npc))
+        {
+            Close();
+            return;
+        }
+        town.HoldTalk(_npc, _ui.Entity);
+        // A price on the service button follows the player (the Nurse's heal shrinks as life regenerates).
+        if ((_labelWait -= delta) > 0) return;
+        _labelWait = LabelRefreshSeconds;
+        RefreshServiceLabels();
     }
 
+    /// <summary>Hides the box without ending the conversation (the shop carries it on).</summary>
+    private void HideBox()
+    {
+        _root.Visible = false;
+        _npc = null;
+        _serviceButtons.Clear();
+        InputGate.SetOpen(Gate, false, GateKind.Overlay);
+        LayoutChanged?.Invoke();
+    }
+
+    /// <summary>Shows a line in the box, which then fits its height to the text.</summary>
+    private void Say(string text)
+    {
+        _text.Text = text;
+        Arrange();
+    }
+
+    /// <summary>The buttons from the resident's definition: Shop when they sell anything, their service, Close.</summary>
     private void RebuildButtons()
     {
-        foreach (var c in _buttons.GetChildren()) c.QueueFree();
+        foreach (var b in _buttonList)
+        {
+            _buttons.RemoveChild(b);
+            b.QueueFree();
+        }
+        _buttonList.Clear();
         var npc = _npc!;
-        if (npc.Def.Shop.Length > 0) _buttons.AddChild(Button("Shop", () => ShowShop(!_shopScroll.Visible)));
-        if (npc.Def.Service is { } service)
+        if (HasShop(npc)) AddShopButtons(npc);
+        AddServiceButtons(npc);
+        AddButton("Close", Close);
+        _labelWait = LabelRefreshSeconds;
+        Arrange();
+    }
+
+    private Button AddButton(string text, Action pressed)
+    {
+        // No keyboard focus: the player walks and jumps while talking, and Space (ui_accept) would press it again.
+        var b = new Button { Text = text, FocusMode = Control.FocusModeEnum.None, ThemeTypeVariation = UiTheme.TextButton };
+        b.AddThemeFontSizeOverride("font_size", UiFonts.Body);
+        b.MouseEntered += () =>
         {
-            if (service.Type == TownServiceSpecs.Heal)
-            {
-                long cost = _ui.Game.Commerce.HealCost(npc, _ui.Entity);
-                _buttons.AddChild(Button(cost > 0 ? $"Heal ({Coins.Format(cost)})" : "Heal", Heal));
-            }
-            else if (service.Type == TownServiceSpecs.CraftHelp)
-            {
-                _buttons.AddChild(Button("Help", CraftHelp));
-            }
-            else if (service.Type == TownServiceSpecs.SummonBoss)
-            {
-                _buttons.AddChild(Button(service.Parse<SummonServiceParams>().Label, Summon));
-            }
-            else if (service.Type == TownServiceSpecs.Reforge)
-            {
-                long cost = _ui.Game.Services.ReforgeCost(npc, _ui.Entity);
-                _buttons.AddChild(Button(cost > 0 ? $"Reforge ({Coins.Format(cost)})" : "Reforge", Reforge));
-            }
-            else if (service.Type == TownServiceSpecs.Taxes)
-            {
-                long due = _ui.Game.Services.TaxesDue(npc);
-                _buttons.AddChild(Button(due > 0 ? $"Taxes ({Coins.Format(due)})" : "Taxes", CollectTaxes));
-            }
-            else if (service.Type == TownServiceSpecs.AnglerQuest)
-            {
-                _buttons.AddChild(Button("Quest", AnglerQuest));
-            }
-        }
-        _buttons.AddChild(Button("Chat", () => _text.Text = _ui.Game.Commerce.Greet(npc, _ui.Entity)));
-        _buttons.AddChild(Button("Close", Close));
-    }
-
-    /// <summary>Shows the shop list (commands, tests).</summary>
-    public void OpenShop() => ShowShop(true);
-
-    private void ShowShop(bool show)
-    {
-        _shopScroll.Visible = show;
-        if (!show || _npc == null) return;
-        foreach (var c in _shop.GetChildren()) c.QueueFree();
-        var commerce = _ui.Game.Commerce;
-        foreach (var offer in commerce.Stock(_npc, _ui.Entity))
-        {
-            var row = new HBoxContainer();
-            row.AddChild(new TextureRect { Texture = ItemIcons.Get(offer.Item), CustomMinimumSize = new Vector2(32, 32), ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered });
-            row.AddChild(new Label { Text = offer.Item.DisplayName, SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, TooltipText = string.Join("\n", _ui.Tooltip(new ItemStack(offer.Item, 1)).Select(t => t.Text)) });
-            row.AddChild(new Label { Text = Coins.Format(offer.Price) });
-            var item = offer.Item;
-            row.AddChild(Button("Buy", () => Report(commerce.Buy(_npc, _ui.Entity, item), $"Bought {item.DisplayName}.")));
-            _shop.AddChild(row);
-        }
-        var sell = new HBoxContainer();
-        sell.AddChild(Button("Sell held stack", SellHeld));
-        _shop.AddChild(sell);
-    }
-
-    private void SellHeld()
-    {
-        var inv = _ui.Inventory;
-        var held = inv.Held;
-        if (held.IsEmpty) return;
-        long value = _ui.Game.Commerce.SaleValue(held);
-        Report(_ui.Game.Commerce.Sell(_ui.Entity, inv.SelectedHotbar), $"Sold for {Coins.Format(value)}.");
-    }
-
-    private void Heal()
-    {
-        Report(_ui.Game.Commerce.Heal(_npc!, _ui.Entity), "You feel much better.");
-        RebuildButtons();
-    }
-
-    private void CraftHelp()
-    {
-        var held = _ui.Inventory.Held;
-        if (held.IsEmpty)
-        {
-            _text.Text = "Hold an item and ask again: I will tell you what it becomes.";
-            return;
-        }
-        var recipes = _ui.Game.Commerce.RecipesUsing(held.Item!);
-        _text.Text = recipes.Count == 0
-            ? $"I know of nothing made from {held.Item!.DisplayName}."
-            : $"{held.Item!.DisplayName} goes into: " + string.Join(", ", recipes.Select(r =>
-                $"{_ui.Game.Session.Content.Items.Get(r.Output).DisplayName}{(r.Stations.Length > 0 ? $" (at {string.Join(" or ", r.Stations)})" : "")}").Distinct());
-    }
-
-    private void Summon()
-    {
-        var result = _ui.Game.Commerce.Summon(_npc!, _ui.Entity, out var why);
-        if (result == TradeResult.Refused) _text.Text = why ?? "Not now.";
-        else if (result == TradeResult.NothingToDo) _text.Text = "It is already awake.";
-        else Report(result, "So be it.");
-    }
-
-    private void Reforge()
-    {
-        var services = _ui.Game.Services;
-        var held = _ui.Inventory.Held;
-        if (services.ReforgeCost(_npc!, _ui.Entity) == 0)
-        {
-            _text.Text = held.IsEmpty ? "Hold a weapon, tool or accessory and I'll tinker with it." : $"I can't improve a {held.Item!.DisplayName}.";
-            return;
-        }
-        var result = services.Reforge(_npc!, _ui.Entity, out var made);
-        Report(result, $"Reforged: {made}.");
-        RebuildButtons();
-    }
-
-    private void CollectTaxes()
-    {
-        var result = _ui.Game.Services.CollectTaxes(_npc!, _ui.Entity, out long amount);
-        _text.Text = result == TradeResult.Ok ? $"Here's your cut: {Coins.Format(amount)}. Don't spend it all at once." : "Nothing's come in yet. Come back later.";
-        RebuildButtons();
-    }
-
-    private void AnglerQuest()
-    {
-        var services = _ui.Game.Services;
-        var wanted = services.AnglerWants(_npc!);
-        if (wanted == null)
-        {
-            _text.Text = "You already caught what I wanted today. Come back tomorrow!";
-            return;
-        }
-        var result = services.TurnInFish(_npc!, _ui.Entity, out var reward);
-        _text.Text = result switch
-        {
-            TradeResult.Ok => reward.IsEmpty ? "Finally! Here, take some coins." : $"Finally! Take this: {reward}.",
-            _ => $"I want a {wanted.DisplayName}. Go catch me one! Don't come back without it.",
+            Grow(b, HoverScale);
+            Audio.Sfx.Play("ui_hover");
         };
-    }
-
-    private void Report(TradeResult result, string success)
-    {
-        if (result == TradeResult.Ok) Audio.Sfx.Play("coins");
-        _text.Text = result switch
+        b.MouseExited += () => Grow(b, 1f);
+        b.Pressed += () =>
         {
-            TradeResult.Ok => success,
-            TradeResult.TooPoor => "You cannot afford that.",
-            TradeResult.NoRoom => "Your pockets are full.",
-            TradeResult.NotSold => "I have no use for that.",
-            TradeResult.NothingToDo => "You look perfectly healthy to me.",
-            _ => "That is not for sale today.",
+            Audio.Sfx.Play("ui_click");
+            pressed();
         };
-    }
-
-    private static Button Button(string text, Action onPressed)
-    {
-        var b = new Button { Text = text };
-        b.Pressed += onPressed;
+        _buttons.AddChild(b);
+        _buttonList.Add(b);
         return b;
+    }
+
+    /// <summary>A new price on a button: it grows about its new centre.</summary>
+    private static void SetLabel(Button b, string text)
+    {
+        b.Text = text;
+        b.ResetSize();
+        b.PivotOffset = b.GetCombinedMinimumSize() / 2f;
+    }
+
+    /// <summary>Terraria's hover: the word grows about its centre.</summary>
+    private static void Grow(Button b, float scale)
+    {
+        b.PivotOffset = b.Size / 2f;
+        b.CreateTween().TweenProperty(b, "scale", new Vector2(scale, scale), HoverSeconds);
+    }
+
+    /// <summary>
+    /// The box at the top of its region, as wide as it, and as tall as its content (the host container shrinks it to
+    /// fit as the text changes): the line is cut to the rows that fit under the name and over the buttons, so the box
+    /// never spills past the region onto the HUD.
+    /// </summary>
+    private void Arrange()
+    {
+        if (_region is not { } r) return;
+        _host.Position = new Vector2(r.X, r.Y);
+        _host.Size = new Vector2(r.W, r.H);
+        float chrome = _root.GetThemeStylebox("panel").GetMinimumSize().Y + 2 * Separation
+            + _title.GetCombinedMinimumSize().Y + _buttons.GetCombinedMinimumSize().Y;
+        float line = _text.GetLineHeight() + _text.GetThemeConstant("line_spacing");
+        _text.MaxLinesVisible = Math.Max(1, (int)((r.H - chrome) / Math.Max(1f, line)));
+    }
+
+    /// <summary>Terraria's chat box: deep blue, a little see-through, with a light rim.</summary>
+    private static StyleBoxFlat ChatStyle()
+    {
+        var style = new StyleBoxFlat { BgColor = UiTheme.ChatPanel, BorderColor = Rim, AntiAliasing = true };
+        style.SetBorderWidthAll(2);
+        style.SetCornerRadiusAll(8);
+        style.ContentMarginLeft = style.ContentMarginRight = 14;
+        style.ContentMarginTop = style.ContentMarginBottom = 8;
+        return style;
     }
 }

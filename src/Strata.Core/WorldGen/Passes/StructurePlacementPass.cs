@@ -122,6 +122,9 @@ public sealed class StructurePlacementPass : GenPass
     internal static void AddStructure(Plan.WorldPlan plan, string kind, Blueprint bp, string? zone = null) =>
         plan.AddFeature(new StructureFeature(bp) { Kind = kind, Zone = zone });
 
+    /// <summary>Adds a ready-made structure feature (e.g. the Dungeon, which carries its layout).</summary>
+    internal static void AddStructure(Plan.WorldPlan plan, StructureFeature feature) => plan.AddFeature(feature);
+
     /// <summary>A surface point inside a given biome (landness high, not near spawn).</summary>
     internal static bool TryBiomeSurfacePoint(PlanContext ctx, ref Pcg32 rng, string biome, float minFromSpawn, out Int3 ground)
     {

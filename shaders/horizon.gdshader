@@ -36,6 +36,7 @@ void fragment() {
 		ALBEDO = base * 0.6;
 		ROUGHNESS = 0.08 + fine * 0.05;
 		SPECULAR = 0.6;
+		AO = 1.0;
 	} else {
 		float slope = 1.0 - clamp(dot(normalize((INV_VIEW_MATRIX * vec4(NORMAL, 0.0)).xyz), vec3(0.0, 1.0, 0.0)), 0.0, 1.0);
 		vec3 rock = vec3(0.34, 0.32, 0.3);
@@ -45,11 +46,15 @@ void fragment() {
 		float canopy = smoothstep(0.38, 0.62, clumps) * green;
 		base = mix(base, base * vec3(0.42, 0.5, 0.4), canopy);
 		base = mix(base * (0.8 + 0.4 * n) * (0.88 + 0.24 * fine), rock, smoothstep(0.35, 0.7, slope));
+		// Bright sand and snow map colours would outshine the real (textured, shadowed) terrain in front of them.
+		float l = dot(base, vec3(0.2126, 0.7152, 0.0722));
+		base *= min(1.0, 0.42 / max(l, 1e-3));
 		ALBEDO = base;
 		ROUGHNESS = 0.9;
 		SPECULAR = 0.3;
+		// Unresolved small-scale shading (dunes, trees, rocks) the coarse heightfield lacks.
+		AO = 0.8;
 	}
-	AO = 1.0;
 	f_sun_gate = strata_cloud_shadow(v_world, strata_light_dir);
 }
 

@@ -1,0 +1,136 @@
+{
+ "comment": "P4-04: boss trophies (a plaque with the boss's own model as a bust) and Expert treasure bags (bgen/trophies.py).",
+ "objects": {
+  "king_slime_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "slime_king",
+    "creatureParams": {}
+   }
+  },
+  "eye_of_cthulhu_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "cthulhu_eye",
+    "creatureParams": {}
+   }
+  },
+  "eater_of_worlds_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "eater_head",
+    "creatureParams": {
+     "radius": 0.8,
+     "length": 1.2
+    }
+   }
+  },
+  "brain_of_cthulhu_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "cthulhu_brain",
+    "creatureParams": {}
+   }
+  },
+  "queen_bee_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "queen_bee_detailed",
+    "creatureParams": {}
+   }
+  },
+  "skeletron_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "skeletron_skull",
+    "creatureParams": {
+     "radius": 1.1
+    }
+   }
+  },
+  "deerclops_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "deerclops_beast",
+    "creatureParams": {}
+   }
+  },
+  "wall_of_flesh_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "wof_mouth",
+    "creatureParams": {
+     "radius": 2.1
+    }
+   }
+  }
+ },
+ "items": {
+  "explicit": {
+   "king_slime_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#3a6ad8",
+     "trim": "#e0b040",
+     "emblem": "#ff4060"
+    }
+   },
+   "eye_of_cthulhu_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#b03028",
+     "trim": "#e8e0c8",
+     "emblem": "#4a9ad8"
+    }
+   },
+   "eater_of_worlds_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#5a3a7a",
+     "trim": "#9a80b0",
+     "emblem": "#80ff40"
+    }
+   },
+   "brain_of_cthulhu_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#a03a4a",
+     "trim": "#e8b0a0",
+     "emblem": "#ffd040"
+    }
+   },
+   "queen_bee_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#e0a020",
+     "trim": "#3a2a1a",
+     "emblem": "#ffe060"
+    }
+   },
+   "skeletron_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#4a4a5a",
+     "trim": "#e8e0c8",
+     "emblem": "#ff5030"
+    }
+   },
+   "deerclops_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#5a6a7a",
+     "trim": "#d8e0f0",
+     "emblem": "#ff3030"
+    }
+   },
+   "wall_of_flesh_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#8a2a3a",
+     "trim": "#e0b040",
+     "emblem": "#ff8040"
+    }
+   }
+  }
+ }
+}

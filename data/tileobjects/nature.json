@@ -1,24 +1,24 @@
 {
   // World-generated flora, debris and treasures. Models come from tools/blender generators.
   "tileObjects": [
-    { "id": "oak_tree", "name": "Tree", "size": [3, 22, 3], "collision": "trunk", "breakTool": "axe", "hitPoints": 6, "variants": 4, "loot": "tree_oak", "natural": true, "covers": ["terraria:tree"] },
-    { "id": "pine_tree", "name": "Boreal Tree", "size": [3, 26, 3], "collision": "trunk", "breakTool": "axe", "hitPoints": 6, "variants": 3, "loot": "tree_pine", "natural": true, "covers": ["terraria:boreal_tree"] },
-    { "id": "palm_tree", "name": "Palm Tree", "size": [3, 20, 3], "collision": "trunk", "breakTool": "axe", "hitPoints": 5, "variants": 3, "loot": "tree_palm", "natural": true, "covers": ["terraria:palm_tree"] },
-    { "id": "mahogany_tree", "name": "Rich Mahogany Tree", "size": [4, 30, 4], "collision": "trunk", "breakTool": "axe", "hitPoints": 8, "variants": 3, "loot": "tree_mahogany", "natural": true, "covers": ["terraria:mahogany_tree"] },
-    { "id": "ebonwood_tree", "name": "Ebonwood Tree", "size": [3, 20, 3], "collision": "trunk", "breakTool": "axe", "hitPoints": 6, "variants": 2, "loot": "tree_ebonwood", "natural": true, "covers": ["terraria:ebonwood_tree"] },
-    { "id": "cactus", "name": "Cactus", "size": [2, 8, 2], "collision": "solid", "breakTool": "axe", "hitPoints": 3, "variants": 3, "loot": "cactus_plant", "natural": true, "covers": ["terraria:cactus"] },
-    { "id": "giant_glowing_mushroom", "name": "Giant Glowing Mushroom", "size": [5, 14, 5], "collision": "trunk", "breakTool": "axe", "hitPoints": 5, "variants": 2, "light": [2, 5, 12], "loot": "glowing_mushroom_giant", "natural": true, "covers": ["terraria:giant_glowing_mushroom"] },
-    { "id": "grass_tuft", "name": "Tall Grass", "size": [1, 1, 1], "decor": true, "variants": 4, "natural": true },
-    { "id": "flower", "name": "Flower", "size": [1, 1, 1], "decor": true, "variants": 4, "natural": true },
+    { "id": "oak_tree", "name": "Tree", "size": [3, 22, 3], "collision": "trunk", "breakTool": "axe", "hitPoints": 6, "variants": 4, "loot": "tree_oak", "sound": "wood", "dustColor": "#8a6040", "leaves": "#4a8a2a", "topple": true, "natural": true, "covers": ["terraria:tree"] },
+    { "id": "pine_tree", "name": "Boreal Tree", "size": [3, 26, 3], "collision": "trunk", "breakTool": "axe", "hitPoints": 6, "variants": 3, "loot": "tree_pine", "sound": "wood", "dustColor": "#9a7a54", "leaves": "#2e6a3a", "topple": true, "natural": true, "covers": ["terraria:boreal_tree"] },
+    { "id": "palm_tree", "name": "Palm Tree", "size": [3, 20, 3], "collision": "trunk", "breakTool": "axe", "hitPoints": 5, "variants": 3, "loot": "tree_palm", "sound": "wood", "dustColor": "#b08a5a", "leaves": "#5a9a3a", "topple": true, "natural": true, "covers": ["terraria:palm_tree"] },
+    { "id": "mahogany_tree", "name": "Rich Mahogany Tree", "size": [4, 30, 4], "collision": "trunk", "breakTool": "axe", "hitPoints": 8, "variants": 3, "loot": "tree_mahogany", "sound": "wood", "dustColor": "#7a3a2a", "leaves": "#3a7a2a", "topple": true, "natural": true, "covers": ["terraria:mahogany_tree"] },
+    { "id": "ebonwood_tree", "name": "Ebonwood Tree", "size": [3, 20, 3], "collision": "trunk", "breakTool": "axe", "hitPoints": 6, "variants": 2, "loot": "tree_ebonwood", "sound": "wood", "dustColor": "#5a4a6a", "leaves": "#6a4a8a", "topple": true, "natural": true, "covers": ["terraria:ebonwood_tree"] },
+    { "id": "cactus", "name": "Cactus", "size": [2, 8, 2], "collision": "solid", "breakTool": "axe", "hitPoints": 3, "variants": 3, "loot": "cactus_plant", "sound": "grass", "dustColor": "#5a8a3a", "natural": true, "covers": ["terraria:cactus"] },
+    { "id": "giant_glowing_mushroom", "name": "Giant Glowing Mushroom", "size": [5, 14, 5], "collision": "trunk", "breakTool": "axe", "hitPoints": 5, "variants": 2, "light": [2, 5, 12], "loot": "glowing_mushroom_giant", "sound": "grass", "dustColor": "#4a6ad0", "leaves": "#5a8aff", "topple": true, "natural": true, "covers": ["terraria:giant_glowing_mushroom"] },
+    { "id": "grass_tuft", "breakByAttack": true, "name": "Tall Grass", "size": [1, 1, 1], "decor": true, "variants": 4, "natural": true },
+    { "id": "flower", "breakByAttack": true, "name": "Flower", "size": [1, 1, 1], "decor": true, "variants": 4, "natural": true },
     { "id": "bush", "name": "Bush", "size": [2, 2, 2], "decor": true, "variants": 3, "natural": true },
-    { "id": "fern", "name": "Jungle Plant", "size": [2, 2, 2], "decor": true, "variants": 3, "natural": true },
-    { "id": "mushroom_plant", "name": "Mushroom", "size": [1, 1, 1], "decor": true, "loot": "plant_mushroom", "natural": true, "covers": ["terraria:mushroom"] },
-    { "id": "glowing_mushroom_plant", "name": "Glowing Mushroom", "size": [1, 1, 1], "decor": true, "light": [1, 3, 8], "loot": "plant_glowing_mushroom", "natural": true, "covers": ["terraria:glowing_mushroom"] },
-    { "id": "stalagmite", "name": "Stalagmite", "size": [1, 3, 1], "decor": true, "variants": 3, "natural": true },
-    { "id": "stalactite", "name": "Stalactite", "size": [1, 3, 1], "anchor": "ceiling", "decor": true, "variants": 3, "natural": true },
-    { "id": "rubble", "name": "Rubble", "size": [2, 1, 2], "decor": true, "variants": 3, "natural": true },
-    { "id": "pot", "name": "Pot", "size": [2, 2, 2], "hitPoints": 1, "variants": 3, "loot": "pot", "natural": true, "covers": ["terraria:pot"] },
-    { "id": "life_crystal_node", "name": "Life Crystal", "size": [2, 2, 2], "breakTool": "pick", "hitPoints": 3, "light": [9, 2, 4], "loot": "life_crystal_node", "natural": true, "covers": ["terraria:life_crystal"] },
-    { "id": "enchanted_sword_shrine", "name": "Enchanted Sword in Stone", "description": "Something sleeps in the stone.", "size": [3, 4, 3], "breakTool": "pick", "hitPoints": 6, "light": [6, 8, 12], "loot": "enchanted_sword_shrine", "natural": true, "covers": ["terraria:enchanted_sword_shrine"] }
+    { "id": "fern", "breakByAttack": true, "name": "Jungle Plant", "size": [2, 2, 2], "decor": true, "variants": 3, "natural": true },
+    { "id": "mushroom_plant", "breakByAttack": true, "name": "Mushroom", "size": [1, 1, 1], "decor": true, "loot": "plant_mushroom", "natural": true, "covers": ["terraria:mushroom"] },
+    { "id": "glowing_mushroom_plant", "breakByAttack": true, "name": "Glowing Mushroom", "size": [1, 1, 1], "decor": true, "light": [1, 3, 8], "loot": "plant_glowing_mushroom", "natural": true, "covers": ["terraria:glowing_mushroom"] },
+    { "id": "stalagmite", "name": "Stalagmite", "size": [1, 3, 1], "decor": true, "variants": 3, "sound": "stone", "dustColor": "#7a7a80", "natural": true },
+    { "id": "stalactite", "name": "Stalactite", "size": [1, 3, 1], "anchor": "ceiling", "decor": true, "variants": 3, "sound": "stone", "dustColor": "#7a7a80", "natural": true },
+    { "id": "rubble", "name": "Rubble", "size": [2, 1, 2], "decor": true, "variants": 3, "sound": "stone", "dustColor": "#7a7a80", "natural": true },
+    { "id": "pot", "breakByAttack": true, "name": "Pot", "size": [2, 2, 2], "hitPoints": 1, "variants": 3, "loot": "pot", "sound": "pot", "dustColor": "#9a6040", "natural": true, "covers": ["terraria:pot"] },
+    { "id": "life_crystal_node", "name": "Life Crystal", "size": [2, 2, 2], "breakTool": "pick", "hitPoints": 3, "light": [9, 2, 4], "loot": "life_crystal_node", "sound": "glass", "dustColor": "#ff4a6a", "natural": true, "covers": ["terraria:life_crystal"] },
+    { "id": "enchanted_sword_shrine", "name": "Enchanted Sword in Stone", "description": "Something sleeps in the stone.", "size": [3, 4, 3], "breakTool": "pick", "hitPoints": 6, "light": [6, 8, 12], "loot": "enchanted_sword_shrine", "sound": "stone", "dustColor": "#8a8a90", "natural": true, "covers": ["terraria:enchanted_sword_shrine"] }
   ]
 }

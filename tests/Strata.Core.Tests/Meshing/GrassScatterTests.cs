@@ -18,14 +18,16 @@ public class GrassScatterTests
     private const int Top = 40;
     private static readonly Int3 Chunk = new(1, 1, 1);
 
-    private static List<GrassClump> Scatter(Action<EditBatch, Func<string, ushort>> edit)
+    private static List<GrassClump> Scatter(Action<EditBatch, Func<string, ushort>> edit) => Mesh(edit).Grass;
+
+    private static ChunkMeshResult Mesh(Action<EditBatch, Func<string, ushort>> edit, int skyTop = Top)
     {
         var world = TestWorlds.Filled("air");
         var batch = world.BeginEdit();
         edit(batch, world.Content.BlockId);
         batch.Commit();
         var nb = Neighborhood.Capture(world, Chunk) ?? throw new InvalidOperationException("missing neighbours");
-        return ChunkMesher.Build(nb, Tables, (_, _) => Top, Array.Empty<LightSource>()).Grass;
+        return ChunkMesher.Build(nb, Tables, (_, _) => skyTop, Array.Empty<LightSource>());
     }
 
     private static void Ground(EditBatch b, ushort block, Func<int, int, bool>? where = null)
@@ -78,6 +80,9 @@ public class GrassScatterTests
         Assert.Equal(0, GrassScatter.VisibleCount(a, 0f));
         Assert.Equal(a.Count, GrassScatter.VisibleCount(a, 1f));
         Assert.Equal(a.Count(c => c.Rank < 0.35f), GrassScatter.VisibleCount(a, 0.35f));
+        var ranks = a.Select(c => c.Rank).ToArray();
+        foreach (float density in new[] { 0f, 0.1f, 0.35f, 0.999f, 1f })
+            Assert.Equal(GrassScatter.VisibleCount(a, density), GrassScatter.VisibleCount(ranks, density));
     }
 
     [Fact]
@@ -178,5 +183,39 @@ public class GrassScatterTests
         Assert.Contains(problems, p => p.Contains("grass: flowers need flowerColors"));
         Assert.Contains(problems, p => p.Contains("'stone' names a block without the 'grass' tag"));
         Assert.Contains(problems, p => p.Contains("'jungle_grass' is tagged 'grass' but has no grass kind"));
+    }
+
+    [Fact]
+    public void GrassHashesAreDeterministic()
+    {
+        var a = Mesh((b, id) => Ground(b, id("grass")));
+        var b2 = Mesh((b, id) => Ground(b, id("grass")));
+        Assert.NotEmpty(a.Grass);
+        Assert.Equal(a.GrassShapeHash, b2.GrassShapeHash);
+        Assert.Equal(a.GrassLightHash, b2.GrassLightHash);
+        Assert.Equal((a.GrassShapeHash, a.GrassLightHash), GrassScatter.Hashes(a.Grass));
+    }
+
+    [Fact]
+    public void LightOnlyChangeKeepsTheShapeHash()
+    {
+        var lit = Mesh((b, id) => Ground(b, id("grass")));
+        // The sky is blocked far above (a roof the chunk cannot see): same clumps, darker roots.
+        var shaded = Mesh((b, id) => Ground(b, id("grass")), skyTop: Top + 200);
+        Assert.Equal(lit.Grass.Count, shaded.Grass.Count);
+        Assert.Equal(lit.GrassShapeHash, shaded.GrassShapeHash);
+        Assert.NotEqual(lit.GrassLightHash, shaded.GrassLightHash);
+    }
+
+    [Fact]
+    public void RemovingAGrassBlockChangesTheShapeHash()
+    {
+        var full = Mesh((b, id) => Ground(b, id("grass")));
+        var dug = Mesh((b, id) =>
+        {
+            Ground(b, id("grass"));
+            b.SetBlock(40, Top - 1, 40, id("air"));
+        });
+        Assert.NotEqual(full.GrassShapeHash, dug.GrassShapeHash);
     }
 }

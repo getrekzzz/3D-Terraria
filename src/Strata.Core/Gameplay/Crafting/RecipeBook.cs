@@ -63,6 +63,74 @@ public sealed class RecipeBook
         return true;
     }
 
+    /// <summary>Whether a player can craft it: ingredients count in the backpack, coin and ammo slots, as in the reference game.</summary>
+    public bool CanCraft(CompiledRecipe r, PlayerInventory inventory, IReadOnlySet<string> stations, ConditionContext context) =>
+        StationsAndConditionsMet(r, stations, context) && r.Inputs.All(i => inventory.CountAll(d => i.Accepts.Contains(d)) >= i.Count);
+
+    /// <summary>
+    /// Crafts once for a player: ingredients come from the backpack, then the ammo and coin slots (wooden arrows for
+    /// flaming arrows), and the output is picked up (arrows to the ammo slots). Returns false (changing nothing) if
+    /// requirements fail or the output does not fit.
+    /// </summary>
+    public bool Craft(CompiledRecipe r, PlayerInventory inventory, IReadOnlySet<string> stations, ConditionContext context)
+    {
+        if (!CanCraft(r, inventory, stations, context)) return false;
+        var output = Prefixes.Fresh(r.Output, r.Def.Count, _content, ref _rng);
+        var backpack = new Inventory(inventory.Backpack.ToArray());
+        var ammo = new Inventory(inventory.Ammo.ToArray());
+        var coins = new Inventory(inventory.Coins.ToArray());
+        foreach (var ing in r.Inputs) Consume(ing, backpack, ammo, coins);
+        if (!PlayerInventory.CanTake(backpack, coins, ammo, output)) return false;
+        foreach (var ing in r.Inputs) Consume(ing, inventory.Backpack, inventory.Ammo, inventory.Coins);
+        inventory.Pickup(output);
+        return true;
+    }
+
+    /// <summary>
+    /// Crafts once onto the mouse cursor, as Terraria's crafting slot does: an empty cursor takes the output, a cursor
+    /// holding the same item with room for the whole output takes it on top, anything else refuses. Ingredients come
+    /// out as in <see cref="Craft(CompiledRecipe, Inventory, IReadOnlySet{string}, ConditionContext)"/>. Returns false
+    /// (changing nothing) when requirements fail or the cursor cannot take the output.
+    /// </summary>
+    public bool CraftInto(ref ItemStack cursor, CompiledRecipe r, Inventory inventory, IReadOnlySet<string> stations, ConditionContext context)
+    {
+        if (!CursorTakes(cursor, r) || !CanCraft(r, inventory, stations, context)) return false;
+        foreach (var ing in r.Inputs) inventory.Remove(d => ing.Accepts.Contains(d), ing.Count);
+        cursor = OntoCursor(cursor, r);
+        return true;
+    }
+
+    /// <summary>
+    /// Crafts once onto a player's cursor: ingredients from the backpack, then the ammo and coin slots, as in
+    /// <see cref="Craft(CompiledRecipe, PlayerInventory, IReadOnlySet{string}, ConditionContext)"/>.
+    /// </summary>
+    public bool CraftInto(ref ItemStack cursor, CompiledRecipe r, PlayerInventory inventory, IReadOnlySet<string> stations, ConditionContext context)
+    {
+        if (!CursorTakes(cursor, r) || !CanCraft(r, inventory, stations, context)) return false;
+        foreach (var ing in r.Inputs) Consume(ing, inventory.Backpack, inventory.Ammo, inventory.Coins);
+        cursor = OntoCursor(cursor, r);
+        return true;
+    }
+
+    /// <summary>
+    /// Whether a cursor holding <paramref name="cursor"/> can take one craft of <paramref name="r"/>: it is empty, or holds
+    /// the same stackable item (no prefix) with room for the recipe's whole count.
+    /// </summary>
+    public static bool CursorTakes(ItemStack cursor, CompiledRecipe r) =>
+        cursor.IsEmpty || (cursor.Item == r.Output && cursor.Prefix == null && r.Output.MaxStack > 1 && cursor.SpaceLeft >= r.Def.Count);
+
+    /// <summary>The cursor after one craft: a fresh output (a weapon may roll a prefix) or the held stack grown by the count.</summary>
+    private ItemStack OntoCursor(ItemStack cursor, CompiledRecipe r) =>
+        cursor.IsEmpty ? Prefixes.Fresh(r.Output, r.Def.Count, _content, ref _rng) : cursor.WithCount(cursor.Count + r.Def.Count);
+
+    private static void Consume(Ingredient ing, Inventory first, Inventory second, Inventory third)
+    {
+        Func<ItemDef, bool> match = ing.Accepts.Contains;
+        int left = ing.Count - first.Remove(match, ing.Count);
+        if (left > 0) left -= second.Remove(match, left);
+        if (left > 0) third.Remove(match, left);
+    }
+
     private static void Index(Dictionary<ItemDef, List<CompiledRecipe>> index, ItemDef key, CompiledRecipe r)
     {
         if (!index.TryGetValue(key, out var list)) index[key] = list = new List<CompiledRecipe>();

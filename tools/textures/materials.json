@@ -291,8 +291,10 @@
    "light": "#8d8e96",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#d9824f",
-   "metallic": 0.8
+   "ore": "#e8804a",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "tin_ore",
@@ -302,8 +304,10 @@
    "light": "#8d8e96",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#c8c0a0",
-   "metallic": 0.8
+   "ore": "#d8cc98",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "iron_ore",
@@ -313,8 +317,10 @@
    "light": "#8d8e96",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#b09080",
-   "metallic": 0.7
+   "ore": "#c4a488",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "lead_ore",
@@ -324,8 +330,10 @@
    "light": "#8d8e96",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#6a7888",
-   "metallic": 0.7
+   "ore": "#6a7c98",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "silver_ore",
@@ -335,8 +343,10 @@
    "light": "#8d8e96",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#e0e6ec",
-   "metallic": 0.9
+   "ore": "#eef0f4",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "tungsten_ore",
@@ -346,8 +356,10 @@
    "light": "#8d8e96",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#8ab888",
-   "metallic": 0.8
+   "ore": "#86c87c",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "gold_ore",
@@ -357,8 +369,10 @@
    "light": "#8d8e96",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#f0cc40",
-   "metallic": 1.0
+   "ore": "#ffd040",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "platinum_ore",
@@ -368,8 +382,10 @@
    "light": "#8d8e96",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#c8d8e8",
-   "metallic": 0.9
+   "ore": "#d8ecf8",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "umbrite_ore",
@@ -379,8 +395,10 @@
    "light": "#8d8e96",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#8a60d0",
-   "metallic": 0.6
+   "ore": "#8a5ae8",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "sanguite_ore",
@@ -390,8 +408,10 @@
    "light": "#8d8e96",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#e04860",
-   "metallic": 0.6
+   "ore": "#e03848",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "meteorite",
@@ -403,7 +423,8 @@
    "cracks": 0.8,
    "ore": "#ff7a30",
    "metallic": 0.5,
-   "nugget_size": 0.25
+   "nugget_size": 0.25,
+   "flecks": 140
   },
   {
    "name": "cinderstone",
@@ -413,7 +434,7 @@
    "light": "#8a3a20",
    "cells": 14,
    "cracks": 0.9,
-   "ore": "#ff5a10",
+   "ore": "#ff5a20",
    "metallic": 0.2,
    "nugget_size": 0.45,
    "nuggets": 30
@@ -642,6 +663,123 @@
    "mortar": "#2a1420"
   },
   {
+   "name": "azure_brick_wall",
+   "type": "bricks",
+   "base": "#2a4274",
+   "dark": "#16264a",
+   "light": "#40609a",
+   "mortar": "#0c1424",
+   "rows": 4,
+   "cols": 2
+  },
+  {
+   "name": "azure_slab",
+   "type": "bricks",
+   "base": "#2a4274",
+   "dark": "#16264a",
+   "light": "#40609a",
+   "mortar": "#0c1424",
+   "rows": 2,
+   "cols": 1,
+   "stagger": false,
+   "bevel": 0.2
+  },
+  {
+   "name": "azure_tiled",
+   "type": "bricks",
+   "base": "#2a4274",
+   "dark": "#16264a",
+   "light": "#40609a",
+   "mortar": "#0c1424",
+   "rows": 4,
+   "cols": 4,
+   "stagger": false,
+   "mortar_width": 0.05,
+   "roughness": 0.35
+  },
+  {
+   "name": "verdant_brick_wall",
+   "type": "bricks",
+   "base": "#2e5c42",
+   "dark": "#183824",
+   "light": "#487a5a",
+   "mortar": "#0c1a12",
+   "rows": 4,
+   "cols": 2
+  },
+  {
+   "name": "verdant_slab",
+   "type": "bricks",
+   "base": "#2e5c42",
+   "dark": "#183824",
+   "light": "#487a5a",
+   "mortar": "#0c1a12",
+   "rows": 2,
+   "cols": 1,
+   "stagger": false,
+   "bevel": 0.2
+  },
+  {
+   "name": "verdant_tiled",
+   "type": "bricks",
+   "base": "#2e5c42",
+   "dark": "#183824",
+   "light": "#487a5a",
+   "mortar": "#0c1a12",
+   "rows": 4,
+   "cols": 4,
+   "stagger": false,
+   "mortar_width": 0.05,
+   "roughness": 0.35
+  },
+  {
+   "name": "rose_brick_wall",
+   "type": "bricks",
+   "base": "#723050",
+   "dark": "#46182c",
+   "light": "#96486a",
+   "mortar": "#1e0e16",
+   "rows": 4,
+   "cols": 2
+  },
+  {
+   "name": "rose_slab",
+   "type": "bricks",
+   "base": "#723050",
+   "dark": "#46182c",
+   "light": "#96486a",
+   "mortar": "#1e0e16",
+   "rows": 2,
+   "cols": 1,
+   "stagger": false,
+   "bevel": 0.2
+  },
+  {
+   "name": "rose_tiled",
+   "type": "bricks",
+   "base": "#723050",
+   "dark": "#46182c",
+   "light": "#96486a",
+   "mortar": "#1e0e16",
+   "rows": 4,
+   "cols": 4,
+   "stagger": false,
+   "mortar_width": 0.05,
+   "roughness": 0.35
+  },
+  {
+   "name": "bone_block",
+   "type": "bricks",
+   "base": "#d8d0b4",
+   "dark": "#a89c7c",
+   "light": "#f0ead4",
+   "mortar": "#5a5040",
+   "rows": 3,
+   "cols": 2,
+   "mortar_width": 0.08,
+   "roughness": 0.7
+  },
+  {
    "name": "obsidian_brick",
    "type": "bricks",
    "base": "#2d2438",
@@ -787,8 +925,10 @@
    "light": "#65666f",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#3a86f0",
-   "metallic": 0.85
+   "ore": "#2a8cff",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "rosalite_ore",
@@ -798,8 +938,10 @@
    "light": "#65666f",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#f08a58",
-   "metallic": 0.85
+   "ore": "#ff8a5a",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "verdite_ore",
@@ -809,8 +951,10 @@
    "light": "#65666f",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#38d878",
-   "metallic": 0.85
+   "ore": "#3ae0b0",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "orchidite_ore",
@@ -820,8 +964,10 @@
    "light": "#65666f",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#f06ac0",
-   "metallic": 0.85
+   "ore": "#ff60c8",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "crimsite_ore",
@@ -831,8 +977,10 @@
    "light": "#65666f",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#e8283c",
-   "metallic": 0.85
+   "ore": "#ff2a40",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "stellite_ore",
@@ -842,8 +990,10 @@
    "light": "#65666f",
    "cells": 18,
    "cracks": 0.4,
-   "ore": "#dce8f8",
-   "metallic": 0.85
+   "ore": "#c8dcf0",
+   "metallic": 0.9,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "lihzahrd_brick",
@@ -863,7 +1013,9 @@
    "cells": 16,
    "cracks": 0.5,
    "ore": "#5ae05a",
-   "metallic": 0.4
+   "metallic": 0.4,
+   "flecks": 140,
+   "nugget_size": 0.36
   },
   {
    "name": "luminite",
@@ -874,7 +1026,8 @@
    "cells": 14,
    "cracks": 0.6,
    "ore": "#6affd0",
-   "metallic": 0.7
+   "metallic": 0.7,
+   "flecks": 140
   },
   {
    "name": "ebonwood_planks",

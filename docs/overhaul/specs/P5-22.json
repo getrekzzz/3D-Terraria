@@ -1,0 +1,48 @@
+{
+ "id": "P5-22",
+ "title": "Dye Trader trade and Strange Plants in world generation (GenVersion bump)",
+ "player_outcome": "Strange Plants now grow rarely on grass and in caves. Bring one to the Dye Trader, and 'Trade' swaps it for a rare dye.",
+ "design": [
+  "World generation: 4 natural tile objects strange_plant_1..4, each dropping its own item. Place them in DecorationPass through DecorPalette.cs: about 1 per 2000 grass-top columns on the surface and in underground jungle/grass, deterministic via SeedTree names, with no transcendental maths.",
+  "Bump GenVersion.Current to the next value and add a comment. Re-record the 6 golden hashes in tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs and update Assert.Equal(version) there. Old worlds are disposable.",
+  "A new 'dyeTrade' service {acceptsTag:'strange_plant', table:'dye_trader_trade'}. TownServices.DyeTrader.cs has TradeStrangePlant(npc, player, out ItemStack dye): it removes one tagged item from the backpack and rolls the loot table into the backpack.",
+  "Items: strange_plant_1..4 (tag strange_plant, material) and rare dyes for the trade table (acid, red_acid, blue_acid, mushroom, purple_ooze, reflective, gel, negative, shadow...: about 8 new dye items). The TownDialog.Services entry 'dyeTrade' shows 'Trade' only when a plant is carried.",
+  "ItemSources (P5-24) lists the strange plants as world-generated through the objects' Natural flag."
+ ],
+ "files_modify": [
+  "src/Strata.Core/WorldGen/Passes/DecorPalette.cs \u2014 strange plant ids",
+  "src/Strata.Core/WorldGen/Passes/DecorationPass.cs \u2014 placement",
+  "src/Strata.Core/WorldGen/GenVersion.cs \u2014 bump",
+  "tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs \u2014 re-pin the hashes and the version assert",
+  "src/Strata.Core/Content/Specs/TownServiceSpecs.cs \u2014 dyeTrade",
+  "game/UI/TownDialog.Services.cs \u2014 Trade entry",
+  "data/town/pre_hardmode.json \u2014 dye_trader services",
+  "data/tileobjects/nature.json \u2014 strange plants",
+  "tools/blender/assets.json \u2014 plant models and dye icons"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Town/TownServices.DyeTrader.cs",
+  "data/items/town_rare_dyes.json \u2014 strange plant items, rare dyes, the dye_trader_trade loot table"
+ ],
+ "data_changes": [
+  "4 tile objects + 4 items + about 8 dyes + 1 loot table; GenVersion bump"
+ ],
+ "tests": [
+  "WorldGenTests golden hashes re-pinned; the purity test (chunk alone equals chunk amid neighbours) still passes",
+  "DyeTraderTests.TradeConsumesPlantGivesDye; without a plant \u2192 NothingToDo",
+  "A worldgen test: a tiny world contains \u22651 strange plant object in the plan area (scan generated chunks near spawn with a larger radius, or count via a feature helper)"
+ ],
+ "verification": [
+  "dotnet test on Linux (CI adds Windows for determinism)",
+  "Smoke basic.cmds still PASS (the new world generates)"
+ ],
+ "depends_on": [
+  "P5-13",
+  "P5-16"
+ ],
+ "risks": [
+  "Other phases (terrain, dungeon) also bump GenVersion and re-pin hashes; land this after them in the same push, or rebase and re-record once. Never merge two different re-pins.",
+  "The placement rate needs a playtest."
+ ],
+ "effort": "M"
+}

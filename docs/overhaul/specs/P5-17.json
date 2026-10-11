@@ -1,0 +1,41 @@
+{
+ "id": "P5-17",
+ "title": "Shops III: Zoologist (bestiary-gated) and Golfer (working golf); Leather Whip becomes obtainable",
+ "player_outcome": "The Zoologist's stock grows as you fill the bestiary: Leather Whip, Fairy Glowsticks and critter-themed items, plus the pet licenses (P5-20). The Golfer sells clubs that knock bouncing golf balls into enemies and golf cups and tees to place.",
+ "design": [
+  "Zoologist entries gated with {type:'bestiary', min:N} at Terraria thresholds (verify on the wiki): leather_whip, fairy_glowstick (new: a thrown light that sticks), critter_shampoo (new dye), license_cat/dog/bunny (items defined in P5-20).",
+  "Golfer: golf_club_iron/driver/wedge/putter (new: melee swing plus a shootProjectile 'golf_ball_shot' using ammo class 'golf_ball', each club with different speed/arc), golf_ball (ammo), golf_cup and golf_tee (tile objects), golf visor/shirt/pants (vanity). Projectile golf_ball_shot: friendly, gravity, bounces 6, low damage.",
+  "No new Core code; this uses shootProjectile and ammo classes. If a club needs both melee and shooting, depend on the items phase's fix for sword+projectile (audit F); otherwise make the clubs pure shooters.",
+  "Assets and reference as before."
+ ],
+ "files_modify": [
+  "data/town/pre_hardmode.json \u2014 zoologist, golfer shops",
+  "tools/blender/assets.json",
+  "tools/content/reference/items_town.py"
+ ],
+ "files_add": [
+  "data/items/town_shop_golf.json \u2014 golf and zoologist items + golf_ball_shot projectile",
+  "generated icons and models"
+ ],
+ "data_changes": [
+  "about 12 new items/objects; bestiary thresholds on shop entries"
+ ],
+ "tests": [
+  "ShopDataTests.ZoologistGatedByBestiary: with a fake IPlayerRecords at 9% the leather_whip is not in Stock; at 10% it is",
+  "ItemUseTests.GolfClubLaunchesBall: using golf_club_driver with golf_ball ammo spawns golf_ball_shot and consumes 1 ball",
+  "Validator: leather_whip no longer needs the 'shop' tag exemption (ItemSources from P5-24 sees it)"
+ ],
+ "verification": [
+  "validate/manifest/reference/build_all checks; dotnet test",
+  "In game: golf balls bounce off terrain and damage slimes"
+ ],
+ "depends_on": [
+  "P5-16",
+  "P5-20",
+  "P5-25"
+ ],
+ "risks": [
+  "Golf balls are only a physics toy; there is no golf scoring (deferred)."
+ ],
+ "effort": "M"
+}

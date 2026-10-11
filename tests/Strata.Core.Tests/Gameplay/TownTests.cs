@@ -24,9 +24,9 @@ public class TownTests
         g.World.Town.Summon(g.Content.TownNpcs.Get(id), g.World.Navigator.NearestStandable(g.Floor + offset, Strata.Core.Gameplay.Navigation.NavAgent.Humanoid, 3)!.Value);
 
     private static void GiveCoins(TestGame g, long copper) =>
-        Assert.Empty(Wallet.Give(g.Player.State.Inventory.Backpack, g.Content, copper));
+        Assert.Empty(Wallet.Give(g.Player.State.Inventory, g.Content, copper));
 
-    private static long Purse(TestGame g) => Coins.Total(g.Player.State.Inventory.Backpack);
+    private static long Purse(TestGame g) => Coins.Total(g.Player.State.Inventory);
 
     [Fact]
     public void GuideStartsInTownAndResidentsMoveIntoValidHomes()
@@ -105,6 +105,103 @@ public class TownTests
     }
 
     [Fact]
+    public void BuyIntoCursorMergesSameItem()
+    {
+        using var g = Create();
+        var peddler = Summon(g, "merchant", new Int3(2, 1, 2));
+        var commerce = g.World.Commerce;
+        var inv = g.Player.State.Inventory;
+        var torch = commerce.Stock(peddler, g.Player).Single(o => o.Item.Id == "torch");
+        GiveCoins(g, 1000);
+        int carried = inv.CountAll(torch.Item);
+        Assert.Equal(TradeResult.Ok, commerce.Buy(peddler, g.Player, torch.Item, 1, BuyTarget.Cursor));
+        Assert.Equal(TradeResult.Ok, commerce.Buy(peddler, g.Player, torch.Item, 1, BuyTarget.Cursor));
+        Assert.Equal(new ItemStack(torch.Item, 2), inv.Cursor); // repeat clicks stack on the cursor
+        Assert.Equal(carried, inv.CountAll(torch.Item)); // the backpack is untouched
+        Assert.Equal(1000 - 2 * torch.Price, Purse(g));
+    }
+
+    [Fact]
+    public void CursorHoldingOtherItemRefuses()
+    {
+        using var g = Create();
+        var peddler = Summon(g, "merchant", new Int3(2, 1, 2));
+        var commerce = g.World.Commerce;
+        var inv = g.Player.State.Inventory;
+        GiveCoins(g, 1000);
+        var bar = new ItemStack(g.Content.Items.Get("copper_bar"), 3);
+        inv.Cursor = bar;
+        Assert.Equal(TradeResult.NoRoom, commerce.Buy(peddler, g.Player, g.Content.Items.Get("torch"), 1, BuyTarget.Cursor));
+        Assert.Equal(bar, inv.Cursor);
+        Assert.Equal(1000, Purse(g));
+    }
+
+    [Fact]
+    public void SoldStackCanBeBoughtBackAtSalePrice()
+    {
+        using var g = Create();
+        var commerce = g.World.Commerce;
+        var inv = g.Player.State.Inventory;
+        var bars = new ItemStack(g.Content.Items.Get("copper_bar"), 10);
+        inv.Backpack[20] = bars;
+        Assert.Equal(TradeResult.Ok, commerce.Sell(g.Player, inv.Backpack, 20));
+        Assert.Equal(150, Purse(g)); // 20 % of 75 copper × 10
+        Assert.Equal(new[] { bars }, commerce.Buyback(g.Player));
+
+        // Dropped from the cursor: the newest sale comes first. An item of no value goes for nothing.
+        var wood = new ItemStack(g.Content.Items.Get("wood"), 10);
+        inv.Cursor = wood;
+        Assert.Equal(TradeResult.Ok, commerce.SellCursor(g.Player));
+        Assert.True(inv.Cursor.IsEmpty);
+        Assert.Equal(150, Purse(g));
+        Assert.Equal(new[] { wood, bars }, commerce.Buyback(g.Player));
+
+        Assert.Equal(TradeResult.Ok, commerce.BuyBack(g.Player, 1, BuyTarget.Backpack));
+        Assert.Equal(0, Purse(g));
+        Assert.Equal(10, inv.Backpack.Count(bars.Item!));
+        Assert.Equal(TradeResult.Ok, commerce.BuyBack(g.Player, 0, BuyTarget.Cursor));
+        Assert.Equal(wood, inv.Cursor);
+        Assert.Empty(commerce.Buyback(g.Player));
+        Assert.Equal(TradeResult.Unavailable, commerce.BuyBack(g.Player, 0));
+    }
+
+    [Fact]
+    public void SellingAFavoriteIsRefused()
+    {
+        using var g = Create();
+        var commerce = g.World.Commerce;
+        var inv = g.Player.State.Inventory;
+        var bars = new ItemStack(g.Content.Items.Get("copper_bar"), 10);
+        inv.Backpack[20] = bars;
+        inv.Backpack.SetFavorite(20, true);
+        Assert.Equal(TradeResult.NotSold, commerce.Sell(g.Player, inv.Backpack, 20));
+        Assert.Equal(bars, inv.Backpack[20]);
+        inv.Cursor = new ItemStack(g.Content.Items.Get("silver_coin"), 5); // coins never sell either
+        Assert.Equal(TradeResult.NotSold, commerce.SellCursor(g.Player));
+        Assert.Equal(5, inv.Cursor.Count);
+        Assert.Empty(commerce.Buyback(g.Player));
+        Assert.Equal(0, Purse(g));
+    }
+
+    [Fact]
+    public void BuybackCappedAt40()
+    {
+        using var g = Create();
+        var commerce = g.World.Commerce;
+        var inv = g.Player.State.Inventory;
+        var bar = g.Content.Items.Get("copper_bar");
+        for (int i = 1; i <= TownCommerce.BuybackCapacity + 5; i++)
+        {
+            inv.Backpack[20] = new ItemStack(bar, i);
+            Assert.Equal(TradeResult.Ok, commerce.Sell(g.Player, 20));
+        }
+        var buyback = commerce.Buyback(g.Player);
+        Assert.Equal(TownCommerce.BuybackCapacity, buyback.Count);
+        Assert.Equal(45, buyback[0].Count); // newest first; the five oldest fell off
+        Assert.Equal(6, buyback[^1].Count);
+    }
+
+    [Fact]
     public void MenderHealsAndCuresForCoins()
     {
         using var g = Create();
@@ -132,7 +229,7 @@ public class TownTests
         var commerce = g.World.Commerce;
         var peddler = Summon(g, "merchant", new Int3(2, 1, 2));
         float alone = commerce.PriceFactor(peddler);
-        Summon(g, "nurse", new Int3(-2, 1, 2)); // the peddler dislikes the mender
+        Summon(g, "tax_collector", new Int3(-2, 1, 2)); // the Merchant dislikes the Tax Collector
         Assert.True(commerce.PriceFactor(peddler) > alone);
         Assert.InRange(commerce.PriceFactor(peddler), g.World.Town.Config.MinPriceFactor, g.World.Town.Config.MaxPriceFactor);
 
@@ -183,8 +280,8 @@ public class TownTests
         town.Damage(guide, 100_000, guide.Position);
         Assert.False(guide.Alive);
         Assert.Contains(guide, died);
-        Assert.Equal(town.Config.RespawnTicks, guide.RespawnTicks);
-        guide.RespawnTicks = 3;
+        Assert.Equal(g.World.Session.Clock.Tick, guide.DiedAtTick);
+        town.Config = new TownConfig { RespawnAtDawn = false, RespawnTicks = 3 }; // the fixed-delay mode
         g.Ticks(4);
         Assert.True(guide.Alive);
         Assert.Equal(guide.Def.Life, guide.Life);

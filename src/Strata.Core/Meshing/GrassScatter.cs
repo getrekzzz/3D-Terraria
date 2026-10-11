@@ -116,6 +116,44 @@ public static class GrassScatter
         return lo;
     }
 
+    /// <summary>
+    /// <see cref="VisibleCount(IReadOnlyList{GrassClump}, float)"/> from the sorted clumps' ranks alone (a renderer
+    /// keeps the ranks of the clumps it drew while newer clumps wait for their rebuild).
+    /// </summary>
+    public static int VisibleCount(ReadOnlySpan<float> sortedRanks, float density)
+    {
+        int lo = 0, hi = sortedRanks.Length;
+        while (lo < hi)
+        {
+            int mid = lo + (hi - lo) / 2;
+            if (sortedRanks[mid] < density) lo = mid + 1;
+            else hi = mid;
+        }
+        return lo;
+    }
+
+    /// <summary>
+    /// Hashes of scattered grass: <c>Shape</c> covers what the clumps look like and where they stand (count,
+    /// positions, normals, facing, height, kinds, flowers), <c>Light</c> only their root light. A remesh with the
+    /// same shape but different light can rewrite the instance buffer in place; the same both needs no work.
+    /// </summary>
+    public static (ulong Shape, ulong Light) Hashes(List<GrassClump> clumps)
+    {
+        ulong shape = Hash.Combine(Salt, clumps.Count), light = Hash.Combine(Salt ^ 1, clumps.Count);
+        foreach (var c in clumps)
+        {
+            shape = Hash.Combine(shape, Bits(c.Position.X) | (ulong)Bits(c.Position.Y) << 32);
+            shape = Hash.Combine(shape, Bits(c.Position.Z) | (ulong)Bits(c.Normal.X) << 32);
+            shape = Hash.Combine(shape, Bits(c.Normal.Y) | (ulong)Bits(c.Normal.Z) << 32);
+            shape = Hash.Combine(shape, Bits(c.Yaw) | (ulong)Bits(c.Height) << 32);
+            shape = Hash.Combine(shape, c.Kind | (ulong)c.Flower << 8 | (ulong)c.Shade << 16);
+            light = Hash.Combine(light, c.Light);
+        }
+        return (shape, light);
+    }
+
+    private static uint Bits(float f) => BitConverter.SingleToUInt32Bits(f);
+
     /// <summary>Material weights at a point: the vertex colours carry per-corner material barycentrics.</summary>
     private static Vector3 Weights(MeshSurface surface, int i0, int i1, int i2, float u, float v, float w)
     {

@@ -1,4 +1,5 @@
 using Strata.Core.Common;
+using Strata.Core.Persistence;
 using Strata.Core.Voxels;
 
 namespace Strata.Core.Session;
@@ -32,41 +33,36 @@ public sealed partial class WorldSession
                 }
     }
 
-    /// <summary>Writes world.json (time, flags, id tables) without touching chunks.</summary>
+    /// <summary>Writes world.json (time, flags, id tables) without touching chunks. Waits for the write.</summary>
     public void SaveMetaOnly()
     {
-        if (Store == null) return;
-        Meta.WorldTick = Clock.Tick;
-        Meta.LastPlayedUtc = DateTime.UtcNow;
-        Meta.Flags = Flags.OrderBy(f => f, StringComparer.Ordinal).ToList();
-        Meta.Counters = new Dictionary<string, int>(Counters, StringComparer.Ordinal);
-        Meta.Wires = Wires.OrderBy(c => c.Y).ThenBy(c => c.Z).ThenBy(c => c.X).SelectMany(c => new[] { c.X, c.Y, c.Z }).ToList();
-        Mutations.Persist(Meta);
-        Meta.StoreIdTables(Ids);
-        Store.SaveMeta(Meta);
+        if (Saver == null) return;
+        RefreshMeta();
+        Saver.Enqueue(new SaveBatch { Meta = SerializeMeta() });
+        Saver.Flush();
     }
 
-    /// <summary>Saves every modified loaded chunk plus metadata. Returns the number of chunks written.</summary>
+    /// <summary>Saves every modified loaded chunk plus metadata and waits for the writes. Returns the number of chunks saved.</summary>
     public int SaveAll()
     {
-        if (Store == null) return 0;
-        var blobs = new Dictionary<Int3, byte[]?>();
-        foreach (var chunk in World.Chunks)
-        {
-            if (!chunk.Modified) continue;
-            blobs[chunk.Coord] = Encode(chunk);
-            chunk.Modified = false;
-        }
-        if (blobs.Count > 0) Store.SaveChunks(blobs);
-        SaveMetaOnly();
-        return blobs.Count;
+        if (Saver == null) return 0;
+        var batch = BeginSave();
+        Saver.Enqueue(batch);
+        Saver.Flush();
+        return batch.Chunks.Count;
     }
 
-    /// <summary>Persists blobs returned by <see cref="Unload"/>.</summary>
-    public void SaveUnloaded(IReadOnlyDictionary<Int3, byte[]> blobs)
+    /// <summary>
+    /// Queues snapshots returned by <see cref="Unload"/>. Until written they stay readable by <see cref="Produce"/>;
+    /// world.json is rewritten after them if encoding added ids.
+    /// </summary>
+    public void SaveUnloaded(IReadOnlyList<ChunkSnapshot> snapshots, bool wait)
     {
-        if (Store == null || blobs.Count == 0) return;
-        Store.SaveChunks(blobs.ToDictionary(kv => kv.Key, kv => (byte[]?)kv.Value));
+        if (Saver == null || snapshots.Count == 0) return;
+        var batch = new SaveBatch();
+        batch.Chunks.AddRange(snapshots);
+        Saver.Enqueue(batch);
+        if (wait) Saver.Flush();
     }
 
     /// <summary>Finds the first standable cell at or above the plan spawn (ground below, headroom above).</summary>

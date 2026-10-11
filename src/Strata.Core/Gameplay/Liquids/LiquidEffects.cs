@@ -69,7 +69,7 @@ public sealed partial class LiquidEffects
 
     public void Tick()
     {
-        long tick = _world.Session.Clock.Tick;
+        long tick = _world.RealTick; // real-time cadence, also while sleep runs the clock fast
         foreach (var p in _world.Players)
         {
             if (!p.Alive)
@@ -109,8 +109,7 @@ public sealed partial class LiquidEffects
             return;
         }
         if (tick % 30 != 0) return;
-        p.State.Vitals.DamageDirect(DrownDamage);
-        _world.Npcs.ReportPlayerDamage(p, DrownDamage, Vector3.Zero);
+        _world.HurtPlayerDirect(p, DrownDamage, harm: Harm.Drowning);
     }
 
     private void TouchPlayer(PlayerEntity p, LiquidDef liquid, long tick)
@@ -138,9 +137,10 @@ public sealed partial class LiquidEffects
         if (liquid.ContactDamage <= 0 || state.Effects.LiquidImmunities.Contains(liquid.Id) || state.Vitals.ImmunityTicks > 0) return;
         var rng = new Pcg32(Hash.Combine(Hash.String(liquid.Id), tick));
         var hit = DamageModel.Roll(liquid.ContactDamage, DamageClass.None, 0, 0f, null, state.Defense,
-            DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction), 1f, ref rng);
+            DamageModel.DefenseFactor(_world.Session.Settings.EffectiveDifficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction), 1f, ref rng);
         if (state.Vitals.Hurt(hit.Damage, NpcSystem.PlayerHitImmunity))
-            _world.Npcs.ReportPlayerDamage(p, hit.Damage, new Vector3(0, 7f, 0)); // lava throws you upward
+            _world.Npcs.ReportPlayerDamage(p, hit.Damage, new Vector3(0, 7f, 0), // lava throws you upward
+                liquid.Id == "lava" ? Harm.Lava : new Harm(HarmKind.Other, liquid.DisplayName, liquid.Id));
     }
 
     private void TouchCreature(Npc npc, LiquidDef liquid)

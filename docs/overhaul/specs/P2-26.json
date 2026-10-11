@@ -1,0 +1,35 @@
+{
+ "id": "P2-26",
+ "title": "NPC chat box at the top centre with Terraria text buttons",
+ "player_outcome": "Talking to a town NPC opens a dark-blue chat box at the top centre that never spills off-screen or covers the hotbar. The text wraps, and the options are plain words ('Shop', 'Heal (4 silver)', 'Reforge', 'Close') that turn gold and grow when hovered. You can keep moving, and walking away closes it.",
+ "design": [
+  "Rebuild game/UI/TownDialog.cs, splitting into TownDialog.cs and TownDialog.Services.cs.\n- PanelContainer with UiTheme ChatPanel style: Color8(35,40,85,205) with a light rim (120,140,220).\n- Placed in the UiLayout NpcChat rect, width 520, GrowVertical End.\n- 14 px muted NPC name; 16 px white wrapped text.\n- An HBox of TextButtons (theme variation 'TextButton') with a Scale 1 \u2192 1.1 hover tween around PivotOffset = Size/2, plus ui_hover/ui_click sounds.",
+  "Buttons:\n- Shop: calls InventoryScreen.OpenShop(npc) (P2-27) and hides the box.\n- Services: Heal with cost, Help, Reforge (InventoryScreen.OpenService, P2-28), Taxes, Quest, summon label.\n- Close.\n\nRemove the framed buttons, the coin label, the list shop and 'Sell held stack' (TownDialog.cs:138-166). Keep public Open, OpenShop, Close and IsOpen so EngineCommands and town.cmds keep working.",
+  "Overlay gate (P2-11). Setting NpcChat in UiState makes ApplyLayout move it clear of the hotbar and hearts.",
+  "UiProbes gains `ui.npc_chat_top`: 1 when the box's top is above H/3 and it overlaps no other HUD rect."
+ ],
+ "files_modify": [
+  "game/UI/TownDialog.cs \u2014 top-centre chat box, text buttons, service dispatch",
+  "game/Debug/UiProbes.cs \u2014 ui.npc_chat_top"
+ ],
+ "files_add": [
+  "game/UI/TownDialog.Services.cs \u2014 heal, help, summon, taxes and quest handlers moved"
+ ],
+ "data_changes": [],
+ "tests": [
+  "town.cmds unchanged \u2192 SMOKE PASS",
+  "ui.cmds: `town summon merchant 0 0 -3` / `ui talk merchant` / `assert ui.npc_chat_top == 1` / `assert ui.overlaps == 0` / `ui close`"
+ ],
+ "verification": [
+  "Lavapipe screenshots at 1280\u00d7720 and 1920\u00d71080 talking to the Merchant: box at the top centre, no overlap with the hotbar, buffs or hearts"
+ ],
+ "depends_on": [
+  "P2-01",
+  "P2-11",
+  "P2-12"
+ ],
+ "risks": [
+  "The NPC phase adds Happiness and housing buttons. Keep the button list data-driven from npc.Def (a service list) so it slots in without layout changes."
+ ],
+ "effort": "S"
+}

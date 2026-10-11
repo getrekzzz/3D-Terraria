@@ -1,0 +1,9 @@
+{
+ "comment": "P3-29: the Heart and mana Star pickups dropped by kills (existing heart/star generators, Terraria's red and blue).",
+ "items": {
+  "explicit": {
+   "heart": {"generator": "heart", "params": {"color": "#ff2850"}},
+   "star": {"generator": "star", "params": {"color": "#4a7cff"}}
+  }
+ }
+}

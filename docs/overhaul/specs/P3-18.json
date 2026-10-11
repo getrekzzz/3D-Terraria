@@ -1,0 +1,54 @@
+{
+ "id": "P3-18",
+ "title": "Pets and light pets (a first batch with Terraria names)",
+ "player_outcome": "Equipping a pet brings a small companion that follows you. Equipping a light pet (Shadow Orb, Crimson Heart, \u2026) brings a floating glow that lights caves as you explore.",
+ "design": [
+  "ProjectileDef.Pet = PetDef { Flies (bool), Speed (m/s), Follow (m), Hover (m) }. Pets are Friendly = false and Contact = false, and never expire.",
+  "New Core ProjectileSystem.Pets.cs, SyncPets(PlayerEntity) each tick: exactly one pet projectile per filled Misc pet/light-pet slot (the item's projectile). Despawn when unequipped or the item changes.",
+  "TickPet, fliers: hover behind the shoulder with a gentle bob (the minion idle ring logic).",
+  "TickPet, walkers: follow on the ground with gravity via VoxelMotion.Move and hop 1-cell steps. Both kinds teleport when more than 30 m away.",
+  "Light pets: the item carries equipEffect emitLight (existing), so PlayerLight shines. Add a PlayerLight anchor func returning ProjectileRenderer.PetNode(owner, light: true) so the light comes from the orb.",
+  "ProjectileRenderer: pets use creature visuals (existing path), playing walk/idle/fly by velocity.",
+  "Data: a new data/items/pets.json (listed via manifest regeneration) with items, pet projectiles and loot/shop sources.",
+  "Assets: assets.json explicit entries for the pet items (orb/heart/bottle generators) and reused creature models (bunny, fish) at small scale."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/ProjectileDef.cs \u2014 PetDef",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs \u2014 call SyncPets; skip pets in normal tick",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 pet validation",
+  "game/Entities/ProjectileRenderer.cs \u2014 pet animation; PetNode()",
+  "game/Player/PlayerLight.cs \u2014 light-pet anchor",
+  "game/Bootstrap/WorldLauncher.cs \u2014 pass the pet anchor",
+  "data/enemies/evil.json \u2014 shadow_orb/crimson_heart loot rotations include the light pets",
+  "tools/blender/assets.json \u2014 pet item entries",
+  "data/manifest.json \u2014 regenerated"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.Pets.cs \u2014 pet sync and movement",
+  "data/items/pets.json \u2014 pet and light-pet items and projectiles",
+  "tests/Strata.Core.Tests/Gameplay/PetTests.cs \u2014 pet tests"
+ ],
+ "data_changes": [
+  "Light pets: shadow_orb (item, from the Shadow Orb loot rotation), crimson_heart (item, from the Crimson Heart rotation), wisp_in_a_bottle (dungeon_spirit loot; verify the Terraria rate)",
+  "Pets: carrot \u2192 pet bunny (bunny model), zephyr_fish \u2192 flying fish (fish model, rare fishing catch), strange_glowing_mushroom \u2192 baby truffle (sold by truffle, if the resident exists)",
+  "Verify each source against the wiki; fall back to an existing Terraria source present in this build"
+ ],
+ "tests": [
+  "PetTests: equipping shadow_orb spawns one pet projectile; after teleporting the player 10 m the pet is within 3 m in 120 ticks",
+  "PetTests: unequipping removes it; Effects.Light is set while equipped",
+  "Smoke movement.cmds: 'equip shadow_orb' / 'wait 0.5' / 'assert projectiles.count >= 1' / 'assert errors == 0'"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate + manifest --check; build_all --check",
+  "Lavapipe screenshot in a cave with the light pet"
+ ],
+ "depends_on": [
+  "P3-16",
+  "P3-05"
+ ],
+ "risks": [
+  "Tile objects shadow_orb/crimson_heart share ids with the new items (different registries; build_all.plan must not map them to the objects \u2014 they are natural, so they are skipped).",
+  "The DynamicLights pool is shared; the light pet should be baked into PlayerLight rather than add another pool light."
+ ],
+ "effort": "M"
+}

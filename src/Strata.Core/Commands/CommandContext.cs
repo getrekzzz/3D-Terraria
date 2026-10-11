@@ -19,9 +19,18 @@ public interface ICommandHost
 /// <summary>Host used by headless runs: moves the Core entity directly.</summary>
 public sealed class HeadlessCommandHost : ICommandHost
 {
-    public void Teleport(PlayerEntity player, Vector3 feet, bool settle = false) => player.Position = feet;
+    public void Teleport(PlayerEntity player, Vector3 feet, bool settle = false)
+    {
+        player.Position = feet;
+        player.Hook.Reset(); // as the engine body does: a latched hook would pull back across the world
+    }
 
-    public void Aim(PlayerEntity player, Vector3 direction) => player.Aim = Vector3.Normalize(direction);
+    public void Aim(PlayerEntity player, Vector3 direction)
+    {
+        var dir = Vector3.Normalize(direction);
+        player.Aim = dir;
+        player.ViewDirection = dir;
+    }
 }
 
 /// <summary>What commands operate on, plus named numeric probes used by <c>assert</c> and <c>probe</c>.</summary>
@@ -35,6 +44,11 @@ public sealed class CommandContext
         World = world;
         Host = host;
         StandardProbes.Register(this);
+        ProbeSources.RegisterAll(this, typeof(CommandContext).Assembly); // [ProbeSource] classes in Strata.Core
+        world.Interaction.ContainerOpened += (p, obj, _) =>
+        {
+            if (p == world.LocalPlayer) OpenContainer = obj;
+        };
     }
 
     public GameWorld World { get; }
@@ -44,10 +58,19 @@ public sealed class CommandContext
     /// <summary>Position stored by the <c>mark</c> command (probe <c>player.from_mark</c>).</summary>
     public Vector3? Mark { get; set; }
 
+    /// <summary>Use animations the player had started when <c>mark</c> ran (probe <c>player.swings</c> counts from it).</summary>
+    public int MarkSwings { get; set; }
+
+    /// <summary>The chest the player opened last (<c>interact</c>); <c>invclick container</c> and <c>chest</c> act on it.</summary>
+    public Voxels.TileObjects.TileObjectInstance? OpenContainer { get; set; }
+
     public PlayerEntity Player => World.LocalPlayer ?? throw new CommandException("no player in this world");
 
-    /// <summary>Adds a fixed probe, e.g. <c>player.life</c>.</summary>
-    public void AddProbe(string name, Func<double> read) => _probes[name] = read;
+    /// <summary>Adds a fixed probe, e.g. <c>player.life</c>. A name is registered once (probe files must not shadow each other).</summary>
+    public void AddProbe(string name, Func<double> read)
+    {
+        if (!_probes.TryAdd(name, read)) throw new InvalidOperationException($"Probe '{name}' is registered twice.");
+    }
 
     /// <summary>Adds a parameterised probe, e.g. prefix <c>inv.</c> resolving <c>inv.torch</c>.</summary>
     public void AddPrefixProbe(string prefix, Func<string, double?> resolve) => _prefixProbes.Add((prefix, resolve));

@@ -1,5 +1,6 @@
 using Strata.Core.Content;
 using Strata.Core.Content.Loading;
+using Strata.Core.Content.Validation;
 
 namespace Strata.Core.Tests.Content;
 
@@ -114,10 +115,98 @@ public class ContentValidatorTests
     }
 
     [Fact]
+    public void NoMeleeBladesCannotSwingAndShotLimitsMustAllowAShot()
+    {
+        var db = Load("""
+        { "projectiles": [ { "id": "blade", "returns": 30 }, { "id": "beam" } ],
+          "items": [
+            { "id": "fake_zenith", "useStyle": "swing", "noMelee": true, "damage": 5, "damageType": "melee", "projectile": "beam",
+              "behaviors": [ { "type": "meleeSwing" }, { "type": "shootProjectile" } ] },
+            { "id": "triple_rang", "useStyle": "shoot", "damage": 5, "damageType": "melee", "projectile": "blade",
+              "behaviors": [ { "type": "shootProjectile", "count": 3 } ] },
+            { "id": "bad_limit", "useStyle": "shoot", "damage": 5, "damageType": "melee", "projectile": "beam",
+              "behaviors": [ { "type": "shootProjectile", "maxActive": -1 } ] },
+            { "id": "real_zenith", "useStyle": "swing", "noMelee": true, "damage": 5, "damageType": "melee", "projectile": "blade",
+              "behaviors": [ { "type": "shootProjectile", "count": 3, "maxActive": 0 } ] }
+          ] }
+        """);
+        AssertError(db, "noMelee items cannot have a meleeSwing behaviour");
+        AssertError(db, "fires 3 'blade' per use but only 1 may be out at once");
+        AssertError(db, "maxActive must be >= 0");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Subject.EndsWith(":real_zenith", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void BiomeReliefIsRangeChecked()
+    {
+        var db = Load("""
+        { "biomes": [
+            { "id": "peaks", "relief": { "base": 5, "ruggedness": 2, "ridges": 70, "mountains": { "height": 10, "peak": 90 } } },
+            { "id": "plains", "relief": { "base": 5, "rolling": 20, "ruggedness": 0.2, "cliffs": 0.1, "mountains": { "height": 20, "peak": 30 } } }
+        ] }
+        """);
+        AssertError(db, "relief.ruggedness must be within 0–1");
+        AssertError(db, "relief.ridges must be within 0–60");
+        AssertError(db, "relief.mountains.peak must be within 0–80");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Subject.EndsWith(":plains", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void BuffsAndInvasionsNeedIcons()
+    {
+        var db = ContentLoader.LoadFromTexts(new[] { ("test.json", """
+        { "buffs": [ { "id": "glowing", "name": "Glowing" }, { "id": "drawn", "name": "Drawn", "icon": "drawn_icon" } ],
+          "events": [
+            { "id": "raid", "phase": "manual", "killGoal": 5, "killTag": "raider" },
+            { "id": "drizzle", "chance": 0.1 }
+          ] }
+        """) }, new ContentValidationOptions { AssetExists = p => p == "assets/icons/buffs/drawn_icon.png" });
+        AssertError(db, "icon asset 'assets/icons/buffs/glowing.png' does not exist");
+        AssertError(db, "icon asset 'assets/icons/events/raid.png' does not exist");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Subject.EndsWith(":drawn", StringComparison.Ordinal));
+        Assert.DoesNotContain(db.Report.Errors, e => e.Subject.EndsWith(":drizzle", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void SoundSetsMustNameASoundFile()
+    {
+        var db = ContentLoader.LoadFromTexts(new[] { ("test.json", """
+        { "items": [ { "id": "boomer", "soundSet": "shotgun" }, { "id": "typo", "soundSet": "shotgnu" }, { "id": "single", "soundSet": "crystal" } ] }
+        """) }, new ContentValidationOptions { AssetExists = p => p is "assets/audio/sfx/shotgun_1.wav" or "assets/audio/sfx/crystal.wav" });
+        AssertError(db, "soundSet sound 'shotgnu' has no assets/audio/sfx/shotgnu.wav");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Message.Contains("sound 'shotgun'") || e.Message.Contains("sound 'crystal'"));
+    }
+
+    [Fact]
     public void RejectsBadIdsAndCovers()
     {
         var db = Load("""{ "items": [ { "id": "BadId", "covers": ["copper"] } ] }""");
         AssertError(db, "snake_case");
         AssertError(db, "terraria:<concept>");
+    }
+
+    [Fact]
+    public void RarityOutsideTerrariaTiersIsAnErrorAndSilentBuffsWarn()
+    {
+        var db = Load("""
+        { "buffs": [ { "id": "mystery" } ],
+          "items": [ { "id": "relic", "rarity": 20 }, { "id": "odd_potion", "rarity": -12, "buff": { "id": "mystery", "ticks": 60 } } ] }
+        """);
+        AssertError(db, "rarity must be -13–13");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Message.Contains("rarity") && e.Message.Contains("odd_potion"));
+        Assert.Contains(db.Report.Warnings, w => w.Message.Contains("buff 'mystery' has no description"));
+    }
+
+    [Fact]
+    public void TownConditionsCheckTheirReferences()
+    {
+        var db = Load("""
+            { "townNpcs": [ { "id": "dyer", "names": ["Ana"], "lines": [ { "text": "Hi." } ],
+                "arrival": [ { "type": "hasItem", "category": "paint" }, { "type": "rescued", "id": "nobody" },
+                             { "type": "season", "is": "easter" } ] } ] }
+            """);
+        AssertError(db, "hasItem category 'paint' is not an item category");
+        AssertError(db, "'nobody'");
+        AssertError(db, "season must be one of");
     }
 }

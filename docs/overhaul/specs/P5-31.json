@@ -1,0 +1,44 @@
+{
+ "id": "P5-31",
+ "title": "Bestiary tab: kill-unlocked entries with 3D preview, stats, drops and habitat",
+ "player_outcome": "The Bestiary shows every creature: '???' until seen, a portrait and habitat once seen, stats and description after a kill, and the full drop list with percentages after enough kills. A rotating 3D model shows the selected creature. Completion % is shown.",
+ "design": [
+  "BestiaryTab (game/UI/GuideBook/BestiaryTab.cs): filters (All/Unlocked/Bosses/Critters/Town, a biome filter from habitat tags) and search, over an ItemList with PortraitIcons (P5-28) lazily loaded. Locked entries show a silhouette or '???'. The header shows Bestiary.Percent.",
+  "Details (BestiaryDetails.cs): name, kill count, then by unlock tier. Seen: habitat text from a new Core Gameplay/Guide/Habitat.cs that describes the enemy's SpawnRuleDefs through ConditionDescriber ('Surface Forest at night', 'Dungeon', 'during the Blood Moon'), plus boss summon items (items with a summonBoss behaviour targeting it) and events. Stats: Life/Defense/Damage/Knockback resist/Coins (scaled by world difficulty via NpcSystem.Scale) and Description. Full: drops from DropRates with conditions.",
+  "3D preview: BestiaryPreview.cs, a single pooled SubViewportContainer (OwnWorld3D, UpdateMode WhenVisible, TransparentBg, the CharacterPreview lighting setup). The model loads with ResourceLoader.LoadThreadedRequest(AssetPaths.CreatureModel) and a spinner, then CreatureVisual.Create shows it with an idle/walk clip and a turntable. The previous model is freed. Worm bosses show the head model.",
+  "Town NPC entries: met via the Journal; show portrait, move-in text and a link to the NPC tab.",
+  "Engine commands 'ui bestiary <enemy>'; probe ui.bestiary_unlock (0\u20133 for the shown entry)."
+ ],
+ "files_modify": [
+  "game/UI/GuideBook/GuideBookScreen.cs \u2014 register tab",
+  "game/Debug/EngineCommands.Guide.cs \u2014 ui bestiary",
+  "game/Debug/GodotCommandHost.cs \u2014 probe"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Guide/Habitat.cs",
+  "game/UI/GuideBook/BestiaryTab.cs",
+  "game/UI/GuideBook/BestiaryDetails.cs",
+  "game/UI/GuideBook/BestiaryPreview.cs",
+  "tests/Strata.Core.Tests/Gameplay/HabitatTests.cs"
+ ],
+ "data_changes": [
+  "optional descriptions for the 29 enemies missing one (the audit counted 200 of 229 with descriptions)"
+ ],
+ "tests": [
+  "HabitatTests: zombie habitat mentions night and surface; eye_of_cthulhu lists suspicious_looking_eye as its summon",
+  "Smoke guide.cmds (after the zombie kill): 'ui bestiary zombie' / 'assert ui.bestiary_unlock >= 2' / 'ui close'"
+ ],
+ "verification": [
+  "guide.cmds PASS",
+  "In game: kill a slime \u2192 its stats unlock; the preview model loads without a frame spike (threaded) and turns; after 25 kills the drops show %"
+ ],
+ "depends_on": [
+  "P5-30",
+  "P5-25",
+  "P5-28"
+ ],
+ "risks": [
+  "SubViewport cost on low presets: render at 256 px and pause when hidden; scale by graphics preset (skip MSAA on low)."
+ ],
+ "effort": "M"
+}

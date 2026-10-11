@@ -1,0 +1,46 @@
+{
+ "id": "P5-23",
+ "title": "Angler: quest counter, milestone rewards and the Journey's End Angler shop",
+ "player_outcome": "The Angler tracks how many of his quests you have completed ('You've done 12 of my quests!'). Rewards improve at milestones, and he sells decorative fishing-themed furniture unlocked by your quest count.",
+ "design": [
+  "PlayerState.AnglerQuests (int), saved in PlayerSave as AnglerQuests (added without a version bump). TownServices.TurnInFish increments it and raises AnglerQuestDone.",
+  "AnglerQuestParams.Rewards: each reward gains MinQuests and EveryQuests (for example a fishing pole at 5 and 10 quests), following Terraria's reward table (verify). Coins also scale with count.",
+  "ConditionContext.AnglerQuests is filled from the talking or local player in TownSystem.TownContext. Angler shop entries use {type:'anglerQuests', min:N}.",
+  "New decor tile objects: lifebuoy, ships_wheel, wall_anchor, treasure_map, seaweed_planter, pile_of_seashells, fish trophies (bass/trout/tuna plaques). Use the furniture/painting generators.",
+  "TownDialog: the Quest text includes the counter; a new Angler 'Shop' button appears once the shop has entries."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Player/PlayerState.cs \u2014 AnglerQuests",
+  "src/Strata.Core/Persistence/PlayerSave.cs \u2014 AnglerQuests",
+  "src/Strata.Core/Gameplay/Town/TownServices.cs \u2014 increment, tiered rewards",
+  "src/Strata.Core/Content/Specs/TownServiceSpecs.cs \u2014 AnglerReward.MinQuests/EveryQuests",
+  "src/Strata.Core/Gameplay/Town/TownSystem.cs \u2014 ctx.AnglerQuests",
+  "game/UI/TownDialog.Services.cs \u2014 quest text with count",
+  "data/town/pre_hardmode.json \u2014 angler rewards and shop",
+  "tools/blender/assets.json"
+ ],
+ "files_add": [
+  "data/tileobjects/angler_decor.json \u2014 about 10 decor objects",
+  "generated assets"
+ ],
+ "data_changes": [
+  "angler rewards table with milestones; about 10 shop objects"
+ ],
+ "tests": [
+  "AnglerTests.CounterIncrementsAndSaves",
+  "AnglerTests.MilestoneRewardAtFive",
+  "AnglerTests.ShopUnlocksByCount"
+ ],
+ "verification": [
+  "dotnet test; validate",
+  "In game: turn in fish on successive days; the counter shows and the shop grows"
+ ],
+ "depends_on": [
+  "P5-13",
+  "P5-03"
+ ],
+ "risks": [
+  "PlayerSave.cs is also edited by the equipment phase (slots, trash). Keep this edit to one property."
+ ],
+ "effort": "S"
+}

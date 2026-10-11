@@ -1,0 +1,46 @@
+{
+ "id": "P5-16",
+ "title": "Shops II: Painter (Shop + Decor), Dye Trader (dyes, Dye Vat), Party Girl, Tavernkeep (Defender Medals)",
+ "player_outcome": "The Painter has a separate Decor tab with paintings to hang, the Dye Trader sells dyes and a Dye Vat, the Party Girl sells confetti and party gear, and the Tavernkeep trades Defender Medals (dropped by the Old One's Army) for an Eternia Crystal Stand, Ale and more.",
+ "design": [
+  "Painter: existing paints and tools in tab 'shop'; about 8 new paintings (wall-anchored tile objects, a new 'painting' generator in furniture.py drawing a framed procedural canvas) in tab 'decor'.",
+  "Dye Trader: dye_vat (station tile object) and 10 basic dyes (silver/brown/black/red/orange/yellow/green/blue/purple/pink_dye, category dye). Dyes satisfy the Dye Trader's 'hasItem category dye' arrival. Visual dyeing waits for the equipment phase's dye slots; the tooltip says 'Dye'.",
+  "Party Girl: confetti (thrown friendly particle projectile), party_hat (vanity), confetti_gun (ranged, confetti projectile), bubble_machine (decor tile object with a pooled bubble particle).",
+  "Tavernkeep: defender_medal (currency item; add to the old_ones_army loot table), eternia_crystal (existing), eternia_crystal_stand (tile object; if ObjectInteraction's Activate plus the startEvent behavior cannot start old_ones_army from the stand, keep it decor and let the crystal item start the event), ale (consumable food giving buff 'tipsy': melee crit up, defense down). Prices in medals via ShopEntry.currency.",
+  "Assets through build_all --only, reference concepts in items_town.py, manifest regenerated."
+ ],
+ "files_modify": [
+  "data/town/pre_hardmode.json \u2014 painter/dye_trader/party_girl/tavernkeep shops",
+  "data/loot/enemies.json \u2014 defender_medal in old_ones_army",
+  "tools/blender/bgen/furniture.py \u2014 painting generator (keep \u2264 400 lines; put it in a new module if needed)",
+  "tools/blender/assets.json \u2014 new entries",
+  "tools/content/reference/items_town.py \u2014 concepts"
+ ],
+ "files_add": [
+  "data/items/town_shop_decor.json \u2014 paintings, dyes, party items, tavern items",
+  "data/tileobjects/town_decor2.json \u2014 paintings, dye_vat, bubble_machine, eternia_crystal_stand",
+  "tools/blender/bgen/paintings.py (if furniture.py would exceed 400 lines)",
+  "generated icons and models"
+ ],
+ "data_changes": [
+  "about 25 new items/objects; buff tipsy; defender_medal drop"
+ ],
+ "tests": [
+  "TownServicesTests.TavernkeepSellsForMedals: 10 medals buy an ale; coins are untouched",
+  "ShopDataTests.PainterHasDecorTab: Tabs(painter) == [shop, decor]",
+  "TownArrivalRulesTests.DyeTraderNeedsDye now uses a real dye item",
+  "Smoke town.cmds: 'town summon painter 2 0 -3' / 'ui talk painter' / 'ui shop decor' / 'ui close'"
+ ],
+ "verification": [
+  "validate, manifest --check, gen_reference --check, build_all --check, dotnet test, smoke PASS",
+  "In game: hang a bought painting on a wall"
+ ],
+ "depends_on": [
+  "P5-15"
+ ],
+ "risks": [
+  "Dyes without dye slots are cosmetic-only for now (depends on the equipment phase); say so in the PR.",
+  "Wall-anchored objects depend on TileAnchor.Wall support; verify with a placement test."
+ ],
+ "effort": "L"
+}

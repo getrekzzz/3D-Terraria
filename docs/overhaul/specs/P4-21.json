@@ -1,0 +1,69 @@
+{
+ "id": "P4-21",
+ "title": "Locked chests and keys: per-chest locks, locked Gold Chests in the dungeon, Shadow Chests in the underworld, unopened chests keep their loot",
+ "player_outcome": "Dungeon Gold Chests are locked; each Golden Key opens one. One of them holds the Shadow Key, which opens (and is kept for) the locked Shadow Chests in the underworld's ruins. Locked chests cannot be smashed, and breaking an unopened chest no longer destroys its loot.",
+ "design": [
+  "TileObjectDef: Lock { Key (item id), Consume = true, RequiresFlag (string?), Message (string?) }.",
+  "TileObjectInstance.Locked (bool). ChunkCodec WriteObjects/ReadObjects state byte bit 2 (value 4) = Locked, so the format is unchanged.",
+  "ObjectOp gains Locked, and Blueprint.Object gets a locked: overload. FeatureCarver.Stamp copies it to the instance.",
+  "ObjectInteraction.Interact, Chest case: if obj.Locked:",
+  "  A RequiresFlag that is not set \u2192 Refused(Message ?? 'It's locked.').",
+  "  Otherwise TakeKey (when Consume) or HasKey \u2192 Locked=false, MarkModified, a new Unlocked event, then open.",
+  "  Missing key \u2192 Refused('It's locked.').",
+  "WorldEditor.HitObject: a new ObjectHitResult.Locked when obj.Locked. Call EnsureContainerLoot(obj) before the NotEmpty check so unrolled world chests keep their loot (this fixes a loot-loss bug).",
+  "gold_chest gets lock {key golden_key}. It only applies to Locked instances.",
+  "New object shadow_chest: model from the chest generator with dark wood, obsidian bands and a purple latch; lock {key shadow_key, consume false}.",
+  "DungeonDecorator (P4-19) marks treasure-room chests Locked with loot dungeon_chest, and the ShadowKey spot with dungeon_chest_shadow_key.",
+  "UnderworldPass.cs:53 places shadow_chest, Locked, loot 'shadow_chest'. New table 'shadow_chest': sunfury, dark_lance, flamelash (weighted; moved out of cabin_chest_primary), plus hellstone bars and potions.",
+  "SFX: 'unlock' (click and jingle) and 'locked' (dull clack) via sfx_recipes. SoundEvents subscribes to ObjectInteraction.Unlocked and Refused.",
+  "Command 'interact nearest <objectId> [radius]' in src/Strata.Core/Commands/EditCommands.cs, for smoke tests.",
+  "Re-pin golden hashes: underworld chests change."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/TileObjectDef.cs \u2014 Lock",
+  "src/Strata.Core/Voxels/TileObjects/TileObjectInstance.cs \u2014 Locked",
+  "src/Strata.Core/Persistence/ChunkCodec.cs \u2014 Locked bit",
+  "src/Strata.Core/WorldGen/Structures/Blueprint.cs \u2014 locked ObjectOp",
+  "src/Strata.Core/WorldGen/Chunk/FeatureCarver.cs \u2014 copy Locked",
+  "src/Strata.Core/Gameplay/Interaction/ObjectInteraction.cs \u2014 lock handling, Unlocked event",
+  "src/Strata.Core/Gameplay/Interaction/WorldEditor.Objects.cs \u2014 Locked result, roll loot before NotEmpty",
+  "src/Strata.Core/WorldGen/Passes/UnderworldPass.cs \u2014 shadow chests",
+  "src/Strata.Core/WorldGen/Structures/Dungeon/DungeonDecorator.Rooms.cs \u2014 locked chests",
+  "src/Strata.Core/Commands/EditCommands.cs \u2014 interact nearest",
+  "game/Audio/SoundEvents.cs \u2014 unlock/locked",
+  "data/tileobjects/furniture.json \u2014 gold_chest lock, shadow_chest",
+  "data/loot/containers.json \u2014 shadow_chest table, cabin_chest_primary trimmed",
+  "tools/blender/assets.json \u2014 shadow_chest",
+  "tools/audio/sfx_recipes.py \u2014 unlock, locked",
+  "tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs \u2014 re-pin"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/Gameplay/LockedChestTests.cs \u2014 lock tests"
+ ],
+ "data_changes": [
+  "gold_chest lock, shadow_chest object and table, underworld loot moved."
+ ],
+ "tests": [
+  "LockedChestTests.LockedChestRefusesWithoutAKey.",
+  "LockedChestTests.GoldenKeyIsConsumedAndTheChestOpens.",
+  "LockedChestTests.ShadowKeyIsKept.",
+  "LockedChestTests.LockedChestsCannotBeBroken.",
+  "LockedChestTests.BreakingAnUnopenedWorldChestDropsItsLoot.",
+  "ChunkCodecTests.LockedStateRoundTrips.",
+  "DungeonGenerationTests.ExactlyOneShadowKeyChest.",
+  "UnderworldChestsAreLockedShadowChests.",
+  "Smoke dungeon.cmds: 'flag defeated_skeletron', 'tp landmark dungeon_chest', 'wait_until stream.idle == 1 600', 'interact nearest gold_chest 8' (refused), 'give golden_key 1', 'interact nearest gold_chest 8', 'assert inv.golden_key == 0'."
+ ],
+ "verification": [
+  "dotnet test; validate; headless dungeon.cmds prints SMOKE PASS"
+ ],
+ "depends_on": [
+  "P4-19",
+  "P4-20"
+ ],
+ "risks": [
+  "The ChunkCodec bit is backward compatible (old saves read 0), though old worlds are disposable anyway.",
+  "The NPC/UI phases may also touch the chest UI (quick stack, rename). No overlap with lock logic."
+ ],
+ "effort": "M"
+}

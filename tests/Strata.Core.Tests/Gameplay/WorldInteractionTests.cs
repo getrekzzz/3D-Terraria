@@ -53,7 +53,7 @@ public class WorldInteractionTests
         Assert.Equal(70, t.Hit(c, 35, 50));
         Assert.Equal(35, t.Hit(c, 35, 500));
         var stone = TestPaths.Content.Blocks.Get("stone");
-        Assert.Equal(150f, MiningRules.Health(stone));
+        Assert.Equal(100f, MiningRules.Health(stone));
         Assert.False(MiningRules.CanMine(TestPaths.Content.Blocks.Get("obsidian"), 35));
         Assert.True(MiningRules.CanMine(TestPaths.Content.Blocks.Get("obsidian"), 55));
     }
@@ -117,5 +117,21 @@ public class WorldInteractionTests
         for (int i = 0; i < 60 && sys.Items.Count > 0; i++) sys.Tick(world, 1f / 60f, player, s => collected.Add(s));
         Assert.Empty(sys.Items);
         Assert.Equal(5, collected.Count(db.Items.Get("gel")));
+    }
+
+    [Fact]
+    public void BreakingAWaterBoltBookDropsTheWaterBolt()
+    {
+        using var g = TestGame.Create();
+        var store = g.World.Session.World.TileObjects;
+        var plain = new TileObjectInstance(g.Content.TileObjects.Get("book"), g.Floor + new Int3(2, 1, 0), 0, 1);
+        var special = new TileObjectInstance(g.Content.TileObjects.Get("book"), g.Floor + new Int3(-2, 1, 0), 0, 2) { PendingLoot = "water_bolt_book" };
+        Assert.True(store.TryAdd(plain));
+        Assert.True(store.TryAdd(special));
+        g.World.Editor.BreakObject(special, dropItems: true);
+        Assert.Contains(g.World.Drops.Items, d => d.Stack.Item!.Id == "water_bolt");
+        Assert.DoesNotContain(g.World.Drops.Items, d => d.Stack.Item!.Id == "book");
+        g.World.Editor.BreakObject(plain, dropItems: true);
+        Assert.Contains(g.World.Drops.Items, d => d.Stack.Item!.Id == "book");
     }
 }

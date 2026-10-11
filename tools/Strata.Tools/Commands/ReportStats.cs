@@ -29,7 +29,7 @@ internal sealed class ReportStats
         foreach (var o in chunk.Objects) _objects.AddOrUpdate(o.Def.Id, 1, (_, v) => v + 1);
     }
 
-    public object Summarize(WorldGenerator gen, long planMs, IEnumerable<double> timings)
+    public object Summarize(WorldGenerator gen, long planMs, IEnumerable<double> timings, object? terrain)
     {
         var t = timings.ToList();
         var layers = _blocksByLayer.GroupBy(kv => kv.Key.Split('/')[0]).ToDictionary(
@@ -53,6 +53,7 @@ internal sealed class ReportStats
             features = gen.Plan.Features.All.GroupBy(f => f.Kind).OrderBy(g => g.Key).ToDictionary(g => g.Key, g => g.Count()),
             objects = _objects.OrderByDescending(kv => kv.Value).ToDictionary(kv => kv.Key, kv => kv.Value),
             percentByLayer = layers,
+            terrain,
         };
     }
 }

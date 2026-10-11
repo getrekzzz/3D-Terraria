@@ -1,0 +1,50 @@
+{
+ "id": "P1-15",
+ "title": "Failed uses give feedback: a sound and a short message (no ammo, no mana, blocked with a reason); tink on too-hard blocks",
+ "player_outcome": "Clicking a bow with no arrows says 'Needs Wooden Arrow' with a dry click. Casting without mana says 'Not enough mana' with a fizzle. Drinking during Potion Sickness says so. A pickaxe too weak for the block goes 'tink'. Holding the button never spams.",
+ "design": [
+  "ItemUseSystem: add public event Action<PlayerEntity, ItemUseInfo, UseOutcome>? Failed and int Failures (count). Raise only when freshPress and the outcome is NoAmmo, NoMana, or Blocked with a stored reason.",
+  "Failure messages go through the existing Refused event, which Hud already toasts, so Hud.cs is untouched.",
+  "NoAmmo message: 'Needs ' + DisplayName of the lowest-Value item whose AmmoClass == item.UseAmmo. This is content-driven and cached per ammo class in a Dictionary, not a table in code.",
+  "NoMana message: 'Not enough mana'.",
+  "Blocked reasons, recorded in a private _refusal set where Blocked is returned: NoItemUse -> 'You can't use items right now'; healing cooldown in Consume -> the potion_sickness buff DisplayName. Placement, boomerang-out and crystal-cap stay silent, as in Terraria.",
+  "tools/audio/sfx_recipes.py: add recipes use_fail (short dull wooden click), no_mana (descending airy fizzle) and tink (bright metallic ping). Build with /root/bpyenv/bin/python tools/audio/build_audio.py --only=use_fail,no_mana,tink and run build_audio.py --check.",
+  "SoundEvents: subscribe Failed -> Sfx.Play(outcome == NoMana ? \"no_mana\" : \"use_fail\", -4f). OnStruck: when TooHard only, play 'tink' instead of dig_* at -8 dB.",
+  "StandardProbes: use.failures."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 Failed event, Failures, raise on fresh press",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs \u2014 NoAmmo/NoMana reasons",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consumables.cs \u2014 potion-sickness reason",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 use.failures",
+  "game/Audio/SoundEvents.cs \u2014 failure sounds, tink",
+  "tools/audio/sfx_recipes.py \u2014 three recipes",
+  "game/Testing/Scripts/combat.cmds \u2014 failure assert"
+ ],
+ "files_add": [
+  "assets/audio/sfx/use_fail_1.wav \u2014 generated",
+  "assets/audio/sfx/no_mana_1.wav \u2014 generated",
+  "assets/audio/sfx/tink_1.wav, tink_2.wav \u2014 generated"
+ ],
+ "data_changes": [],
+ "tests": [
+  "ItemUseTests.NoAmmoIsReportedOncePerPress: wooden_bow without arrows; Use(fresh) == NoAmmo, Failed fires once and Refused carries 'Needs Wooden Arrow'; Use(held) fires nothing",
+  "ItemUseTests.NoManaIsReported: amethyst_staff with mana 0 gives NoMana plus 'Not enough mana'",
+  "ItemUseTests.PotionSicknessExplains: drink lesser_healing_potion twice; the second fresh use gives Blocked plus the Potion Sickness message",
+  "ItemUseTests.PlacementBlockedStaysSilent: placing into an occupied cell gives Blocked with no Failed event",
+  "combat.cmds: 'clear' / 'give wooden_bow 1' / 'wield wooden_bow' / 'assert use.failures == 0' / 'use' / 'assert use.failures == 1' / 'hold use_primary 0.5' / 'assert use.failures == 2' (the fresh press counts once; holding adds nothing)"
+ ],
+ "verification": [
+  "dotnet test; smoke combat.cmds PASS",
+  "build_audio.py --check reports no missing recipes",
+  "Manual: empty-quiver clicks, a mana-less staff and a copper pickaxe on demonite all give distinct feedback with no spam while holding"
+ ],
+ "depends_on": [
+  "P1-10"
+ ],
+ "risks": [
+  "Toasts share Hud's six-line stack with pickup toasts until the UI phase adds Terraria pop-ups.",
+  "The ammo-name lookup must skip placeholder or unobtainable items (Value 0 or the 'hidden' tag) to avoid odd names."
+ ],
+ "effort": "S"
+}

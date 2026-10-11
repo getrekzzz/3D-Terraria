@@ -1,0 +1,43 @@
+{
+ "id": "P2-12",
+ "title": "HUD restructure on the layout model: Terraria hotbar top-left with the selected item's name, crosshair hints, status line, info panel, framed minimap",
+ "player_outcome": "The HUD takes Terraria's layout. The hotbar is top-left; unselected slots are smaller and the selected one is gold. The selected item's name (prefix, rarity colour, stack) stays above it, and reads 'Inventory' when the inventory is open. Bows and guns show their ammo count. Hovering a town NPC or chest shows a small speech-bubble or hand icon with 'E'. 'Too far' style messages appear under the crosshair. Depth meter and watch readouts sit under a framed minimap with zoom buttons.",
+ "design": [
+  "Slim game/UI/Hud.cs to wiring plus `ApplyLayout()`. ApplyLayout builds a UiState, calls Core UiLayout.Compute(viewport logical size, state) and sets widget Position/Size. It runs on `GetViewport().SizeChanged`, on inventory open/close and on boss/event/NPC-chat visibility changes, never per frame. Store widgets under game/UI/Hud/ in namespace Strata.Game.UI.",
+  "Extract these widgets:\n- Hud/HotbarBar.cs: 10 ItemSlotViews. SlotKind.HotbarSelected for the selected slot; per-slot scale eases with MoveToward(sel ? 1 : 0.78, 3\u00b7dt) through Scale and PivotOffset = Size/2. AmmoCount comes from PlayerInventory.CountAmmo. Clicking selects the slot. Hidden while the inventory is open.\n- Hud/ItemNameLabel.cs: persistent, no fade. Text from Core `ItemTooltip.Name(stack)` ('Legendary Muramasa', 'Torch (25)'), in UiTheme.Rarity (animated tiers recoloured), or 'Inventory' when open. The text updates only when the held stack changes.\n- Hud/Crosshair.cs: moved from the nested class and tinted with CursorColor. When Interaction.TalkTarget or a container/door Target is in reach, draw the talk_hint/open_hint sprite plus an 'E' key label to the right. Leave space for P1's crosshair target label below.\n- Hud/StatusLine.cs: a single line under the crosshair (UiLayout StatusLine) that fades after 2 s. ItemUse.Refused, Interaction.Refused, UiContext.Notified and HomeLost go here, replacing the right-edge toasts (Hud.cs:83-87,269-279).\n- Hud/InfoPanel.cs: info-accessory rows (16 px icon plus 14 px outlined text) in the Info rect, holding InfoText() from Hud.cs:347-372, updated at 4 Hz. The FPS label moves into this panel. That fixes the overlaps at (16,44), (16,60) and (16,64).",
+  "Minimap (WorldMapScreen.cs, Minimap class):\n- Position from the layout; hidden when MinimapHidden while the inventory is open.\n- Frame: NinePatchRect using assets/ui/minimap_frame.png.\n- Two 18 px +/- TextureButtons change MapView.Zoom (clamped 0.5\u20136). They only accept clicks while the mouse is free.\n- Marker labels use the theme font.",
+  "UiProbes gains:\n- `ui.overlaps`: counts pairs of visible HUD/inventory widget global rects that intersect, excluding the tooltip, cursor and world-click catcher.\n- `ui.inventory`.\n- `hud.item_name`: 1 when it is non-empty."
+ ],
+ "files_modify": [
+  "game/UI/Hud.cs \u2014 wiring, ApplyLayout, remove bars, toasts and nested crosshair",
+  "game/UI/WorldMapScreen.cs \u2014 Minimap placement, frame, zoom buttons",
+  "game/UI/MapView.cs \u2014 theme font for labels",
+  "game/Debug/UiProbes.cs \u2014 ui.overlaps, ui.inventory, hud.item_name",
+  "src/Strata.Core/Gameplay/Items/ItemTooltip.cs \u2014 public Name(stack) helper"
+ ],
+ "files_add": [
+  "game/UI/Hud/HotbarBar.cs \u2014 top-left hotbar with scale easing and ammo counts",
+  "game/UI/Hud/ItemNameLabel.cs \u2014 selected item name / 'Inventory'",
+  "game/UI/Hud/Crosshair.cs \u2014 tinted crosshair and interaction hints",
+  "game/UI/Hud/StatusLine.cs \u2014 refusal and notice line",
+  "game/UI/Hud/InfoPanel.cs \u2014 info-accessory rows and FPS"
+ ],
+ "data_changes": [],
+ "tests": [
+  "ui.cmds:\n- `assert ui.overlaps == 0` / `assert hud.item_name == 1`.\n- `uiscale 1.5` / `assert ui.overlaps == 0` / `ui inventory` / `assert ui.overlaps == 0` / `ui close` / `uiscale 1`.\n- `give wooden_bow 1` / `give wooden_arrow 20` / `wield wooden_bow` / `assert errors == 0`."
+ ],
+ "verification": [
+  "Headless ui.cmds SMOKE PASS",
+  "Lavapipe screenshots at 1280\u00d7720 and 1920\u00d71080, UI scale 1.0 and 1.5 (`--exec=\"uiscale 1.5;screenshot hud_150\"`): hotbar top-left, name above it, nothing overlapping"
+ ],
+ "depends_on": [
+  "P2-09",
+  "P2-10",
+  "P2-11"
+ ],
+ "risks": [
+  "P1 adds the crosshair entity name label (G). Keep the TargetName label slot under the crosshair and coordinate on Hud/Crosshair.cs.",
+  "First-person players may prefer the hotbar at the bottom. That can be a later setting; the player chose faithful Terraria."
+ ],
+ "effort": "M"
+}

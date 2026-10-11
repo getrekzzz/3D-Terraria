@@ -1,0 +1,45 @@
+{
+ "id": "P5-32",
+ "title": "Book tabs: Bosses & progression checklist, NPCs (move-in and shops), Tips & controls, Achievements",
+ "player_outcome": "The book shows what to do next, with a checklist of bosses and milestones. The NPC tab explains each townsperson's move-in requirement, where to rescue them, their mood and their full shop. There are tips with your actual key bindings, and an achievements page with progress bars.",
+ "design": [
+  "ProgressTab: ProgressionAdvisor steps grouped by Stage. Each row has a checkbox (done), the name, hint text, and related item and enemy chips that link to the Items and Bestiary tabs. The 'Next up' rows are highlighted, and boss rows use portraits.",
+  "NpcsTab: every TownNpcDef (residents, pets, visitors) with portrait, status (Living here / Homeless / Dead until dawn / Not yet / Bound somewhere / Visiting today), requirement text (ConditionDescriber over Arrival, plus Rescue.Where and Requires, e.g. 'Rescue them: found bound in the Caverns after the Goblin Army'), happiness (TownHappiness.Describe when present), services, and the shop list over all tabs and pools with conditions described and prices. Items link to the Items tab.",
+  "TipsTab: GuideTipDefs by topic; the controls list resolves {key:action} and Action to the current InputMap events (InputMap.ActionGetEvents \u2192 text), so rebinding shows correctly.",
+  "AchievementsTab: a grid of achievement cards (icon, name, description, locked grey, unlock date, a progress bar from AchievementTracker.Progress).",
+  "Engine commands 'ui book npcs|progress|tips|achievements'; probe ui.book_tab."
+ ],
+ "files_modify": [
+  "game/UI/GuideBook/GuideBookScreen.cs \u2014 register tabs",
+  "game/Debug/EngineCommands.Guide.cs",
+  "game/Debug/GodotCommandHost.cs"
+ ],
+ "files_add": [
+  "game/UI/GuideBook/ProgressTab.cs",
+  "game/UI/GuideBook/NpcsTab.cs",
+  "game/UI/GuideBook/NpcDetails.cs",
+  "game/UI/GuideBook/TipsTab.cs",
+  "game/UI/GuideBook/AchievementsTab.cs"
+ ],
+ "data_changes": [
+  "none (uses P5-26/P5-27 data)"
+ ],
+ "tests": [
+  "Smoke guide.cmds: 'ui book progress' / 'ui book npcs' / 'ui book tips' / 'ui book achievements' / 'assert errors == 0' / 'ui close'",
+  "Core coverage is already in the ConditionDescriber, Advisor and Achievement tests"
+ ],
+ "verification": [
+  "guide.cmds PASS; screenshot tour: add 'ui book npcs' + 'screenshot guide_npcs' to game/Testing/Tours/tour.cmds (lavapipe, main only)"
+ ],
+ "depends_on": [
+  "P5-30",
+  "P5-26",
+  "P5-27",
+  "P5-12",
+  "P5-28"
+ ],
+ "risks": [
+  "The NPC tab reveals spoilers (rescue locations); Terraria's wiki-like guide does the same, so accept it."
+ ],
+ "effort": "M"
+}

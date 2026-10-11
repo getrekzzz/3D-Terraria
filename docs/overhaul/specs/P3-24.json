@@ -1,0 +1,59 @@
+{
+ "id": "P3-24",
+ "title": "Terraria-accurate mining hits, tink sound, and cracks on every damaged block",
+ "player_outcome": "Mining feels brisk like Terraria: a copper pickaxe breaks dirt in 2 hits and stone or ore in 3, with special tiles (hellstone, dungeon bricks, hardmode ores, chlorophyte) taking proportionally longer. Too-hard blocks tink. Every damaged block keeps showing staged cracks while its damage lasts, even when you look away.",
+ "design": [
+  "Verified: Health = 100 \u00d7 hardness (MiningRules.cs:11), so stone takes 150 HP and 5 copper hits. Cracks only draw on the cursor target (TargetHighlight.cs:52, 92). BlockDamageTracker.Active is unused by game/. Too-hard plays dig_* at \u22128 dB (SoundEvents.cs:184).",
+  "MiningRules.Health \u2192 a constant TileHealth = 100. Add BlockDef.PickDamageScale (default 1). WorldEditor.Mine multiplies damage per cell by the block's scale; explosions keep 1e6.",
+  "Keep 'hardness' only for sound/particle intensity and update its doc comment.",
+  "BlockDamageTracker gains a Version counter bumped on Hit/Clear/Prune.",
+  "New game/Rendering/BlockCracks.cs: when Version changes (or every 0.25 s for fading), take \u2264 64 active damaged cells within 24 m of the camera into a MultiMesh of 1.02\u00d7 cell cubes. Per-instance custom data = (stage 0\u20133 by damage fraction at 25/50/75/90%, fade over the last 60 ticks before forget).",
+  "New shaders/block_crack.gdshader, a box decal: back faces, hint_depth_texture world-position reconstruction, discard outside the unit cube, triplanar crack mask from a 4-stage atlas. It works on smooth surface-nets terrain.",
+  "Crack atlas: new tools/textures/gen_fx.py (set 'fx' in build_textures.py) writes assets/textures/fx/cracks.png (4 stages, alpha mask).",
+  "TargetHighlight stops passing mining progress to the cursor faces (no doubled cracks); the colour ramp stays.",
+  "SoundEvents.OnStruck: TooHard-only \u2192 'tink'."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Mining/MiningRules.cs \u2014 TileHealth; tracker Version",
+  "src/Strata.Core/Content/Defs/BlockDef.cs \u2014 PickDamageScale; hardness doc",
+  "src/Strata.Core/Gameplay/Interaction/WorldEditor.cs \u2014 per-cell damage scale",
+  "game/Player/TargetHighlight.cs \u2014 no cursor cracks",
+  "game/Audio/SoundEvents.cs \u2014 tink",
+  "game/Bootstrap/WorldLauncher.cs \u2014 create BlockCracks",
+  "tools/textures/build_textures.py \u2014 'fx' set",
+  "data/blocks/natural.json, ores.json, built.json, hardmode.json \u2014 pickDamageScale",
+  "tests/Strata.Core.Tests/Gameplay/WorldInteractionTests.cs \u2014 line 56 expectation (150 \u2192 100)"
+ ],
+ "files_add": [
+  "game/Rendering/BlockCracks.cs \u2014 MultiMesh crack decals",
+  "shaders/block_crack.gdshader \u2014 depth-reconstructed box decal",
+  "tools/textures/gen_fx.py \u2014 crack atlas generator",
+  "assets/textures/fx/cracks.png \u2014 generated atlas",
+  "tests/Strata.Core.Tests/Gameplay/MiningHitsTests.cs \u2014 hit-count tests"
+ ],
+ "data_changes": [
+  "pickDamageScale 2: dirt, grass, clay, mud, jungle_grass, mushroom_grass, corrupt/crimson/hallowed grass, sand, pearlsand, ebonsand, crimsand, hardened_sand, silt, snow, slush, ash, hive (soft tiles)",
+  "pickDamageScale 0.5: ebonstone, crimstone, pearlstone, hellstone, blue/green/pink_brick, cobalt_ore, palladium_ore",
+  "pickDamageScale 0.33: mythril_ore, orichalcum_ore; 0.25: adamantite_ore, titanium_ore, lihzahrd_brick; 0.2: chlorophyte_ore"
+ ],
+ "tests": [
+  "MiningHitsTests: copper pickaxe (35) breaks stone in 3 hits and dirt in 2; gold (55) breaks stone in 2",
+  "MiningHitsTests: cobalt ore at 100 power \u00d7 0.5 \u2192 2 hits; hellstone below 65 power \u2192 TooHard",
+  "Update WorldInteractionTests (Health 100)",
+  "Smoke basic.cmds pickaxe hold still yields 'inv.stone >= 8'"
+ ],
+ "verification": [
+  "dotnet test",
+  "Lavapipe: mine partially, look away \u2014 cracks stay on smooth terrain and crisp bricks",
+  "perf: gd.cracks < 0.1 ms"
+ ],
+ "depends_on": [
+  "P3-01",
+  "P3-08"
+ ],
+ "risks": [
+  "Depth-texture decals need the Forward+ renderer (project default). Check the low preset still works; fall back to cursor-only cracks on the compatibility renderer.",
+  "Faster mining changes smoke expectations that count hits."
+ ],
+ "effort": "M"
+}

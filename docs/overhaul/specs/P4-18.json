@@ -1,0 +1,54 @@
+{
+ "id": "P4-18",
+ "title": "Dungeon decor and hazards: banners, statues, shelves of books (Water Bolt), spikes that hurt, per-object loot",
+ "player_outcome": "Dungeon walls carry Terraria's banners (Marching Bones Banner, Necromantic Sign, Rusted Company Standard, Ragged Brotherhood Sigil, Molten Legion Flag, Diabolic Sigil). Statues stand in alcoves and shelves hold books, one of which may be the Water Bolt. Spike strips bite if you walk into them.",
+ "design": [
+  "New TileObjectDef field Hazard { Damage, Knockback } (src/Strata.Core/Content/Defs/TileObjectDef.cs).",
+  "New partial src/Strata.Core/Session/GameWorld.Hazards.cs: TouchHazards(p), called from TickPlayer next to StepOnPlates. It scans the cells overlapping the player's box grown by 0.05 m (about 16 lookups) and, for objects with Hazard, rolls DamageModel against the player's defense, applies Vitals.Hurt with the normal immunity, and reports through Npcs.ReportPlayerDamage with knockback away from the spike.",
+  "WorldEditor.BreakObject: non-container objects with a per-instance PendingLoot roll it instead of Def.Loot (books; later special pots).",
+  "Objects in data/tileobjects/dungeon.json:",
+  "  6 banners (Terraria ids above): size [2,4,1], anchor Wall, natural false, tags [world, banner].",
+  "  statues skeleton_statue, armor_statue, angel_statue: size [2,4,2], tags [world].",
+  "  book: size [1,1,1], 4 variants, natural, loot 'book'.",
+  "  spike: size [1,1,1], anchor Any, natural false, hazard {damage 40, knockback 6}, hitPoints 1, covers terraria:spike.",
+  "Items: book (material, maxStack 9999, covers terraria:book).",
+  "Loot tables: 'book' (1 book) and 'water_bolt_book' (water_bolt).",
+  "Blender: new tools/blender/bgen/dungeon_decor.py. banner: a cloth panel with a sagging hem, rod and painted emblem (params: colours, emblem shape). statue: a grey-stone figure from primitives and detail.organic on a pedestal (poses: skeleton, armor, angel). book: a small tome with 4 colour variants. spike: 5 iron cones on a plate.",
+  "assets.json entries; build_all.py --only for the new ids; reference rows."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/TileObjectDef.cs \u2014 Hazard",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 call TouchHazards in TickPlayer",
+  "src/Strata.Core/Gameplay/Interaction/WorldEditor.Objects.cs \u2014 per-instance loot on break",
+  "src/Strata.Core/Content/Validation/ContentValidator.cs \u2014 hazard damage \u2265 0",
+  "data/tileobjects/dungeon.json \u2014 decor",
+  "tools/blender/assets.json, tools/blender/build_all.py, tools/content/reference/items_extra.py \u2014 assets and rows"
+ ],
+ "files_add": [
+  "src/Strata.Core/Session/GameWorld.Hazards.cs \u2014 object hazards",
+  "tools/blender/bgen/dungeon_decor.py \u2014 banner, statue, book, spike generators",
+  "data/loot/dungeon.json \u2014 book tables (later dungeon tables too)",
+  "tests/Strata.Core.Tests/Gameplay/HazardTests.cs \u2014 spike tests"
+ ],
+ "data_changes": [
+  "6 banners, 3 statues, book (object and item), spike object, 2 loot tables."
+ ],
+ "tests": [
+  "HazardTests.SpikesHurtWithImmunityFrames: step into a placed spike; life drops once per immunity window.",
+  "HazardTests.SpikesRespectGodMode.",
+  "WorldInteractionTests.BreakingAWaterBoltBookDropsTheWaterBolt: an instance with PendingLoot 'water_bolt_book'.",
+  "Smoke combat.cmds: 'place spike 1 0 0', 'wait 0.5', 'tp 1 0 0' (relative), 'wait 0.3', 'assert player.life < 100'."
+ ],
+ "verification": [
+  "dotnet test; validate; build_all.py --check",
+  "lavapipe screenshot of banners and statues placed in the builder arena"
+ ],
+ "depends_on": [
+  "P4-17"
+ ],
+ "risks": [
+  "GameWorld.cs is at 387 lines. Only one call line is added.",
+  "Spike knockback plus immunity must not trap the player in a spike pit. Terraria-like 40 damage over 40 immunity ticks gives time to jump out."
+ ],
+ "effort": "M"
+}

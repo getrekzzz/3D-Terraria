@@ -1,9 +1,9 @@
 """Clothing shaped from the body itself: a garment is the body's surface over a region (shirt, trousers, boots,
-coat, a robe's bodice), tailored into cloth (tailoring.py, robes.py: ease, draping across hollows, folds), torn on the
-undead (tatters.py) and finished (finishing.py: seams, collars, cuffs, hems, boot rims and soles, buttons), skinned
-with the body's own weights. Skin that ends up under clothing is removed so nothing pokes through when limbs bend
-(but kept under tears). Skirts (coats, robes; skirts.py) are lofted from under the belt or sash, which ties it
-together.
+coat, a vest (cut as a sleeveless coat), a robe's bodice), tailored into cloth (tailoring.py, robes.py: ease, draping
+across hollows, folds), torn on the undead (tatters.py) and finished (finishing.py: seams, collars, cuffs, hems, boot
+rims and soles, buttons), skinned with the body's own weights. Skin that ends up under clothing is removed so nothing
+pokes through when limbs bend (but kept under tears). Skirts (coats, robes; skirts.py) are lofted from under the belt
+or sash, which ties it together; their loose cloth is marked for the game's sway (skirts.mark_sway).
 """
 import math
 
@@ -36,8 +36,9 @@ class Wardrobe(Skirts):
         self.girded = bool(p.get("robe") or "coat" in p or "shirt" in p) and not self.suit    # (see ``girth``)
         self.hidden = []                # tests for skin hidden under what isn't shaped from it (a long skirt)
         self.tucked = self.belted and "coat" not in p and not self.suit   # the shirt bloused over the belt
-        # A coat worn open (the default, ``lapels``): a V down to the chest with lapels, showing the shirt under it.
-        self.lapels = "coat" in p and p.get("lapels", True) and not self.suit
+        # A coat (or a vest) worn open (the default, ``lapels``): a V down to the chest with lapels, showing the shirt
+        # under it.
+        self.lapels = ("coat" in p or "vest" in p) and p.get("lapels", True) and not self.suit
         self.front = None               # the open front's V (lapels.Front), once the collar is fitted
         self.sole = 0.022 * s           # top of the boot soles
         self.standoff = {}              # each garment's height off the skin per vertex (a coat sits on the shirt)
@@ -92,6 +93,10 @@ class Wardrobe(Skirts):
     def in_coat(self, co):
         """The shirt's region down to just under the belt, where the coat's tails take over."""
         return self.in_shirt(co) and (self._on_arm(co) or co.z > self.waist - 0.015 * self.f.s)
+
+    def in_vest(self, co):
+        """A sleeveless vest: the coat's region off the arms (the shirt shows as sleeves and collar)."""
+        return self.in_coat(co) and not self._on_arm(co)
 
     def in_pants(self, co):
         return self.boot_top - 0.01 * self.f.s < co.z < self.waist + 0.004 * self.f.s and not self._on_arm(co)

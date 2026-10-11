@@ -1,0 +1,119 @@
+{
+ "comment": "P5-22 Strange Plants (wild flowers) and the Dye Trader's rare dyes (potion bottles).",
+ "objects": {
+  "strange_plant_1_plant": {
+   "generator": "flower",
+   "params": {
+    "colors": [
+     "#c040c0"
+    ]
+   }
+  },
+  "strange_plant_2_plant": {
+   "generator": "flower",
+   "params": {
+    "colors": [
+     "#40c0c0"
+    ]
+   }
+  },
+  "strange_plant_3_plant": {
+   "generator": "flower",
+   "params": {
+    "colors": [
+     "#e0c040"
+    ]
+   }
+  },
+  "strange_plant_4_plant": {
+   "generator": "flower",
+   "params": {
+    "colors": [
+     "#e05050"
+    ]
+   }
+  }
+ },
+ "items": {
+  "explicit": {
+   "strange_plant_1": {
+    "generator": "feather",
+    "params": {
+     "color": "#c040c0"
+    }
+   },
+   "strange_plant_2": {
+    "generator": "feather",
+    "params": {
+     "color": "#40c0c0"
+    }
+   },
+   "strange_plant_3": {
+    "generator": "feather",
+    "params": {
+     "color": "#e0c040"
+    }
+   },
+   "strange_plant_4": {
+    "generator": "feather",
+    "params": {
+     "color": "#e05050"
+    }
+   },
+   "acid_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#80e040"
+    }
+   },
+   "red_acid_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#e04030"
+    }
+   },
+   "blue_acid_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#3070e0"
+    }
+   },
+   "mushroom_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#4080ff"
+    }
+   },
+   "purple_ooze_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#9040c0"
+    }
+   },
+   "reflective_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#d8e0e8"
+    }
+   },
+   "gel_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#40a0f0"
+    }
+   },
+   "negative_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#202028"
+    }
+   },
+   "shadow_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#302040"
+    }
+   }
+  }
+ }
+}

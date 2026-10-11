@@ -1,0 +1,15 @@
+{
+ "comment": "P3-05: thrown yoyo heads and flail balls (head_only), used by the projectile defs from P3-12/P3-13 on. 'projectile' names the content projectile a model is for.",
+ "projectiles": {
+  "wood_yoyo_head": {"projectile": "wood_yoyo", "generator": "yoyo", "params": {"head_only": true, "color": "#b0703a"}},
+  "rally_head": {"projectile": "rally", "generator": "yoyo", "params": {"head_only": true, "color": "#3a8aff"}},
+  "amazon_head": {"projectile": "amazon", "generator": "yoyo", "params": {"head_only": true, "color": "#3ab84a"}},
+  "code_1_head": {"projectile": "code_1", "generator": "yoyo", "params": {"head_only": true, "color": "#d8d8e8"}},
+  "terrarian_head": {"projectile": "terrarian_yoyo", "generator": "yoyo", "params": {"head_only": true, "color": "#4aff8a", "glow": true}},
+  "ball_o_hurt_ball": {"projectile": "ball_o_hurt", "generator": "flail", "params": {"head_only": true, "ball": "#5a3a7a"}},
+  "sunfury_ball": {"projectile": "sunfury", "generator": "flail", "params": {"head_only": true, "ball": "#ff8a2a", "glow": true}},
+  "blue_moon_ball": {"projectile": "blue_moon", "generator": "flail", "params": {"head_only": true, "ball": "#4a7aff", "glow": true}},
+  "flower_pow_ball": {"projectile": "flower_pow", "generator": "flail", "params": {"head_only": true, "ball": "#e05a9a"}},
+  "flairon_ball": {"projectile": "flairon", "generator": "flail", "params": {"head_only": true, "ball": "#4ac0b0"}}
+ }
+}

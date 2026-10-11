@@ -14,7 +14,7 @@ public sealed class UiContext
         Game = game;
         Player = player;
         Interaction = interaction;
-        Recipes = new RecipeBook(game.Session.Content);
+        Recipes = game.Recipes;
     }
 
     public GameWorld Game { get; }
@@ -24,11 +24,21 @@ public sealed class UiContext
     public PlayerEntity Entity => Player.Entity;
     public PlayerInventory Inventory => Entity.State.Inventory;
 
-    /// <summary>Short on-screen notification (crafting results, warnings); the HUD shows them as toasts.</summary>
+    /// <summary>Short on-screen notification (crafting results, warnings); the HUD shows them on the status line under the crosshair.</summary>
+    /// <summary>The shop tab the next opened shop shows (the town dialog's tab buttons set it; the shop resets it).</summary>
+    public string ShopTab { get; set; } = Strata.Core.Content.Defs.ShopTabs.Shop;
+
     public event System.Action<string, Godot.Color>? Notified;
 
     public void Notify(string text, Godot.Color color) => Notified?.Invoke(text, color);
 
-    public List<(string Text, TooltipKind Kind)> Tooltip(ItemStack stack) =>
-        ItemTooltip.Lines(stack, Game.Uses[stack.Item!], Recipes.RecipesUsing(stack.Item!).Count > 0);
+    /// <summary>
+    /// Tooltip lines for a stack as the local player sees it: prefix and class bonuses applied, the worn set bonus, and
+    /// the town's sell price (or <paramref name="buyPrice"/> in a shop).
+    /// </summary>
+    public List<(string Text, TooltipKind Kind)> Tooltip(ItemStack stack) => Tooltip(stack, null);
+
+    public List<(string Text, TooltipKind Kind)> Tooltip(ItemStack stack, long? buyPrice) =>
+        ItemTooltip.Lines(stack, Game.Uses[stack.Item!], new TooltipContext(Recipes.RecipesUsing(stack.Item!).Count > 0,
+            Game.Session.Content, Entity.State, Game.Town.Config.SellRatio, buyPrice));
 }

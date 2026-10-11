@@ -1,9 +1,13 @@
 """Actions for generated humans, sampled every frame from pose functions (exact curves, authored easing, seamless
 loops).
 
-Whole-body clips: idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt, death. Upper-body actions that
-the game layers over them (swing, mine, thrust, shoot, bow, cast, drink, use, hold) live in human/actions.py. Undead
-folk (zombies, mummies) shamble with their arms held out; skeletons keep a hunch but walk normally.
+Whole-body clips: idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt, death, strafe_left and
+strafe_right (runs at an angle to the hips, human/strafe.py), and the rest poses sit, sleep, bound and lie
+(human/rest_poses.py). Upper-body actions that the game layers over them (one per item use style: swing, mine, rapier,
+spear, whip, place, use, wave, hold, flail in human/actions.py; gun, bow, staff, tome, throw, hold_up, drink, eat,
+yoyo in human/actions_items.py) take their timing from data/config/use_styles.json. Undead folk (zombies, mummies)
+shamble with their arms held out; skeletons keep a hunch but walk normally. Item actions and rest poses start every
+body from a living person's arms (see Motion.stance).
 
 Every pose starts from a relaxed stance (arms lowered from the A-pose rest, elbows soft, fingers curled; the right
 hand closed around a handle at GRIP for held items) and adds the clip's rotations. Poses are dicts of bone -> rotation ops (see
@@ -130,19 +134,25 @@ class Motion:
         pose[f"thumb.03.{side}"] = [("swing", palm, deg(26))]
         return pose
 
-    def stance(self):
+    def stance(self, acting=False, fist=True):
+        """The base every clip adds to: the right hand a fist round a held item's handle (``fist``; the rest poses
+        relax it). ``acting``: for item actions, which pose both arms themselves, the arms start from a living
+        person's (no undead hunch or shamble on them), so an action looks the same on every body and a raised arm
+        never turns past straight up and back, where the game's blend into and out of the action (by the shortest
+        turn from the rest pose) would swing it the other way round."""
+        hunch, shamble = (0.0, False) if acting else (self.hunch, self.shamble)
         pose = {"spine": [("swing", FWD, deg(4 * self.hunch))], "neck": [("swing", FWD, deg(10 * self.hunch))]}
         for side, sx in SIDES:
-            pose[f"upper_arm.{side}"] = [("swing", DOWN, deg(33 - self.spread)), ("swing", FWD, deg(4 + 25 * self.hunch))]
-            pose[f"forearm.{side}"] = [("swing", FWD, deg(12 + 30 * self.hunch))]
-            if self.shamble:     # arms held out in front, wrists limp
+            pose[f"upper_arm.{side}"] = [("swing", DOWN, deg(33 - self.spread)), ("swing", FWD, deg(4 + 25 * hunch))]
+            pose[f"forearm.{side}"] = [("swing", FWD, deg(12 + 30 * hunch))]
+            if shamble:          # arms held out in front, wrists limp
                 pose[f"upper_arm.{side}"] += [("axis", SIDE_AXIS, deg(52)), ("axis", UP, deg(-6 * sx))]
                 pose[f"forearm.{side}"] = [("swing", FWD, deg(14))]
                 pose[f"hand.{side}"] = [("axis", SIDE_AXIS, deg(-28))]
-            if side == "R" and not self.shamble:
+            if side == "R" and fist and not shamble:
                 pose = merge(pose, self.grip(side))
             else:
-                pose = merge(pose, self.fingers(side, 0.3 if self.shamble else 0.28, 0.35))
+                pose = merge(pose, self.fingers(side, 0.3 if shamble else 0.28, 0.35))
         return pose
 
     # ------------------------------------------------------------------ clips
@@ -164,10 +174,15 @@ class Motion:
             "hurt": (0.4, self.hurt),
             "death": (1.3, self.death),
         }
-        from . import actions     # (imports this module's helpers)
-        clips.update(actions.clips(self))
+        from . import actions, rest_poses, strafe     # (import this module's helpers)
+        clips.update(strafe.clips(walk, clips["run"][0]))
         for name, (length, fn) in clips.items():
             self.clip(name, length, fn, base)
+        acting, resting = self.stance(acting=True), self.stance(acting=True, fist=False)
+        for name, (length, fn) in rest_poses.clips(self).items():
+            self.clip(name, length, fn, resting)
+        for name, (length, fn) in actions.clips(self).items():
+            self.clip(name, length, fn, acting)
 
     def clip(self, name, length, fn, base):
         """Samples ``fn(t)`` (t in 0..1) at every frame; every bone is keyed so layered clips never fall back to rest."""

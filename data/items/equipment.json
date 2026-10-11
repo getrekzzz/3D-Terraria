@@ -44,7 +44,7 @@
       "name": "Wooden Bow",
       "category": "weapon",
       "value": 100,
-      "useStyle": "shoot",
+      "useStyle": "bow",
       "useTime": 28,
       "useAnimation": 28,
       "damage": 4,
@@ -79,7 +79,7 @@
       "category": "weapon",
       "rarity": 1,
       "value": 10000,
-      "useStyle": "shoot",
+      "useStyle": "staff",
       "useTime": 22,
       "useAnimation": 22,
       "autoReuse": true,
@@ -94,11 +94,11 @@
       ]
     },
     {
-      "id": "amethyst_staff",
+      "id": "amethyst_staff", "soundSet": "staff_bolt",
       "name": "Amethyst Staff",
       "category": "weapon",
       "value": 2000,
-      "useStyle": "shoot",
+      "useStyle": "staff",
       "useTime": 37,
       "useAnimation": 37,
       "damage": 14,
@@ -112,11 +112,11 @@
       ]
     },
     {
-      "id": "topaz_staff",
+      "id": "topaz_staff", "soundSet": "staff_bolt",
       "name": "Topaz Staff",
       "category": "weapon",
       "value": 3000,
-      "useStyle": "shoot",
+      "useStyle": "staff",
       "useTime": 36,
       "useAnimation": 36,
       "damage": 15,
@@ -194,7 +194,7 @@
       "equipEffects": [
         {
           "type": "stat",
-          "stat": "moveSpeed",
+          "stat": "runSpeed",
           "add": 0.45
         }
       ],
