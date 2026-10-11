@@ -60,8 +60,10 @@ internal static class MiniBiomeCarver
                 bool column = ch.Chamber == ChamberKind.Marble && IsColumn(ch, x, z);
                 ctx.Blocks[i] = column ? p.Marble : p.Air;
             }
-            else if (ctx.Blocks[i] != p.Air || d < 1f)
+            else if (ctx.Blocks[i] != p.Air)
             {
+                // The chamber's marble, granite or moss walls line the rock round it; a tunnel or cave room running
+                // into the chamber stays open.
                 ctx.Blocks[i] = wall;
             }
         });

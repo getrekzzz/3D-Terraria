@@ -10,9 +10,11 @@
     { "id": "plant_glowing_mushroom", "entries": [{ "item": "glowing_mushroom" }] },
     { "id": "life_crystal_node", "entries": [{ "item": "life_crystal" }] },
     { "id": "enchanted_sword_shrine", "mode": "weighted", "entries": [{ "item": "enchanted_sword", "weight": 1 }, { "item": "wooden_sword", "weight": 2 }] },
-    { "id": "pot", "name": "Pots", "mode": "weighted", "rolls": 1, "coins": [10, 300], "entries": [
+    { "id": "pot", "name": "Pots", "mode": "weighted", "rolls": 1, "coins": [10, 300], "depthScale": { "coins": 2.5, "counts": 0.5 }, "entries": [
       { "item": "torch", "min": 4, "max": 12, "weight": 3 },
       { "item": "lesser_healing_potion", "min": 1, "max": 2, "weight": 2 },
+      { "item": "healing_potion", "min": 1, "max": 2, "weight": 0.2, "depthBonus": 2.5, "conditions": [{ "type": "worldDepth", "min": 0.4 }] },
+      { "item": "spelunker_potion", "weight": 0.1, "depthBonus": 0.6, "conditions": [{ "type": "worldDepth", "min": 0.3 }] },
       { "item": "wooden_arrow", "min": 10, "max": 25, "weight": 2 },
       { "item": "gel", "min": 2, "max": 6, "weight": 1 },
       { "item": "bomb", "min": 1, "max": 3, "weight": 0.6 },
@@ -21,8 +23,10 @@
     ] },
     { "id": "cabin_chest_primary", "mode": "weighted", "entries": [
       { "item": "cloud_in_a_bottle", "weight": 1 }, { "item": "hermes_boots", "weight": 1 }, { "item": "band_of_regeneration", "weight": 1 },
-      { "item": "wand_of_sparking", "weight": 1 }, { "item": "lucky_horseshoe", "weight": 0.5 }, { "item": "aglet", "weight": 1 },
-      { "item": "magic_mirror", "weight": 1.2 }, { "item": "enchanted_boomerang", "weight": 0.8 }, { "item": "minecart", "weight": 0.6 },
+      { "item": "wand_of_sparking", "weight": 1 }, { "item": "lucky_horseshoe", "weight": 0.5, "depthBonus": 0.5 }, { "item": "aglet", "weight": 1 },
+      { "item": "magic_mirror", "weight": 1.2, "depthBonus": 1 }, { "item": "enchanted_boomerang", "weight": 0.8 }, { "item": "minecart", "weight": 0.6, "depthBonus": 0.5 },
+      { "item": "cloud_in_a_balloon", "weight": 0.1, "depthBonus": 1, "conditions": [{ "type": "worldDepth", "min": 0.35 }] },
+      { "item": "rocket_boots", "weight": 0.1, "depthBonus": 0.8, "conditions": [{ "type": "worldDepth", "min": 0.5 }] },
       { "item": "finch_staff", "weight": 2, "conditions": [{ "type": "biome", "any": ["forest"] }, { "type": "depth", "max": 12 }] },
       { "item": "amazon", "weight": 2, "conditions": [{ "type": "biome", "any": ["jungle"] }] },
       { "item": "feral_claws", "weight": 2, "conditions": [{ "type": "biome", "any": ["jungle"] }] },
@@ -46,7 +50,7 @@
       { "item": "recall_potion", "min": 1, "max": 3, "chance": 0.33 },
       { "item": "bomb", "min": 10, "max": 19, "chance": 0.3 }
     ] },
-    { "id": "cabin_chest", "name": "Cabin Chests", "coins": [500, 3000], "entries": [
+    { "id": "cabin_chest", "name": "Cabin Chests", "coins": [500, 3000], "depthScale": { "coins": 1, "counts": 0.4 }, "entries": [
       { "table": "cabin_chest_primary" },
       { "item": "torch", "min": 10, "max": 25, "chance": 0.7 },
       { "item": "lesser_healing_potion", "min": 2, "max": 5, "chance": 0.6 },
@@ -61,14 +65,61 @@
       { "item": "musket_ball", "min": 30, "max": 60, "chance": 0.2 },
       { "item": "throwing_knife", "min": 25, "max": 50, "chance": 0.15 }
     ] },
-    { "id": "gold_chest", "name": "Gold Chests", "coins": [1500, 6000], "entries": [
+    { "id": "deep_chest_primary", "mode": "weighted", "entries": [
+      { "item": "lava_charm", "weight": 1.2 }, { "item": "magma_stone", "weight": 1 }, { "item": "obsidian_skull", "weight": 1.2 },
+      { "item": "flamarang", "weight": 0.8 }, { "item": "rocket_boots", "weight": 0.7 }, { "item": "cloud_in_a_balloon", "weight": 0.6 },
+      { "item": "imp_staff", "weight": 0.5 }, { "item": "magic_lantern", "weight": 0.4 }, { "item": "sunfury", "weight": 0.35 },
+      { "item": "flamelash", "weight": 0.35 }, { "item": "dark_lance", "weight": 0.35 }, { "item": "fairy_bell", "weight": 0.3 },
+      { "item": "magic_dagger", "weight": 0.25 }
+    ] },
+    { "id": "cave_chest", "name": "Cave Chests", "coins": [400, 2000], "depthScale": { "coins": 1.5, "counts": 0.6 }, "entries": [
+      { "table": "cabin_chest_primary", "chance": 0.5, "depthBonus": 0.4 },
+      { "item": "torch", "min": 8, "max": 20, "chance": 0.75 },
+      { "item": "lesser_healing_potion", "min": 1, "max": 3, "chance": 0.5 },
+      { "item": "healing_potion", "min": 1, "max": 2, "chance": 0.05, "depthBonus": 0.4 },
+      { "item": "wooden_arrow", "min": 20, "max": 40, "chance": 0.4 },
+      { "item": "glowstick", "min": 5, "max": 12, "chance": 0.3 },
+      { "item": "rope", "min": 25, "max": 60, "chance": 0.3 },
+      { "item": "iron_bar", "min": 3, "max": 8, "chance": 0.3 },
+      { "item": "silver_bar", "min": 3, "max": 8, "chance": 0.15, "depthBonus": 0.25 },
+      { "item": "bomb", "min": 2, "max": 5, "chance": 0.25 },
+      { "item": "recall_potion", "min": 1, "max": 2, "chance": 0.25 },
+      { "item": "spelunker_potion", "chance": 0.05, "depthBonus": 0.25 },
+      { "item": "shuriken", "min": 15, "max": 35, "chance": 0.15 },
+      { "item": "throwing_knife", "min": 15, "max": 35, "chance": 0.15 },
+      { "item": "amethyst", "min": 2, "max": 5, "chance": 0.12, "depthBonus": 0.15 },
+      { "item": "topaz", "min": 1, "max": 4, "chance": 0.06, "depthBonus": 0.15 }
+    ] },
+    { "id": "obsidian_chest", "name": "Obsidian Chests", "coins": [5000, 15000], "depthScale": { "coins": 1, "counts": 0.5 }, "entries": [
+      { "table": "deep_chest_primary" },
+      { "table": "cabin_chest_primary", "chance": 0.35 },
+      { "item": "hellstone_bar", "min": 4, "max": 10, "chance": 0.35 },
+      { "item": "obsidian", "min": 10, "max": 25, "chance": 0.5 },
+      { "item": "healing_potion", "min": 3, "max": 6, "chance": 0.65 },
+      { "item": "spelunker_potion", "min": 1, "max": 3, "chance": 0.4 },
+      { "item": "mining_potion", "min": 1, "max": 2, "chance": 0.3 },
+      { "item": "endurance_potion", "min": 1, "max": 2, "chance": 0.25 },
+      { "item": "titan_potion", "min": 1, "max": 2, "chance": 0.25 },
+      { "item": "lifeforce_potion", "min": 1, "max": 2, "chance": 0.2 },
+      { "item": "recall_potion", "min": 2, "max": 4, "chance": 0.4 },
+      { "item": "ruby", "min": 2, "max": 5, "chance": 0.25 },
+      { "item": "diamond", "min": 1, "max": 3, "chance": 0.15 },
+      { "item": "dynamite", "min": 2, "max": 4, "chance": 0.25 },
+      { "item": "bomb", "min": 8, "max": 15, "chance": 0.3 },
+      { "item": "flaming_arrow", "min": 30, "max": 60, "chance": 0.3 }
+    ] },
+    { "id": "gold_chest", "name": "Gold Chests", "coins": [1500, 6000], "depthScale": { "coins": 1.2, "counts": 0.6 }, "entries": [
       { "table": "cabin_chest_primary" },
+      { "table": "deep_chest_primary", "chance": 0.02, "depthBonus": 0.28, "conditions": [{ "type": "worldDepth", "min": 0.55 }] },
       { "item": "fairy_bell", "chance": 0.04 },
       { "item": "torch", "min": 15, "max": 30, "chance": 0.7 },
-      { "item": "healing_potion", "min": 2, "max": 4, "chance": 0.5 },
+      { "item": "healing_potion", "min": 2, "max": 4, "chance": 0.4, "depthBonus": 0.3 },
       { "item": "lesser_healing_potion", "min": 3, "max": 6, "chance": 0.4 },
       { "item": "gold_bar", "min": 5, "max": 12, "chance": 0.3 },
       { "item": "platinum_bar", "min": 5, "max": 12, "chance": 0.2 },
+      { "item": "sapphire", "min": 1, "max": 3, "chance": 0.08, "depthBonus": 0.15 },
+      { "item": "ruby", "min": 1, "max": 3, "chance": 0.04, "depthBonus": 0.15 },
+      { "item": "diamond", "min": 1, "max": 2, "chance": 0.02, "depthBonus": 0.1 },
       { "item": "tungsten_bar", "min": 6, "max": 14, "chance": 0.25 },
       { "item": "spelunker_potion", "min": 1, "max": 2, "chance": 0.3 },
       { "item": "night_owl_potion", "min": 1, "max": 2, "chance": 0.3 },

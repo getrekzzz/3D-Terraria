@@ -9,19 +9,22 @@ public sealed record DropInfo(ItemDef Item, float Chance, int Min, int Max, Type
 /// <summary>
 /// Drop-rate maths for loot tables, matching <see cref="LootRoller"/>: an each-mode entry drops with its chance; a
 /// weighted entry with 1 − (1 − weight / total)^rolls, over every entry as if eligible (conditional entries are
-/// listed with their conditions, so the exact rate depends on them); nested tables multiply through. Pure and
-/// thread-safe.
+/// listed with their conditions, so the exact rate depends on them); nested tables multiply through. Rates are those at
+/// sea level unless a world depth is given (<see cref="LootEntry.DepthBonus"/> raises chances and weights deeper down).
+/// Pure and thread-safe.
 /// </summary>
 public static class DropRates
 {
     /// <summary>Chance that a single roll of <paramref name="table"/> picks <paramref name="entry"/> at least once.</summary>
-    public static float EntryChance(LootTableDef table, LootEntry entry)
+    public static float EntryChance(LootTableDef table, LootEntry entry, float worldDepth = 0f)
     {
-        if (table.Mode != LootMode.Weighted) return Math.Clamp(entry.Chance, 0f, 1f);
+        float deep = Math.Clamp(worldDepth, 0f, 1f);
+        if (table.Mode != LootMode.Weighted) return Math.Clamp(entry.Chance + entry.DepthBonus * deep, 0f, 1f);
         float total = 0f;
-        foreach (var e in table.Entries) total += Math.Max(0f, e.Weight);
-        if (total <= 0f || entry.Weight <= 0f) return 0f;
-        return 1f - MathF.Pow(1f - entry.Weight / total, Math.Max(0, table.Rolls));
+        foreach (var e in table.Entries) total += Math.Max(0f, e.Weight + e.DepthBonus * deep);
+        float weight = entry.Weight + entry.DepthBonus * deep;
+        if (total <= 0f || weight <= 0f) return 0f;
+        return 1f - MathF.Pow(1f - weight / total, Math.Max(0, table.Rolls));
     }
 
     /// <summary>Every item the table can give (nested tables flattened, an item listed once per path), in table order.</summary>

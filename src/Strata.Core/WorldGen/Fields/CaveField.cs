@@ -10,7 +10,7 @@ namespace Strata.Core.WorldGen.Fields;
 public sealed class CaveField
 {
     private readonly WorldPlan _plan;
-    private readonly NoiseField _spagA, _spagB, _cheese, _pillars, _region, _crack, _crackMask;
+    private readonly NoiseField _spagA, _spagB, _cheese, _pillars, _region, _crack, _crackMask, _warp;
 
     public CaveField(WorldPlan plan)
     {
@@ -23,7 +23,11 @@ public sealed class CaveField
         _region = NoiseField.Create(s, "region", 420f, NoiseFractal.Fbm, 2);
         _crack = NoiseField.Create(s, "crack", 46f, NoiseFractal.None, 1);
         _crackMask = NoiseField.Create(s, "crack_mask", 30f, NoiseFractal.Fbm, 2);
+        _warp = NoiseField.Create(s, "network_warp", Caves.CaveTuning.WarpWavelength, NoiseFractal.Fbm, 2);
     }
+
+    /// <summary>Smooth roughness (about −1…1) that bends the cave network's walls and roofs (see <see cref="Caves.CaveCarver"/>).</summary>
+    public float Warp(int x, int y, int z) => _warp.Sample(x, y, z);
 
     public float SpaghettiA(int x, int y, int z) => _spagA.Sample(x, y * 1.25f, z);
     public float SpaghettiB(int x, int y, int z) => _spagB.Sample(x, y * 1.25f, z);

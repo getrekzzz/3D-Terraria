@@ -6,7 +6,11 @@ using Strata.Core.Gameplay.Items;
 
 namespace Strata.Core.Gameplay.Loot;
 
-/// <summary>Rolls loot tables (independent-chance or weighted modes, nested tables, conditional entries, coins).</summary>
+/// <summary>
+/// Rolls loot tables (independent-chance or weighted modes, nested tables, conditional entries, coins). Depth-aware
+/// tables grow their coins and stacks with <see cref="ConditionContext.WorldDepth"/> (<see cref="LootTableDef.DepthScale"/>)
+/// and entries with a <see cref="LootEntry.DepthBonus"/> grow likelier.
+/// </summary>
 public sealed class LootRoller
 {
     private readonly ContentDatabase _content;
@@ -17,46 +21,56 @@ public sealed class LootRoller
     public List<ItemStack> Roll(string tableId, ref Pcg32 rng, ConditionContext? context = null)
     {
         var result = new List<ItemStack>();
-        RollInto(_content.LootTables.Get(tableId), ref rng, context ?? new ConditionContext(), result, 0);
+        RollInto(_content.LootTables.Get(tableId), ref rng, context ?? new ConditionContext(), result, 0, null);
         return Merge(result);
     }
 
-    private void RollInto(LootTableDef table, ref Pcg32 rng, ConditionContext ctx, List<ItemStack> into, int depth)
+    private void RollInto(LootTableDef table, ref Pcg32 rng, ConditionContext ctx, List<ItemStack> into, int depth, LootDepthScale? scale)
     {
         if (depth > LootTableDef.MaxNesting) return;
-        if (table.Coins is { Length: 2 } c) into.AddRange(Coins.ToStacks(_content, rng.Range(c[0], c[1])));
+        scale = table.DepthScale ?? scale;
+        float deep = Math.Clamp(ctx.WorldDepth, 0f, 1f);
+        if (table.Coins is { Length: 2 } c)
+        {
+            long coins = rng.Range(c[0], c[1]);
+            if (scale != null) coins = (long)MathF.Round(coins * (1f + scale.Coins * deep));
+            into.AddRange(Coins.ToStacks(_content, coins));
+        }
         var eligible = table.Entries.Where(e => Condition(e).Evaluate(ctx)).ToList();
         if (table.Mode == LootMode.Weighted)
         {
-            float total = eligible.Sum(e => e.Weight);
+            float total = eligible.Sum(e => e.Weight + e.DepthBonus * deep);
             for (int r = 0; r < table.Rolls && total > 0; r++)
             {
                 float pick = rng.NextFloat() * total;
                 foreach (var e in eligible)
                 {
-                    pick -= e.Weight;
+                    pick -= e.Weight + e.DepthBonus * deep;
                     if (pick > 0) continue;
-                    Emit(e, ref rng, ctx, into, depth);
+                    Emit(e, ref rng, ctx, into, depth, scale);
                     break;
                 }
             }
             return;
         }
         foreach (var e in eligible)
-            if (rng.NextFloat() < e.Chance) Emit(e, ref rng, ctx, into, depth);
+            if (rng.NextFloat() < e.Chance + e.DepthBonus * deep) Emit(e, ref rng, ctx, into, depth, scale);
     }
 
-    private void Emit(LootEntry e, ref Pcg32 rng, ConditionContext ctx, List<ItemStack> into, int depth)
+    private void Emit(LootEntry e, ref Pcg32 rng, ConditionContext ctx, List<ItemStack> into, int depth, LootDepthScale? scale)
     {
         if (e.Table != null)
         {
-            RollInto(_content.LootTables.Get(e.Table), ref rng, ctx, into, depth + 1);
+            RollInto(_content.LootTables.Get(e.Table), ref rng, ctx, into, depth + 1, scale);
             return;
         }
         int count = rng.Range(e.Min, e.Max);
         if (count <= 0) return;
+        var item = _content.Items.Get(e.Item!);
+        if (scale != null && item.MaxStack > 1)
+            count = Math.Min(item.MaxStack, (int)MathF.Round(count * (1f + scale.Counts * Math.Clamp(ctx.WorldDepth, 0f, 1f))));
         // Each weapon, tool or accessory dropped rolls its own prefix.
-        into.AddRange(Prefixes.Made(_content.Items.Get(e.Item!), count, _content, ref rng));
+        into.AddRange(Prefixes.Made(item, count, _content, ref rng));
     }
 
     private ICondition Condition(LootEntry e)

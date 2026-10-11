@@ -21,9 +21,11 @@ internal static class ChamberCarver
             switch (ch.Chamber)
             {
                 case ChamberKind.Geode:
+                    // The crystal and obsidian rinds line the rock only, so a tunnel through a geode stays open.
                     if (d < 0.72f) ctx.Blocks[i] = p.Air;
+                    else if (ctx.Blocks[i] == p.Air) break;
                     else if (d < 1f) ctx.Blocks[i] = p.Crystal;
-                    else if (d < 1.18f && ctx.Blocks[i] != p.Air) ctx.Blocks[i] = p.Obsidian;
+                    else if (d < 1.18f) ctx.Blocks[i] = p.Obsidian;
                     break;
                 case ChamberKind.Lake:
                     if (d < 1f)

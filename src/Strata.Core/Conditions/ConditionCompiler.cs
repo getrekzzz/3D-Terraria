@@ -68,6 +68,11 @@ public static partial class ConditionCompiler
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.Depth >= p.Min && c.Depth <= p.Max);
         };
+        f["worldDepth"] = s =>
+        {
+            var p = s.Parse<RangeConditionParams>();
+            return new DelegateCondition(c => c.WorldDepth >= p.Min && c.WorldDepth <= p.Max);
+        };
         f["light"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
@@ -185,6 +190,7 @@ public static partial class ConditionCompiler
         c.Register<FlagConditionParams>(SpecKind.Condition, "flag");
         c.Register<EventConditionParams>(SpecKind.Condition, "event");
         c.Register<RangeConditionParams>(SpecKind.Condition, "depth");
+        c.Register<RangeConditionParams>(SpecKind.Condition, "worldDepth");
         c.Register<RangeConditionParams>(SpecKind.Condition, "light");
         c.Register<MoonConditionParams>(SpecKind.Condition, "moon");
         c.Register<NearLiquidParams>(SpecKind.Condition, "nearLiquid");

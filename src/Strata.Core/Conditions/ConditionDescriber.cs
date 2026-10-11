@@ -80,6 +80,8 @@ public static class ConditionDescriber
             }
             case "depth":
                 return Range(s.Parse<RangeConditionParams>(), "depth", "");
+            case "worldDepth":
+                return WorldDepth(s.Parse<RangeConditionParams>());
             case "light":
                 return Range(s.Parse<RangeConditionParams>(), "light", "");
             case "moon":
@@ -193,6 +195,17 @@ public static class ConditionDescriber
         if (hasMin) return $"{what} at least {p.Min:0.##}{unit}";
         if (hasMax) return $"{what} at most {p.Max:0.##}{unit}";
         return what;
+    }
+
+    /// <summary>A world depth range in words: "deep underground" past halfway to the underworld and so on.</summary>
+    private static string WorldDepth(RangeConditionParams p)
+    {
+        bool hasMin = p.Min > float.MinValue / 2, hasMax = p.Max < float.MaxValue / 2;
+        static string Way(float d) => $"{MathF.Round(d * 100f):0}% of the way to the underworld";
+        if (hasMin && hasMax) return $"between {MathF.Round(p.Min * 100f):0}% and {Way(p.Max)}";
+        if (hasMin) return $"deeper than {Way(p.Min)}";
+        if (hasMax) return $"shallower than {Way(p.Max)}";
+        return "at any depth";
     }
 
     private static string Hour(float h)

@@ -12,7 +12,7 @@ Deterministic from `(seed, size, GenVersion)`. Two tiers:
    any thread.
 
 Passes (`PassRegistry`, in order): 1 global density · 2 continents · 3 geological layers · 4 biome masks ·
-5 caves (cheese/spaghetti lattices + plan worms) · 6 large caverns · 7 underground rivers · 8 ores ·
+5 caves (the cave network, cheese/spaghetti lattices + plan worms) · 6 large caverns · 7 underground rivers · 8 ores ·
 9 structures (cabins, mineshafts, living trees, pyramid, mini-biomes) · 10 dungeon · 11 jungle · 12 hostile
 biome · 13 underworld · 14 floating islands · 15 ocean · 16 treasure · 17 ecology · 18 decoration ·
 19 navigation (face connectivity, walkable cells) · 20 simulation init.
@@ -86,6 +86,57 @@ Evidence for a terrain change: run the report on the parent commit with `--out=b
 with `--out=build/wg-after --compare=build/wg-before/stats.json`, which prints metric / before / after / delta
 (overall, step buckets and per biome) and writes it to `terrain_compare.txt`. `build/` is gitignored, so paste the
 table and the two terrain PNGs into the PR or commit message. Options take `--key=value` or `--key value`.
+
+## Cave network (GenVersion 15)
+
+The caves pass plans a network of rooms and passages (`WorldGen/Caves`, `CaveNetworkPlanner`, tuning in `CaveTuning`)
+on four levels, each a band of normalized depth: the underground (0.10–0.28; rooms also keep 16 cells of rock under
+the ground), the upper caverns (0.36–0.52), the deep caverns (0.57–0.75) and the abyss over the underworld (0.80–0.90).
+Rooms sit one per square of a jittered grid (spacing 84/92/100/116 cells by level) on land, away from spawn on the
+first level, dropping any that would crowd a room already placed. Each level has its own kinds (`CaveRoomKind`):
+halls, long galleries and mossy grottos round a pool in the underground; tall domes over a great stalagmite, lakes with
+a dry shore, terraced bowls and grottos below; vast pillared halls, crystal caves, domes and lakes deeper; magma
+chambers with lava pools and pillared halls in the abyss. A room (`CaveRoomFeature`) is a rotated elliptical footprint
+with a flat floor row (`FloorY`, open; the row under it rock), a vaulted roof (`Roof` 2–4 from round to nearly flat),
+a fillet where floor meets wall, and floor sinks for pools and terraces (`SinkAt`).
+
+Passages (`CavePassageFeature`, straight stretches between floor points) link each level's rooms to their three nearest
+neighbours: a spanning tree plus 30% of the remaining links as loops (skipping links that would crowd a door). They
+meander (a bend every 22 cells) and arch over a flat floor no steeper than `MaxSlope` (0.56, one-cell steps), so the
+whole network can be walked. Descents join each level to the one above (22% of the lower rooms, at least one per
+connected piece): where the drop is too steep they switch back in legs of 26–36 cells at slope 0.5 with a small
+landing room at each turn. A share of the underground rooms gets a walk-in entrance from the surface (not in Don't Dig
+Up worlds); 35% of rooms get a dead-end spur to a treasure niche, and some get a side alcove. Doors sit at 0.72 of the
+footprint on the floor row, so passages meet rooms level.
+
+`CaveFurnisher` dresses the plan: pools (a lake's water, a grotto's pond, a magma chamber's lava), formations
+(stalagmites, stalactites and floor-to-roof columns; a dome's great stalagmite; a pillared hall's colonnade; crystal
+clusters in crystal caves) kept clear of doors, and treasure: a chest by level and biome (`CaveChests`: the biome's
+wooden-tier chest in the underground, Gold Chests below and in every niche, Obsidian Chests in the abyss) and pot
+clusters. Everything is plan data; `CaveCarver` builds it per chunk inside pass 5. It marks the cells each room and
+passage opens (warped by a λ18 noise so walls are not perfect ellipses), fills pools, and protects a rock shell round
+every room (4 cells thick, from under the floor to a share of the roof by kind, whole for domes, grottos, crystal caves
+and niches) and the rock under passages, which the older noise caves then carve around, so rooms keep their floors and
+shapes while the noise caves still break in high on the walls of the great halls. Then it opens the network, dresses
+the walls by room kind (moss and glowing argon moss, crystal and gems, obsidian, ash and hellstone, silt under water)
+and grows the formations. The treasure pass stands each planned chest and pot on the floor (searching a few rows if a
+later pass changed it) before scattering the random ones, which are now about a third as many chests and half as many
+pots, the wooden-tier ones themed by biome.
+
+Chest loot (`data/loot/containers.json`) ranks by chest type and grows with depth: `cave_chest` (wooden-tier) below
+`gold_chest` below `obsidian_chest` (always one of `deep_chest_primary`'s rarer treasures), and every underground
+table's coins and stacks grow with world depth (`depthScale`), while entries with a `depthBonus` (deep Gold Chest
+treasure, healing potions, gems) grow likelier deeper. `ConditionContext.WorldDepth` (0 at sea level, 1 at the
+underworld's top) carries the depth, set by `WorldSession.ContextAt`; the `worldDepth` condition reads it.
+
+**Cave census** (`CaveProfile`): worldgen-report `--cave-window=N --cave-offset=M` measures an N-cell square M cells
+east of spawn from the underworld's top up to the surface: open share per layer, how the open space hangs together
+(pieces, the share the sky reaches, pockets under 512 cells), floor and hall-floor shares (a player's headroom of 4 and
+16 cells), cramped spots, walk-in and round-trip shares, and the chests and pots by layer. The report also paints
+`cave_network.png` (rooms by level, passages, entrances white, chests yellow) and `rooms/room_L*_*.png` (for the room
+of each kind nearest spawn, a section along its long axis over a plan slice two rows above its floor), and lists those
+rooms and the entrances nearest spawn in stats.json (handy for aiming screenshots). `CaveNetworkTests` pin the levels,
+walkable slopes, connectivity and the planned chests.
 
 ## Blueprint op index and zone fast path
 

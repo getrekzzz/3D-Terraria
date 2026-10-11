@@ -82,16 +82,22 @@ public sealed class StructurePlacementPass : GenPass
     }
 
     /// <summary>
-    /// Abandoned cabins, most of them standing in the cave tunnels (the tunnel runs through their doorways) so exploring
-    /// finds them; the rest are buried somewhere in the rock as before. Cavern-layer cabins hold a Gold Chest.
+    /// Abandoned cabins, most of them standing in the cave tunnels (a worm tunnel or a level stretch of the cave
+    /// network's passages runs through their doorways) so exploring finds them; the rest are buried somewhere in the rock
+    /// as before. Cavern-layer cabins hold a Gold Chest.
     /// </summary>
     private static void PlaceCabins(PlanContext ctx, ref Pcg32 rng)
     {
         var plan = ctx.Plan;
         var bands = plan.Bands;
-        // Tunnel segments well under the surface (the worm tunnels from the cave pass).
+        // Tunnel segments well under the surface: the worm tunnels and the network's level passages from the cave pass,
+        // as (floor point at the middle, direction).
         var tunnels = plan.Features.OfKind<CapsuleFeature>("worm")
-            .Where(c => ctx.Terrain.SurfaceHeight((c.A.X + c.B.X) * 0.5f, (c.A.Z + c.B.Z) * 0.5f) - (c.A.Y + c.B.Y) * 0.5f > 24f)
+            .Select(c => (At: (c.A + c.B) * 0.5f - new Vector3(0f, (c.RadiusA + c.RadiusB) * 0.5f - 1f, 0f), Along: c.B - c.A))
+            .Concat(plan.Features.All.OfType<Caves.CavePassageFeature>()
+                .Where(p => p.Slope <= 0.12f && p.Length >= 20f)
+                .Select(p => (At: (p.A + p.B) * 0.5f, Along: p.B - p.A)))
+            .Where(t => ctx.Terrain.SurfaceHeight(t.At.X, t.At.Z) - t.At.Y > 24f)
             .ToList();
         var placed = new List<Vector3>();
         for (int i = 0, n = ctx.Scaled(34); i < n; i++)
@@ -101,9 +107,8 @@ public sealed class StructurePlacementPass : GenPass
             if (tunnels.Count > 0 && rng.Chance(0.8f))
             {
                 var t = tunnels[rng.NextInt(tunnels.Count)];
-                var mid = (t.A + t.B) * 0.5f;
-                at = new Vector3(mid.X, mid.Y - (t.RadiusA + t.RadiusB) * 0.5f + 1f, mid.Z);
-                along = t.B - t.A;
+                at = t.At;
+                along = t.Along;
             }
             else
             {

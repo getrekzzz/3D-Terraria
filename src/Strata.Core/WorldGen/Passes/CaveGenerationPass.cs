@@ -1,6 +1,7 @@
 using System.Numerics;
 using Strata.Core.Common;
 using Strata.Core.Determinism;
+using Strata.Core.WorldGen.Caves;
 using Strata.Core.WorldGen.Chunk;
 using Strata.Core.WorldGen.Features;
 using Strata.Core.WorldGen.Fields;
@@ -8,10 +9,12 @@ using Strata.Core.WorldGen.Fields;
 namespace Strata.Core.WorldGen.Passes;
 
 /// <summary>
-/// Pass 5 — cave networks: noise tunnels and cracks everywhere underground, plus planned features that
-/// connect the surface to the depths: meandering worm tunnels (about a third open as cave mouths in a hillside, the rest
-/// buried), vertical shafts and sinkholes that drop into chambers and let sunlight into the caves. Noise caves keep a
-/// roof under the true surface (the 2D height minus the column's overhang amplitude).
+/// Pass 5 — cave networks: the planned cave network (rooms of distinct kinds on four levels linked by walkable passages,
+/// switchback descents and walk-in entrances; see <see cref="CaveNetworkPlanner"/>), noise tunnels and cracks everywhere
+/// underground, plus planned features that connect the surface to the depths: meandering worm tunnels (about a third
+/// open as cave mouths in a hillside, the rest buried), vertical shafts and sinkholes that drop into chambers and let
+/// sunlight into the caves. Noise caves keep a roof under the true surface (the 2D height minus the column's overhang
+/// amplitude) and stay out of the rock under the network's floors.
 /// </summary>
 public sealed class CaveGenerationPass : GenPass
 {
@@ -57,6 +60,7 @@ public sealed class CaveGenerationPass : GenPass
             float cr = rng.Range(14f, 24f);
             plan.AddFeature(new ChamberFeature(new Vector3(x, top - depth - cr * 0.3f, z), new Vector3(cr, cr * 0.55f, cr)) { Kind = "sinkhole_chamber", Chamber = ChamberKind.Cavern });
         }
+        CaveNetworkPlanner.Plan(ctx, ctx.SeedsFor(this).Child("network"));
     }
 
     /// <summary>
@@ -109,7 +113,10 @@ public sealed class CaveGenerationPass : GenPass
     public override void Generate(ChunkGenContext ctx)
     {
         if (ctx.AllAir) return;
-        CarveNoiseCaves(ctx);
+        // The cave network first marks the rock noise caves must leave whole (room and passage floors), then opens itself.
+        var network = CaveCarver.Prepare(ctx);
+        CarveNoiseCaves(ctx, network?.State);
+        network?.Apply();
         foreach (var f in ctx.Plan.Features.InChunk(ctx.Coord))
         {
             switch (f)
@@ -127,7 +134,8 @@ public sealed class CaveGenerationPass : GenPass
         }
     }
 
-    private static void CarveNoiseCaves(ChunkGenContext ctx)
+    /// <param name="keep">Per padded cell, nonzero where the cave network protects or opens the cell itself (or null).</param>
+    private static void CarveNoiseCaves(ChunkGenContext ctx, byte[]? keep)
     {
         var caves = ctx.Gen.Caves;
         var p = ctx.Palette;
@@ -156,7 +164,7 @@ public sealed class CaveGenerationPass : GenPass
                 {
                     int i = ChunkGenContext.Index(lx, ly, lz);
                     ushort b = ctx.Blocks[i];
-                    if (b == p.Air || b == p.Bedrock) continue;
+                    if (b == p.Air || b == p.Bedrock || (keep != null && keep[i] != 0)) continue;
                     int wy = ctx.Origin.Y + ly;
                     if (roof == null ? wy < bands.UnderworldTop + 6 : wy > bands.UnderworldTop - 6) continue;
                     float sd = (roof != null && wy + wy > ctx.SurfaceHeight[col] + roof[col] ? wy - roof[col] : h - wy) - spawnGuard;

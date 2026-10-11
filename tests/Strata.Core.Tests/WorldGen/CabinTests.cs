@@ -18,8 +18,10 @@ public class CabinTests
     {
         var cabins = Cabins();
         Assert.True(cabins.Count >= 10, $"only {cabins.Count} cabins");
-        var tunnels = Small.Value.Plan.Features.OfKind<CapsuleFeature>("worm").ToList();
-        int inTunnel = cabins.Count(c => tunnels.Any(t => c.Bounds.Intersects(t.Bounds)));
+        // Worm tunnels and the cave network's passages.
+        var tunnels = Small.Value.Plan.Features.OfKind<CapsuleFeature>("worm").Select(t => t.Bounds)
+            .Concat(Small.Value.Plan.Features.All.OfType<Strata.Core.WorldGen.Caves.CavePassageFeature>().Select(p => p.Bounds)).ToList();
+        int inTunnel = cabins.Count(c => tunnels.Any(t => c.Bounds.Intersects(t)));
         Assert.True(inTunnel * 3 >= cabins.Count * 2, $"{inTunnel} of {cabins.Count} cabins touch a tunnel");
     }
 

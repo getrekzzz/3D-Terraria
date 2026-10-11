@@ -1,13 +1,45 @@
 name: CI
 
+# The repo is public, so GitHub-hosted runners cost nothing and every PR, draft or not, gets the
+# full check. Where each check runs:
+#   pull request (any base)                 -> Core tests (ubuntu + windows) + Godot smoke test
+#   push to main                            -> the same + Screenshot tour (about two hours)
+#   1st of each month                       -> everything (catches runner image changes in a quiet month)
+#   Run workflow (Actions tab, any branch)  -> as a PR; tick the box to add the tour
+# Nothing runs for pushes to branches without a PR (the PR's run covers them, once), for docs-only
+# changes, or for a PR with merge conflicts until they are resolved; use Run workflow for those.
+# If the repo goes private again, every job draws on the account's 2,000 free minutes a month
+# (Windows counts double), and this file would use them up in a busy month: then run core-windows
+# and engine-smoke only when !github.event.pull_request.draft, and the tour only monthly.
 on:
   push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - 'LICENSE'
   pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - 'LICENSE'
+  schedule:
+    - cron: '23 4 1 * *' # 04:23 UTC on the 1st of each month, on the default branch
   workflow_dispatch:
+    inputs:
+      screenshot_tour:
+        description: Also run the Screenshot tour (about two hours)
+        type: boolean
+        default: false
 
+# A new push to a PR, or to main, cancels the run it replaces (so a burst of merges tests only the
+# last). Monthly and manual runs each have a group of their own and are never cancelled.
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.event_name == 'push' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
+
+permissions:
+  contents: read
 
 env:
   DOTNET_NOLOGO: true
@@ -16,38 +48,29 @@ env:
 
 jobs:
   core:
-    name: Core tests (${{ matrix.os }})
-    strategy:
-      fail-fast: false
-      matrix:
-        # Windows runs only where it matters (determinism of world generation across OSes)
-        # to keep private-repo Actions minutes low.
-        os: ${{ (github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch') && fromJSON('["ubuntu-latest","windows-latest"]') || fromJSON('["ubuntu-latest"]') }}
-    runs-on: ${{ matrix.os }}
+    name: Core tests (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
       - name: Module size guard
-        if: runner.os == 'Linux'
         run: python3 tools/ci/check_file_length.py
       - name: Build
         run: dotnet build Strata.sln -c Debug
       - name: Test
         run: dotnet test tests/Strata.Core.Tests/Strata.Core.Tests.csproj -c Debug --no-build --logger "console;verbosity=normal"
       - name: Content up to date (manifest + generated tiers)
-        if: runner.os == 'Linux'
         run: |
           python3 tools/content/gen_ore_tiers.py --check
           python3 tools/content/gen_furniture.py --check
           python3 tools/content/gen_banners.py --check
           dotnet run --project tools/Strata.Tools -c Debug --no-build -- manifest --check
       - name: Validate content
-        if: runner.os == 'Linux'
         run: dotnet run --project tools/Strata.Tools -c Debug --no-build -- validate
       - name: Reference databases and asset coverage
-        if: runner.os == 'Linux'
         run: |
           python3 tools/content/gen_reference.py --check
           python3 tools/blender/build_all.py --check
@@ -55,10 +78,27 @@ jobs:
           python3 tools/textures/icon_mipmaps.py --check
           dotnet run --project tools/Strata.Tools -c Debug --no-build -- coverage | tee coverage.md >> "$GITHUB_STEP_SUMMARY"
 
+  # Golden chunk hashes must match on Linux and Windows (docs/CONVENTIONS.md, "Determinism"). Its own
+  # job, so a Windows-only failure doesn't skip the smoke test or the tour.
+  core-windows:
+    name: Core tests (windows-latest)
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build
+        run: dotnet build Strata.sln -c Debug
+      - name: Test
+        run: dotnet test tests/Strata.Core.Tests/Strata.Core.Tests.csproj -c Debug --no-build --logger "console;verbosity=normal"
+
   engine-smoke:
     name: Godot smoke test
     runs-on: ubuntu-latest
     needs: core
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -98,13 +138,15 @@ jobs:
         with:
           name: smoke-logs
           path: smoke-*.log
+          retention-days: 7
 
   screenshot-tour:
     name: Screenshot tour
     runs-on: ubuntu-latest
     needs: engine-smoke
-    # Software rendering is slow: run on main and on demand only.
-    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    # Software rendering is slow (well over an hour): on main, monthly, and on demand when ticked.
+    if: github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.screenshot_tour)
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -146,6 +188,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: screenshot-tour
+          retention-days: 14
           path: |
             shots/*.png
             tour.log

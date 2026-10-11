@@ -27,6 +27,10 @@ public sealed class ConditionContext
     /// <summary>Cells below the local surface (negative when above ground).</summary>
     public float Depth { get; set; }
 
+    /// <summary>How deep the position lies in the world: 0 at sea level, 1 at the top of the underworld (negative above
+    /// the sea, past 1 in the underworld). Chest loot grows richer with it.</summary>
+    public float WorldDepth { get; set; }
+
     /// <summary>Effective light level 0–15 at the position.</summary>
     public int Light { get; set; } = 15;
 
